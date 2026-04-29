@@ -66,37 +66,54 @@
       name="twitter:image:alt"
       content="Budgetter dashboard screenshot showing analytics and insights"
     />
+    <!-- Preload LCP hero image -->
     <link
       rel="preload"
-      href="https://res.cloudinary.com/budgettercloud/image/upload/v1772306125/uploads_that_mhel2k.png"
       as="image"
+      href="/assets/dashboard/hero-min.svg"
+      fetchpriority="high"
     />
 
-    <!-- google fonts -->
+    <!-- google fonts (non-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Bree+Serif&family=Karla:ital,wght@0,200..800;1,200..800&family=Overpass:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Karla:wght@400;500;600;700&family=Overpass:wght@400;500;600;700&display=swap"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Karla:wght@400;500;600;700&family=Overpass:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Karla:wght@400;500;600;700&family=Overpass:wght@400;500;600;700&display=swap"
+      />
+    </noscript>
     <title>Budgetter - Manage Your Daily Expenses</title>
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-726NG3YYPT"
-    ></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-
-      gtag('config', 'G-726NG3YYPT');
-    </script>
   </head>
   <body>
     <div id="root" class="relative"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Google tag (gtag.js) - deferred to after page interactive -->
+    <script>
+      window.addEventListener('load', function () {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=G-726NG3YYPT';
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', 'G-726NG3YYPT');
+      });
+    </script>
   </body>
 </html>

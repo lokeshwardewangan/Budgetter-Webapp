@@ -46,11 +46,14 @@ const Navbar: React.FC = () => {
           className="flex h-full items-center justify-between px-4"
         >
           {/* Logo */}
-          <a href="#hero_section" className="flex items-center">
+          <a href="/" aria-label="Budgetter home" className="flex items-center">
             <img
               className="h-8 2xl:h-10"
               src="/assets/logo/logo.png"
-              alt="Budgetter"
+              alt=""
+              width={48}
+              height={45}
+              decoding="async"
             />
             {/* <img
               className="h-7 pl-4 relative top-1 right-2"
@@ -70,7 +73,7 @@ const Navbar: React.FC = () => {
                 <path
                   d="M0 5 Q 50 10 100 5"
                   stroke="currentColor"
-                  stroke-width="3"
+                  strokeWidth="3"
                   fill="none"
                 ></path>
               </svg>

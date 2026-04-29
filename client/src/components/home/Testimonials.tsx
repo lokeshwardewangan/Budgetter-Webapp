@@ -7,29 +7,9 @@ import {
 } from '@/utils/framer/properties';
 import { motion } from 'framer-motion';
 import { FaQuoteRight } from 'react-icons/fa';
-export const testimonials = [
-  {
-    name: 'Lokeshwar Dewangan',
-    quote:
-      'Tracking pocket money used to be a mess. With Budgetter, I get clear visuals of where every rupee goes — it’s perfect for student life and staying stress-free!',
-    image:
-      'https://res.cloudinary.com/budgettercloud/image/upload/v1747475519/f6boi90imjmxmj456y33.jpg',
-  },
-  {
-    name: 'Poshan Harmukh',
-    quote:
-      'Before Budgetter, I had no idea how much I was spending on little things. Now, I plan better, track smarter, and manage my monthly allowance like a pro!',
-    image:
-      'https://res.cloudinary.com/budgettercloud/image/upload/v1747475493/xm2cdpb98ffn2a46jxwc.jpg',
-  },
-  {
-    name: 'Comic Diwakar',
-    quote:
-      'As a student juggling studies and expenses, Budgetter became my daily tool. It showed me where I overspent — especially on food — and helped me save over ₹500 every month!',
-    image:
-      'https://res.cloudinary.com/budgettercloud/image/upload/v1747475473/n45a2mxtdrvhz47c1puu.jpg',
-  },
-];
+import { testimonials } from '@/data/testimonials';
+
+export { testimonials };
 
 export const Testimonials = () => {
   return (
@@ -65,26 +45,41 @@ export const Testimonials = () => {
           whileInView="visible"
           className="mt-16 grid grid-cols-1 gap-14 md:grid-cols-3 md:gap-7"
         >
-          {testimonials.map((t) => (
-            <motion.div
-              key={t.name}
-              variants={TESTIMONIAL_CARD}
-              className="relative flex flex-col items-center rounded-3xl bg-white p-6 pb-10 shadow-xl transition-all duration-300 hover:shadow-2xl"
-            >
-              <img
-                src={t.image}
-                alt={t.name}
-                className="-mt-16 mb-2 h-24 w-24 rounded-full border-[4px] border-[#00b87c] object-cover shadow-md"
-              />
-              <h4 className="text-lg font-semibold text-zinc-800">{t.name}</h4>
-              <p className="mt-1 text-center text-sm font-medium leading-relaxed text-gray-600">
-                {t.quote}
-              </p>
-              <div className="absolute bottom-5 right-6 text-2xl text-[#2e7dff] opacity-60">
-                <FaQuoteRight />
-              </div>
-            </motion.div>
-          ))}
+          {testimonials.map((t) => {
+            const optimizedImage = t.image.replace(
+              '/upload/',
+              '/upload/f_auto,q_auto,w_192,h_192,c_fill,g_face/'
+            );
+            return (
+              <motion.div
+                key={t.name}
+                variants={TESTIMONIAL_CARD}
+                className="relative flex flex-col items-center rounded-3xl bg-white p-6 pb-10 shadow-xl transition-all duration-300 hover:shadow-2xl"
+              >
+                <img
+                  src={optimizedImage}
+                  alt={`Photo of ${t.name}`}
+                  width={96}
+                  height={96}
+                  loading="lazy"
+                  decoding="async"
+                  className="-mt-16 mb-2 h-24 w-24 rounded-full border-[4px] border-[#00b87c] object-cover shadow-md"
+                />
+                <h3 className="text-lg font-semibold text-zinc-800">
+                  {t.name}
+                </h3>
+                <p className="mt-1 text-center text-sm font-medium leading-relaxed text-gray-600">
+                  {t.quote}
+                </p>
+                <div
+                  className="absolute bottom-5 right-6 text-2xl text-[#2e7dff] opacity-60"
+                  aria-hidden="true"
+                >
+                  <FaQuoteRight />
+                </div>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </motion.div>

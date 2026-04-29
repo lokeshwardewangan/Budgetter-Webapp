@@ -51,14 +51,14 @@ const GetInTouchSection: React.FC = () => {
     >
       <div className="mx-auto w-full max-w-full px-4 font-karla md:max-w-[38rem]">
         <div className="w-full max-w-full rounded-sm p-4">
-          <motion.div
+          <motion.h2
             variants={UPWARD_WAVE_SCALE_HEADING_ANIMATION}
             initial="hidden"
             whileInView="visible"
             className="landingpage_section_heading"
           >
             Get in Touch
-          </motion.div>
+          </motion.h2>
           <motion.p
             variants={FADE_UP_DESCRIPTION}
             initial="hidden"

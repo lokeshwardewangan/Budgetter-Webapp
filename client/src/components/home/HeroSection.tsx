@@ -2,17 +2,21 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ANIMATE_WORDS_VARIENT } from '@/utils/framer/properties';
 import React from 'react';
-import { testimonials } from './Testimonials';
+import { testimonials } from '@/data/testimonials';
 
 const HeroSection: React.FC = () => {
   const MotionLink = motion.create(Link);
 
-  const userImages = testimonials.map((user) => user.image);
+  // Cloudinary transform: serve a 80x80 (2x of 40px display) auto-format/quality
+  const toSmallAvatar = (url: string) =>
+    url.replace('/upload/', '/upload/f_auto,q_auto,w_80,h_80,c_fill,g_face/');
+
+  const userImages = testimonials.map((user) => toSmallAvatar(user.image));
 
   const RatedUsers = [
     ...userImages,
-    'https://i.pravatar.cc/150?u=$584',
-    'https://i.pravatar.cc/150?u=$1168',
+    'https://i.pravatar.cc/80?u=$584',
+    'https://i.pravatar.cc/80?u=$1168',
   ];
   return (
     <motion.div
@@ -108,7 +112,11 @@ const HeroSection: React.FC = () => {
               >
                 <img
                   src={url}
-                  alt={`User ${i}`}
+                  alt=""
+                  width={40}
+                  height={40}
+                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full bg-slate-100 object-cover"
                 />
               </div>
@@ -149,8 +157,11 @@ const HeroSection: React.FC = () => {
           >
             <img
               className="h-auto w-full rounded-lg shadow-sm dark:shadow-none"
-              src="./assets/dashboard/hero-min.svg"
+              src="/assets/dashboard/hero-min.svg"
               alt="Budgetter Dashboard Preview"
+              width={900}
+              height={600}
+              decoding="async"
             />
             {/* Floating UI Card Decoration */}
             <motion.div

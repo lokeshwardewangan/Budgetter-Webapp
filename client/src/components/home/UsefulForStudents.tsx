@@ -59,14 +59,14 @@ export const WhyItIsUseful = () => {
       className="landingpage_section_paddings relative w-full bg-gradient-to-b from-[#ccf2f4]/40 to-[#CCEFF5]/40"
     >
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-center gap-3 2xl:max-w-7xl">
-        <motion.div
+        <motion.h2
           variants={UPWARD_WAVE_SCALE_HEADING_ANIMATION}
           initial="hidden"
           whileInView="visible"
           className="landingpage_section_heading"
         >
           Why Budgetter is Useful for Students
-        </motion.div>
+        </motion.h2>
         <motion.div
           variants={CARDS_CONTAINER}
           initial="hidden"
@@ -74,10 +74,9 @@ export const WhyItIsUseful = () => {
           className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3 xl:gap-2 2xl:gap-6"
         >
           {items.map((item, idx) => (
-            <motion.a
-              key={`${item.link}-${idx}`}
+            <motion.div
+              key={`${item.title}-${idx}`}
               variants={CARD_ITEM}
-              href={item.link}
               className="group relative block py-2 sm:p-2"
               onMouseEnter={() => setHoveredIndex(idx)}
               onMouseLeave={() => setHoveredIndex(null)}
@@ -103,7 +102,7 @@ export const WhyItIsUseful = () => {
                 <CardTitle>{item.title}</CardTitle>
                 <CardDescription>{item.description}</CardDescription>
               </Card>
-            </motion.a>
+            </motion.div>
           ))}
         </motion.div>
       </div>
@@ -140,14 +139,14 @@ const CardTitle = ({
   children: React.ReactNode;
 }) => {
   return (
-    <h4
+    <h3
       className={cn(
         'mb-2 text-lg font-semibold tracking-wide text-[#2e7dff]',
         className
       )}
     >
       {children}
-    </h4>
+    </h3>
   );
 };
 

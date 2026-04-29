@@ -11,14 +11,14 @@ const Features: React.FC = () => {
         id="features_section"
         className="features_container landingpage_section_paddings landingpage_section_width mx-auto flex w-full flex-col items-center justify-center gap-14 2xl:gap-16"
       >
-        <motion.div
+        <motion.h2
           variants={UPWARD_WAVE_SCALE_HEADING_ANIMATION}
           initial="hidden"
           whileInView="visible"
           className="landingpage_section_heading"
         >
           Features That Matters
-        </motion.div>
+        </motion.h2>
 
         <div className="feature_box_container grid w-full grid-cols-1 gap-x-7 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
           {/* box -1 */}

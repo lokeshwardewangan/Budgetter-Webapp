@@ -8,25 +8,37 @@ const SocialMedia: React.FC = () => {
           href="https://www.instagram.com/your-profile"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Instagram"
           className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-pink-400 to-orange-400 opacity-80"
         >
-          <i className="ri-instagram-fill text-xl text-white"></i>
+          <i
+            className="ri-instagram-fill text-xl text-white"
+            aria-hidden="true"
+          ></i>
         </a>
         <a
           href="https://www.facebook.com/your-profile"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Facebook"
           className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 opacity-80"
         >
-          <i className="ri-facebook-fill text-xl text-white"></i>
+          <i
+            className="ri-facebook-fill text-xl text-white"
+            aria-hidden="true"
+          ></i>
         </a>
         <a
           href="https://twitter.com/your-profile"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="Twitter"
           className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-400 opacity-80"
         >
-          <i className="ri-twitter-fill text-xl text-white"></i>
+          <i
+            className="ri-twitter-fill text-xl text-white"
+            aria-hidden="true"
+          ></i>
         </a>
       </div>
     </div>
