@@ -75,21 +75,29 @@ const HomePage: React.FC = () => {
         structuredData={seoData.structuredData}
       />
       <Navbar />
-      <div id="hero_section" className="hero_section bg-[#eefbff]">
-        <HeroSection />
-      </div>
+      <main id="main-content">
+        <section
+          id="hero_section"
+          aria-label="Hero"
+          className="hero_section bg-[#eefbff]"
+        >
+          <HeroSection />
+        </section>
 
-      {/* Lazy Loaded Sections */}
-      <Suspense
-        fallback={<div className="h-96 w-full animate-pulse bg-slate-50"></div>}
-      >
-        <Features />
-        <WhyItIsUseful />
-        <InsightsPreview />
-        <Testimonials />
-        <CallToAction />
-        <ContactSection />
-      </Suspense>
+        {/* Lazy Loaded Sections */}
+        <Suspense
+          fallback={
+            <div className="h-96 w-full animate-pulse bg-slate-50"></div>
+          }
+        >
+          <Features />
+          <WhyItIsUseful />
+          <InsightsPreview />
+          <Testimonials />
+          <CallToAction />
+          <ContactSection />
+        </Suspense>
+      </main>
 
       <Footer />
       <ScrollToTopButton />

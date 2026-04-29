@@ -12,14 +12,14 @@ const InsightsPreview = () => {
       className="landingpage_section_paddings bg-[#f9f9ff]"
     >
       <div className="landingpage_section_width">
-        <motion.div
+        <motion.h2
           variants={UPWARD_WAVE_SCALE_HEADING_ANIMATION}
           initial="hidden"
           whileInView="visible"
           className="landingpage_section_heading"
         >
           Expense Analytics & Insights
-        </motion.div>
+        </motion.h2>
         <motion.p
           variants={FADE_UP_DESCRIPTION}
           initial="hidden"
@@ -50,9 +50,13 @@ const InsightsPreview = () => {
               categories. Easily spot which areas consume most of your budget.
             </p>
             <img
-              src="https://res.cloudinary.com/budgettercloud/image/upload/v1772306486/Screenshot_3_idi9w6.png"
+              src="https://res.cloudinary.com/budgettercloud/image/upload/f_auto,q_auto,w_1300/v1772306486/Screenshot_3_idi9w6.png"
               alt="Category wise expense chart"
-              className="rounded-lg"
+              width={636}
+              height={447}
+              loading="lazy"
+              decoding="async"
+              className="h-auto w-full rounded-lg"
             />
           </motion.div>
 
@@ -69,9 +73,13 @@ const InsightsPreview = () => {
               financial flow and identify months with higher spending patterns.
             </p>
             <img
-              src="https://res.cloudinary.com/budgettercloud/image/upload/v1772306476/Screenshot_4_hesrgg.png"
+              src="https://res.cloudinary.com/budgettercloud/image/upload/f_auto,q_auto,w_1300/v1772306476/Screenshot_4_hesrgg.png"
               alt="Expenses over time graph"
-              className="rounded-lg"
+              width={636}
+              height={394}
+              loading="lazy"
+              decoding="async"
+              className="h-auto w-full rounded-lg"
             />
           </motion.div>
         </motion.div>

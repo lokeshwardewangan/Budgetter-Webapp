@@ -70,7 +70,7 @@
 
 @layer components {
   .landingpage_section_heading {
-    @apply my-2 text-center font-bree text-2xl font-semibold xl:text-3xl;
+    @apply my-2 text-center font-bree text-2xl font-semibold tracking-wide xl:text-3xl 2xl:text-4xl;
   }
   .landingpage_section_subheading {
     @apply mx-auto mb-10 max-w-2xl text-center text-sm font-medium text-gray-600 2xl:mb-12 2xl:text-base;
