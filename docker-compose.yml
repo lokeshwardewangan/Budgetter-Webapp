@@ -1,0 +1,137 @@
+# Production-oriented compose stack for Budgetter.
+#
+# Three services on a shared bridge network:
+#
+#   ┌──────────┐  :80      :5000      :27017
+#   │  client  │ ───────▶ │ server │ ────────▶ │ mongo │
+#   └──────────┘  /api/*  └────────┘ MONGO_URL └───────┘
+#
+# - The browser only ever talks to `client` (nginx). All API traffic is
+#   reverse-proxied to `server` over the internal network — no hardcoded
+#   localhost/IP between containers, only docker DNS service names.
+# - `server` reaches mongo via the service name `mongo` (see MONGO_URL in .env).
+# - mongo data persists in the named volume `mongo_data`.
+#
+# Local dev workflow is unchanged: keep using `npm run dev` in client/server.
+# This compose file is for production builds and (optionally) a local mongo.
+#
+# Typical commands (see README "Docker" section for the full flow):
+#   cp .env.example .env             # one-time
+#   docker compose up -d --build     # build + start everything
+#   docker compose logs -f server    # tail backend logs
+#   docker compose down              # stop (volume preserved)
+#   docker compose down -v           # stop AND wipe mongo data
+
+name: budgetter
+
+services:
+  # ---------------------------------------------------------------------------
+  # MongoDB — internal only by default; expose 27017 to host only if you need
+  # to connect from a GUI (Compass) by uncommenting the `ports` block below.
+  # ---------------------------------------------------------------------------
+  mongo:
+    image: mongo:7
+    container_name: budgetter-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-budgetter}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-budgetter}
+      MONGO_INITDB_DATABASE:      ${MONGO_INITDB_DATABASE:-budgetter}
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - budgetter-net
+    # ports:
+    #   - "27017:27017"   # uncomment for host access from MongoDB Compass etc.
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Backend (Express + Mongoose). Builds from ./server/Dockerfile.
+  # ---------------------------------------------------------------------------
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: budgetter/server:latest
+    pull_policy: build
+    container_name: budgetter-server
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      # Container-to-container DNS: hostname is the service name `mongo`.
+      MONGO_URL: ${MONGO_URL:-mongodb://${MONGO_INITDB_ROOT_USERNAME:-budgetter}:${MONGO_INITDB_ROOT_PASSWORD:-budgetter}@mongo:27017/${MONGO_INITDB_DATABASE:-budgetter}?authSource=admin}
+    # Pull any extra runtime secrets (JWT_SECRET, cloudinary keys, SMTP, etc.)
+    # from .env without echoing them into the compose file.
+    env_file:
+      - ./server/.env
+    networks:
+      - budgetter-net
+    # No host port published by default — only the client container needs it.
+    # Uncomment to hit the API directly from the host for debugging.
+    # ports:
+    #   - "5000:5000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ---------------------------------------------------------------------------
+  # Frontend (Vite build served by nginx). Builds from ./client/Dockerfile.
+  # ---------------------------------------------------------------------------
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      # VITE_* are inlined at build time — they MUST be passed as build args,
+      # not runtime env, or they won't appear in the bundle.
+      args:
+        VITE_BUDGETTER_API_HOST:        ${VITE_BUDGETTER_API_HOST:-/api}
+        VITE_CONTACT_FORM_HOST_URL:     ${VITE_CONTACT_FORM_HOST_URL:-}
+        VITE_GOOGLE_CLIENT_ID:          ${VITE_GOOGLE_CLIENT_ID:-}
+        VITE_SENTRY_DSN:                ${VITE_SENTRY_DSN:-}
+        VITE_BUDGETTER_ADMIN_PASSWORD:  ${VITE_BUDGETTER_ADMIN_PASSWORD:-}
+    image: budgetter/client:latest
+    pull_policy: build
+    container_name: budgetter-client
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - budgetter-net
+    ports:
+      # Public entrypoint. In a real prod deploy you'd typically front this
+      # with a TLS-terminating proxy (Caddy / Traefik / ALB) — adjust accordingly.
+      - "${CLIENT_HOST_PORT:-8080}:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+# -----------------------------------------------------------------------------
+# Shared bridge network — every service joins this one, so they reach each
+# other by service name (mongo, server, client) and not by IP/localhost.
+# -----------------------------------------------------------------------------
+networks:
+  budgetter-net:
+    driver: bridge
+
+# -----------------------------------------------------------------------------
+# Named volume keeps mongo data across `docker compose down` / `up` cycles.
+# -----------------------------------------------------------------------------
+volumes:
+  mongo_data:
+    driver: local

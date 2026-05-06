@@ -9,11 +9,12 @@
 3. [Project Structure](#project-structure)
 4. [Technology Stack](#technology-stack)
 5. [How to Use Locally](#how-to-use-locally)
-6. [Testing & Quality Gates](#testing--quality-gates)
-7. [Contributing](#contributing)
-8. [API Endpoints](#api-endpoints)
-9. [Environment Variables](#environment-variables)
-10. [Live Demo](#live-demo)
+6. [Docker (Production)](#docker-production)
+7. [Testing & Quality Gates](#testing--quality-gates)
+8. [Contributing](#contributing)
+9. [API Endpoints](#api-endpoints)
+10. [Environment Variables](#environment-variables)
+11. [Live Demo](#live-demo)
 
 ## Features
 
@@ -295,6 +296,76 @@ Budgetter-Webapp/
    The frontend will start on `http://localhost:5173`
 
 7. Open `http://localhost:5173` in your browser to access the application.
+
+---
+
+## Docker (Production)
+
+A production-ready Docker setup is provided for the full stack. Local development is **unchanged** — keep using `npm run dev` in `client/` and `server/`. Docker is for production builds and (optionally) running a local MongoDB.
+
+### Architecture
+
+```
+┌──────────┐  :80      :5000      :27017
+│  client  │ ──────▶ │ server │ ──────▶ │ mongo │
+│  nginx   │ /api/*  │ node   │ MONGO_URL │       │
+└──────────┘          └────────┘           └───────┘
+   exposed             internal              internal
+   :8080 → :80         (no host port)        (no host port)
+```
+
+- `client` — multi-stage build: Vite produces static assets, then `nginx:alpine` serves them. `/api/*` is reverse-proxied to the backend over the internal docker network.
+- `server` — `node:22-alpine`, production dependencies only, runs as the non-root `node` user under `tini` for proper signal handling.
+- `mongo` — `mongo:7` with a persistent named volume (`mongo_data`).
+- All three live on the `budgetter-net` bridge network. Inter-container traffic uses **service names** (no hardcoded localhost).
+
+### First-time setup
+
+```bash
+# 1. Copy env templates and fill in real values
+cp .env.example .env                  # compose-level vars (mongo creds, VITE_* build args)
+cp server/.env.example server/.env    # server runtime secrets (JWT, SMTP, OAuth)
+# client/.env is only needed for local `npm run dev`; the docker build reads from root .env
+
+# 2. Build and start the whole stack in the background
+docker compose up -d --build
+
+# 3. Open the app
+open http://localhost:8080
+```
+
+### Common commands
+
+```bash
+docker compose up -d --build            # build images + start everything
+docker compose ps                       # show container status + healthchecks
+docker compose logs -f server           # tail backend logs
+docker compose logs -f client           # tail nginx access/error logs
+docker compose exec server sh           # shell into the backend
+docker compose exec mongo mongosh       # mongo shell
+docker compose restart server           # restart one service
+docker compose down                     # stop stack (mongo data preserved)
+docker compose down -v                  # stop AND wipe mongo volume
+docker compose build --no-cache client  # force a clean rebuild
+```
+
+### `docker compose up` flow
+
+1. `mongo` starts and runs its healthcheck (`db.adminCommand('ping')`) until ready.
+2. `server` starts only after mongo reports healthy (`depends_on.condition: service_healthy`), connects via `MONGO_URL`, then exposes `/healthz` for its own healthcheck.
+3. `client` starts after the server is healthy. nginx serves the SPA on container port 80 and proxies `/api/*` to `server:5000`.
+4. The host publishes only the client port (default `8080`), so the API and database are not directly reachable from outside the docker network.
+
+### Production notes
+
+- **TLS termination** — this stack publishes plain HTTP on port 8080. In a real deploy, put a TLS-terminating proxy (Caddy, Traefik, Nginx, an ALB, Cloudflare) in front of the `client` container.
+- **Secrets** — never bake secrets into images. `server/.env` is mounted at runtime via `env_file`. For real deployments, prefer a secret manager (Docker secrets, SOPS, Vault, cloud KMS).
+- **Vite vars are build-time** — `VITE_*` values are inlined into the JS bundle when the client image is built. Changing them requires `docker compose build client` (a runtime `restart` won't pick them up).
+- **Image sizes** — multi-stage + `--omit=dev` + alpine bases keep final images small (client ≈ 25 MB on `nginx:alpine`, server ≈ 180 MB on `node:22-alpine`).
+- **Healthchecks** — every service has one; orchestrators (compose, swarm, k8s) use them to gate dependents and to auto-restart unhealthy containers.
+- **No host-exposed API/DB ports** — only the client publishes `:8080`. To debug the API or connect MongoDB Compass from the host, uncomment the `ports:` blocks in `docker-compose.yml`.
+- **Scaling** — `server` is stateless; you can run `docker compose up -d --scale server=3` behind a load balancer. The `client` (nginx) sees them via docker DNS round-robin.
+- **Restart policy** — every service uses `restart: unless-stopped` so containers come back after host reboots but respect manual `docker compose down`.
 
 ---
 

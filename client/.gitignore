@@ -9,6 +9,7 @@ lerna-debug.log*
 
 # Environment variables
 *.env.*
+!.env.example
 
 # Node modules
 /node_modules/

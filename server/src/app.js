@@ -32,6 +32,11 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Budgetter API' });
 });
 
+// Liveness probe for container HEALTHCHECK — must stay cheap and unauthenticated.
+app.get('/healthz', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime() });
+});
+
 // Api EndPoints
 app.use('/api/user', userRoutes);
 app.use('/api/user/report', userReportRoutes);

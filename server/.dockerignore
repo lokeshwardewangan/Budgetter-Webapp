@@ -1,0 +1,24 @@
+# Keep the build context small — only src + package manifests are needed.
+node_modules
+coverage
+*.log
+
+# VCS / editor / OS
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+
+# Docs / hosting platform configs
+README.md
+vercel.json
+
+# Env files — runtime only, never baked in
+.env
+.env.*
+!.env.example
+
+# Docker meta
+Dockerfile
+.dockerignore

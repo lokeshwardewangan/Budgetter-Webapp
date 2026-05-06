@@ -4,7 +4,9 @@
       "Bash(npx tsc *)",
       "Bash(npx vite *)",
       "Bash(node -p \"require\\('./package.json'\\).dependencies.react\")",
-      "Bash(node -p \"require\\('react/package.json'\\).version\")"
+      "Bash(node -p \"require\\('react/package.json'\\).version\")",
+      "Bash(docker compose *)",
+      "Bash(git check-ignore *)"
     ]
   }
 }

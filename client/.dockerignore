@@ -1,0 +1,30 @@
+# Keep the build context small — anything not needed for `vite build` is excluded.
+node_modules
+dist
+.vite
+coverage
+*.log
+*.tsbuildinfo
+
+# VCS / editor / OS
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+
+# Docs / hosting platform configs
+README.md
+netlify.toml
+vercel.json
+.netlify
+.vercel
+
+# Env files — pass build-time vars via compose `args`, runtime vars via runtime env
+.env
+.env.*
+!.env.example
+
+# Docker meta
+Dockerfile
+.dockerignore

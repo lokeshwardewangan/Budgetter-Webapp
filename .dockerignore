@@ -1,0 +1,47 @@
+# Root .dockerignore — applies to any build context started from repo root.
+# Per-service Dockerfiles use ./client and ./server as contexts, so each
+# service also has its own .dockerignore for tighter scoping.
+
+# VCS / CI
+.git
+.github
+.husky
+
+# Editor / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+*.swp
+
+# Docs / meta (not needed inside images)
+*.md
+LICENSE
+SECURITY.md
+CONTRIBUTING.md
+AGENTS.md
+
+# Compose / docker artifacts
+docker-compose*.yml
+**/Dockerfile
+**/.dockerignore
+
+# Env files (must be injected at runtime, never baked in)
+.env
+.env.*
+!.env.example
+
+# Logs / build output / caches
+**/node_modules
+**/dist
+**/build
+**/.vite
+**/coverage
+**/*.log
+**/*.tsbuildinfo
+
+# Hosting platform artifacts (irrelevant in containers)
+**/.netlify
+**/.vercel
+**/netlify.toml
+**/vercel.json
