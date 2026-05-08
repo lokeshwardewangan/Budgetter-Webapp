@@ -6,7 +6,9 @@
       "Bash(node -p \"require\\('./package.json'\\).dependencies.react\")",
       "Bash(node -p \"require\\('react/package.json'\\).version\")",
       "Bash(docker compose *)",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(npm run *)",
+      "Bash(npx eslint *)"
     ]
   }
 }

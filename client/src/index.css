@@ -69,14 +69,17 @@
 }
 
 @layer components {
+  .landingpage_section_eyebrow {
+    @apply mb-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700;
+  }
   .landingpage_section_heading {
-    @apply my-2 text-center font-bree text-2xl font-semibold tracking-wide xl:text-3xl 2xl:text-4xl;
+    @apply text-center font-bree text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-3xl lg:text-[2.75rem] 2xl:text-4xl;
   }
   .landingpage_section_subheading {
-    @apply mx-auto mb-10 max-w-2xl text-center text-sm font-medium text-gray-600 2xl:mb-12 2xl:text-base;
+    @apply mx-auto mb-12 mt-3 max-w-2xl text-center text-sm font-medium leading-relaxed text-slate-600 sm:text-base 2xl:mb-14 2xl:text-lg;
   }
   .landingpage_section_paddings {
-    @apply px-4 py-10 pt-5 sm:py-10 lg:py-12 lg:pb-16 2xl:py-12 2xl:pb-16;
+    @apply px-4 py-16 sm:py-20 lg:py-24 2xl:py-28;
   }
   .landingpage_section_width {
     @apply mx-auto max-w-6xl 2xl:max-w-7xl;
@@ -86,5 +89,8 @@
   }
   .gradient_theme_color {
     @apply bg-gradient-to-r from-[#2e7dff] to-[#00b87c] bg-clip-text text-transparent;
+  }
+  .gradient_emerald_accent {
+    @apply bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent;
   }
 }

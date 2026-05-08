@@ -18,11 +18,9 @@ const FeatureCard: React.FC<FeatureCardType> = ({
   return (
     <motion.div
       variants={CARDS_EFFECT_VARIENT}
-      initial="initial"
-      whileInView="whileInView"
       whileHover="whileHover"
       whileTap="whileTap"
-      className="feature_box relative flex min-h-40 w-full flex-col items-center justify-center rounded-sm border-2 border-[#19154A]"
+      className="feature_box relative flex min-h-40 w-full flex-col items-center justify-center rounded-sm border-2 border-[#19154A] transition-shadow duration-300 hover:shadow-[5px_9px_0_0_#19154A]"
       style={{ background: `${bg}`, boxShadow: '3px 6px 0 0 #19154A' }}
     >
       {/* hook design */}
