@@ -103,25 +103,9 @@ const IndividualUserDetails = ({ user }: { user: User }) => {
             </div>
           </div>
 
-          {/* History */}
-          <div className="border-t pt-4">
-            <p className="mb-2 text-gray-500 dark:text-white">
-              PocketMoney History
-            </p>
-            {user?.PocketMoneyHistory.length > 0 ? (
-              <div className="space-y-2">
-                {user?.PocketMoneyHistory?.map(
-                  ({ date, amount, source }, index) => (
-                    <div key={index} className="rounded border p-2">
-                      {date} - {source} - (₹{amount})
-                    </div>
-                  )
-                )}
-              </div>
-            ) : (
-              <p>No transaction history</p>
-            )}
-          </div>
+          {/* Pocket money + lent money histories were removed when the
+              server split them into their own collections. Per-user totals
+              could be added later via a join endpoint if needed. */}
 
           {/* Dates */}
           <div className="border-t pt-4 text-sm text-gray-500 dark:text-white">
