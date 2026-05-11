@@ -1,8 +1,9 @@
 import AccountVerified from '@/components/auth/AccountVerified';
-import ForgotPasswordSection from '@/components/auth/ForgotPasswordSection';
-import LoginSection from '@/components/auth/LoginSection';
-import ResetPassword from '@/components/auth/ResetPassword';
-import SignupSection from '@/components/auth/SignupSection';
+import AccountAlreadyVerified from '@/components/auth/AccountAlreadyVerified';
+import LoginForm from '@/features/auth/components/LoginForm';
+import SignupForm from '@/features/auth/components/SignupForm';
+import ForgotPasswordForm from '@/features/auth/components/ForgotPasswordForm';
+import ResetPasswordForm from '@/features/auth/components/ResetPasswordForm';
 import AuthLayout from '@/pages/auth/AuthLayout';
 import MainLayout from '@/pages/MainLayout';
 import {
@@ -15,13 +16,11 @@ import UserLayout from '@/pages/user/UserLayout';
 import HomePage from '@/pages/home/HomePage';
 import Dashboard from '@/pages/user/dashboard/Dashboard';
 import AddMoney from '@/pages/user/addMoney/AddMoney';
-// import Reports from '@/pages/user/reports/Reports';
 import ShowExpenses from '@/pages/user/showExpenses/ShowExpenses';
 import AddExpenses from '@/pages/user/addExpenses/AddExpenses';
 import ProfilePage from '@/pages/user/Profile/ProfilePage';
-import AccountAlreadyVerified from '@/components/auth/AccountAlreadyVerified';
 import Reports from '@/pages/user/reports/Reports';
-import AddLentMoney from '@/pages/user/addLentMoney/AddLentMoney.';
+import AddLentMoney from '@/pages/user/addLentMoney/AddLentMoney';
 import AdminLayout from '@/pages/admin/AdminLayout';
 import AppUsersCards from '@/components/admin/UserDetails/AppUsersCards';
 import ErrorPage from '@/components/layout/ErrorPage';
@@ -32,15 +31,15 @@ const routes = createBrowserRouter(
     <Route element={<MainLayout />}>
       {/* public routes */}
       <Route element={<AuthLayout />}>
-        <Route path="login" element={<LoginSection />} />
-        <Route path="signup" element={<SignupSection />} />
-        <Route path="forgot-password" element={<ForgotPasswordSection />} />
+        <Route path="login" element={<LoginForm />} />
+        <Route path="signup" element={<SignupForm />} />
+        <Route path="forgot-password" element={<ForgotPasswordForm />} />
         <Route path="account-verified" element={<AccountVerified />} />
         <Route
           path="account-already-verified"
           element={<AccountAlreadyVerified />}
         />
-        <Route path="reset-password/*" element={<ResetPassword />} />
+        <Route path="reset-password/*" element={<ResetPasswordForm />} />
       </Route>
 
       {/* protected routes */}
@@ -68,14 +67,14 @@ const routes = createBrowserRouter(
       <Route path="logout" element={<Navigate to="/login" />} />
       {/* Error page */}
       <Route path="/*" element={<ErrorPage />} />
-    </Route>
+    </Route>,
   ),
   {
     future: {
       v7_startTransition: true,
       v7_relativeSplatPath: true,
     } as any,
-  }
+  },
 );
 
 export default routes;
