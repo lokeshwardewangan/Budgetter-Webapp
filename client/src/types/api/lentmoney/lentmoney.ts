@@ -1,17 +1,13 @@
-export interface LentMoneyItem {
-  _id: string;
-  personName: string;
-  price: string;
-  date: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { LentMoneyEntry } from '@/types/api/auth/auth';
+
+export type LentMoneyItem = LentMoneyEntry;
 
 export interface AddLentMoneyResType {
   statusCode: number;
   data: {
-    TotalLentMoney: number;
-    currentPocketMoney: number;
+    entry: LentMoneyEntry;
+    currentPocketMoney: string;
+    totalLentMoney: number;
   };
   message: string;
   success: boolean;
@@ -20,7 +16,8 @@ export interface AddLentMoneyResType {
 export interface ReceivedLentMoneyResType {
   statusCode: number;
   data: {
-    currentPocketMoney: number;
+    entry: LentMoneyEntry;
+    currentPocketMoney: string;
   };
   message: string;
   success: boolean;
@@ -28,9 +25,7 @@ export interface ReceivedLentMoneyResType {
 
 export interface AllLentMoneyResType {
   statusCode: number;
-  data: {
-    LentMoneyHistory: LentMoneyItem[];
-  };
+  data: LentMoneyEntry[];
   message: string;
   success: boolean;
 }

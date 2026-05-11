@@ -1,8 +1,12 @@
-// services/auth.ts
 import Cookies from 'universal-cookie';
-const cookie = new Cookies();
+import axios, { AxiosRequestConfig } from 'axios';
+import { apiURL } from '@/lib/http';
+import { endpoints } from '@/shared/api/endpoints';
+import { backendHostURL, contactFormServerHostURL } from './api';
+import { getCurrentAccessToken } from '@/utils/cookie/CookiesInfo';
 import {
   AllSessionsResType,
+  AuthResType,
   ChangeAvatarResType,
   CommonNullResType,
   ContactFormResType,
@@ -26,180 +30,139 @@ import {
   SignupGoogleCredentialsType,
   UpdateUserDetailsCredType,
 } from '@/types/api/auth/credentials';
-import { apiURL } from '@/lib/http';
-import axios, { AxiosRequestConfig } from 'axios';
-import { backendHostURL, contactFormServerHostURL } from './api';
-import { getCurrentAccessToken } from '@/utils/cookie/CookiesInfo';
 
-// For User Registration through email password form
+const cookie = new Cookies();
+
+// --- Auth (public + protected) ----------------------------------------------
+
 export const registerUser = async (
-  credentials: RegisterCredentialsType
-): Promise<UserDetailsResType> => {
-  const { data } = await apiURL.post<UserDetailsResType>(
-    `/user/register`,
-    credentials
-  );
+  credentials: RegisterCredentialsType,
+): Promise<AuthResType> => {
+  const { data } = await apiURL.post<AuthResType>(endpoints.auth.register, credentials);
   return data;
 };
 
-// For User Login through email password form
 export const LoginUser = async (
-  credentials: LoginCredentialsType
-): Promise<UserDetailsResType> => {
-  const { data } = await apiURL.post<UserDetailsResType>(
-    `/user/login`,
-    credentials
-  );
+  credentials: LoginCredentialsType,
+): Promise<AuthResType> => {
+  const { data } = await apiURL.post<AuthResType>(endpoints.auth.login, credentials);
   return data;
 };
 
-// Signup with google authentication
 export const SignupWithGoogle = async (
-  credentials: SignupGoogleCredentialsType
-): Promise<UserDetailsResType> => {
-  const { data } = await apiURL.post<UserDetailsResType>(
-    `/user/google-login`,
-    credentials
-  );
+  credentials: SignupGoogleCredentialsType,
+): Promise<AuthResType> => {
+  const { data } = await apiURL.post<AuthResType>(endpoints.auth.google, credentials);
   return data;
 };
 
-// Getting current user details
-export const getCurrentUser = async (): Promise<UserDetailsResType> => {
-  const token = cookie.get('accessToken');
-  if (!token) {
-    throw new Error('Access token is missing. Please log in.');
-  }
-  const { data } = await apiURL.get<UserDetailsResType>('/user/get-user-data');
-  return data;
-};
-
-// Add Pocket Money to User Account
-export const AddUserPocketMoney = async (
-  credentials: AddPocketMoneyCredentialType
-): Promise<PocketMoneyResType> => {
-  const { data } = await apiURL.post<PocketMoneyResType>(
-    '/user/add-money',
-    credentials
-  );
-  return data;
-};
-
-// User Logout
+// Logout is now POST (was GET on the old server).
 export const UserLogout = async (): Promise<UserLogoutResType> => {
-  const { data } = await apiURL.get<UserLogoutResType>('/user/logout');
+  const { data } = await apiURL.post<UserLogoutResType>(endpoints.auth.logout);
   return data;
 };
 
-// Change User Avatar
-export const changeUserAvatar = async (
-  formData: FormData
-): Promise<ChangeAvatarResType> => {
-  const config: AxiosRequestConfig = {
-    headers: {
-      Authorization: `Bearer ${getCurrentAccessToken()}`,
-    },
-  };
-  const { data } = await axios.post<ChangeAvatarResType>(
-    `${backendHostURL}/user/change-avatar`,
-    formData,
-    config
-  );
-  return data;
-};
-
-// Send Reset Password Link to User Email
 export const SendResetLinkToUserEmail = async (
-  credentials: SendResetLinkCredType
+  credentials: SendResetLinkCredType,
 ): Promise<SendPassResetLinkResType> => {
   const { data } = await apiURL.post<SendPassResetLinkResType>(
-    `/user/send-reset-link`,
-    credentials
+    endpoints.auth.passwordResetRequest,
+    credentials,
   );
   return data;
 };
 
-// Reset User Password
+// Reset is now POST (was PATCH on the old server).
 export const ResetUserPassword = async (
-  credentials: ResetPasswordCredType
+  credentials: ResetPasswordCredType,
 ): Promise<ResetPasswordResType> => {
-  const { data } = await apiURL.patch<ResetPasswordResType>(
-    `/user/reset-password`,
-    credentials
+  const { data } = await apiURL.post<ResetPasswordResType>(
+    endpoints.auth.passwordReset,
+    credentials,
   );
   return data;
 };
 
-// Check if User Account is Verified
-export const CheckUserAccountVerified =
-  async (): Promise<UserAccountVerifiedResType> => {
-    const { data } = await apiURL.get<UserAccountVerifiedResType>(
-      `/user/is-user-verified`
-    );
-    return data;
-  };
+export const CheckUserAccountVerified = async (): Promise<UserAccountVerifiedResType> => {
+  const { data } = await apiURL.get<UserAccountVerifiedResType>(endpoints.auth.meVerified);
+  return data;
+};
 
-// Update User Details
+// --- Current user (profile) --------------------------------------------------
+
+export const getCurrentUser = async (): Promise<UserDetailsResType> => {
+  const token = cookie.get('accessToken');
+  if (!token) throw new Error('Access token is missing. Please log in.');
+  const { data } = await apiURL.get<UserDetailsResType>(endpoints.users.me);
+  return data;
+};
+
 export const updatedUserDetails = async (
-  credentials: UpdateUserDetailsCredType
+  credentials: UpdateUserDetailsCredType,
 ): Promise<UpdateUserDetailsResType> => {
-  const { data } = await apiURL.patch<UpdateUserDetailsResType>(
-    `/user/change-user-details`,
-    credentials
+  const { data } = await apiURL.patch<UpdateUserDetailsResType>(endpoints.users.me, credentials);
+  return data;
+};
+
+// Avatar route is now PATCH /api/users/me/avatar (was POST /user/change-avatar).
+export const changeUserAvatar = async (formData: FormData): Promise<ChangeAvatarResType> => {
+  const config: AxiosRequestConfig = {
+    headers: { Authorization: `Bearer ${getCurrentAccessToken()}` },
+  };
+  const { data } = await axios.patch<ChangeAvatarResType>(
+    `${backendHostURL}${endpoints.users.avatar}`,
+    formData,
+    config,
   );
   return data;
 };
 
-// Delete User Account
 export const deleteUserAccount = async (
-  credentials: DeleteUserCredType
+  credentials: DeleteUserCredType,
 ): Promise<DeleteUserResType> => {
-  const { data } = await apiURL.delete<DeleteUserResType>(
-    '/user/delete-account',
-    {
-      data: credentials,
-    }
-  );
-
+  const { data } = await apiURL.delete<DeleteUserResType>(endpoints.users.me, {
+    data: credentials,
+  });
   return data;
 };
 
-// Send contact form message
+// --- Pocket money (kept in this file for backwards compatibility with current
+// imports; will move to features/pocketMoney/api.ts in the next phase) -------
+
+export const AddUserPocketMoney = async (
+  credentials: AddPocketMoneyCredentialType,
+): Promise<PocketMoneyResType> => {
+  const { data } = await apiURL.post<PocketMoneyResType>(endpoints.pocketMoney.root, credentials);
+  return data;
+};
+
+// --- Contact form (external service, unchanged) -----------------------------
+
 export const submitContactForm = async (
-  credentials: contactFormCredentialsType
+  credentials: contactFormCredentialsType,
 ): Promise<ContactFormResType> => {
-  const { data } = await axios.post<ContactFormResType>(
-    contactFormServerHostURL,
-    credentials
-  );
+  const { data } = await axios.post<ContactFormResType>(contactFormServerHostURL, credentials);
   return data;
 };
 
-// Get all sessions of the user
+// --- Sessions ---------------------------------------------------------------
+
 export const getUserSessions = async (): Promise<AllSessionsResType> => {
-  const { data } = await apiURL.get<AllSessionsResType>(
-    `/user/get-all-sessions`
-  );
+  const { data } = await apiURL.get<AllSessionsResType>(endpoints.sessions.list);
   return data;
 };
 
-// delete one sessions of the user
+// Now uses a path param (was DELETE /user/delete-active-session with body).
 export const deleteOneUserSessions = async (credentials: {
   sessionId: string;
 }): Promise<CommonNullResType> => {
   const { data } = await apiURL.delete<CommonNullResType>(
-    `/user/delete-active-session`,
-    {
-      data: credentials,
-    }
+    endpoints.sessions.one(credentials.sessionId),
   );
   return data;
 };
 
-// delete all sessions of the user
 export const deleteAllUserSessions = async (): Promise<CommonNullResType> => {
-  const { data } = await apiURL.delete<CommonNullResType>(
-    `/user/delete-all-active-sessions`
-  );
+  const { data } = await apiURL.delete<CommonNullResType>(endpoints.sessions.list);
   return data;
 };
