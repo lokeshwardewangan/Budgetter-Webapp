@@ -1,16 +1,13 @@
-import AddMoneySection from '@/components/user/addMoney/AddMoneySection';
-import ShowMoney from '@/components/user/addMoney/ShowMoney';
-import PocketMoneyDetails from '@/components/user/addMoney/table/PocketMoneyDetails';
-import React from 'react';
+import AddPocketMoneyForm from '@/features/pocketMoney/components/AddPocketMoneyForm';
+import CurrentBalanceCard from '@/features/pocketMoney/components/CurrentBalanceCard';
+import PocketMoneyHistoryTable from '@/features/pocketMoney/components/PocketMoneyHistoryTable';
 
-const AddMoney: React.FC = () => {
+export default function AddMoney() {
   return (
     <>
-      <ShowMoney />
-      <AddMoneySection />
-      <PocketMoneyDetails />
+      <CurrentBalanceCard />
+      <AddPocketMoneyForm />
+      <PocketMoneyHistoryTable />
     </>
   );
-};
-
-export default AddMoney;
+}
