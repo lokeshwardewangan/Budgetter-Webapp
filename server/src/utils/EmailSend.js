@@ -6,47 +6,33 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const TEMPLATE_DIR = path.join(__dirname, '../../public/email-template');
+
+const readTemplate = (filename) => fs.readFileSync(path.join(TEMPLATE_DIR, filename), 'utf-8');
+
 const sendMessageToUser = async (userName, type, userEmail, subject, token, html = null) => {
   const serverURL = process.env.SERVER_URL;
 
   let customizedHTML;
   if (type === 'RESET_PASSWORD') {
-    const resetPasswordTemplatePath = path.join(
-      __dirname,
-      '../../public/email-template/reset-password-template.html',
-    );
-    const htmlContent = fs.readFileSync(resetPasswordTemplatePath, 'utf-8');
-    // replace placeholder with actual data
-    const resetLink = `${serverURL}/api/user/reset-password/validate/?token=${token}`;
-    // console.log(resetLink);
-    customizedHTML = htmlContent.replace('{link}', resetLink).replace('{userName}', userName);
+    const tpl = readTemplate('reset-password-template.html');
+    const link = `${serverURL}/api/auth/password-reset/validate?token=${token}`;
+    customizedHTML = tpl.replace('{link}', link).replace('{userName}', userName);
   } else if (type === 'VERIFY_ACCOUNT') {
-    const accountVerificationTemplatePath = path.join(
-      __dirname,
-      '../../public/email-template/account-verification.html',
-    );
-    const htmlContent = fs.readFileSync(accountVerificationTemplatePath, 'utf-8');
-    // replace placeholder with actual data
-    const resetLink = `${serverURL}/api/user/account-verification/?token=${token}`;
-    // console.log(resetLink);
-    customizedHTML = htmlContent.replace('{link}', resetLink).replace('{userName}', userName);
+    const tpl = readTemplate('account-verification.html');
+    const link = `${serverURL}/api/auth/account-verification?token=${token}`;
+    customizedHTML = tpl.replace('{link}', link).replace('{userName}', userName);
   } else if (type === 'DELETE_ACCOUNT') {
-    const deleteAccountTemplatePath = path.join(
-      __dirname,
-      '../../public/email-template/account-delete.html',
-    );
-    const htmlContent = fs.readFileSync(deleteAccountTemplatePath, 'utf-8');
-    // replace placeholder with actual data
-    customizedHTML = htmlContent.replace('{userName}', userName);
+    const tpl = readTemplate('account-delete.html');
+    customizedHTML = tpl.replace('{userName}', userName);
   } else if (type === 'NEWSLETTER') {
     customizedHTML = html;
   } else {
-    console.log('invalid request');
-    return;
+    console.log('invalid email type:', type);
+    return false;
   }
 
   try {
-    // Create a transporter using Gmail
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -55,8 +41,7 @@ const sendMessageToUser = async (userName, type, userEmail, subject, token, html
       },
     });
 
-    // Email options
-    let mailOptions = {
+    const mailOptions = {
       from: 'message.reponse.web@gmail.com',
       to: Array.isArray(userEmail) ? userEmail.join(',') : userEmail,
       subject: `${subject} 🚀`,
@@ -64,14 +49,12 @@ const sendMessageToUser = async (userName, type, userEmail, subject, token, html
       html: customizedHTML,
     };
 
-    // Send email
-    let info = await transporter.sendMail(mailOptions);
-    // console.log('Email sent: ' + info.response);
-    console.log('Email sent successfully! to - ', userEmail);
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully! to -', userEmail);
     return true;
   } catch (error) {
-    console.error(`Error during sending email to - ${userEmail}`, error);
-    throw error;
+    console.error(`Error sending email to - ${userEmail}`, error);
+    return false;
   }
 };
 

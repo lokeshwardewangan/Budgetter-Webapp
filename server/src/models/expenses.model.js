@@ -1,5 +1,16 @@
 import mongoose, { Schema } from 'mongoose';
 
+export const EXPENSE_CATEGORIES = [
+  'Groceries',
+  'Housing & Utilities',
+  'Medical',
+  'Food',
+  'Personal',
+  'Educational',
+  'Transportation',
+  'Miscellaneous',
+];
+
 const ProductSchema = new Schema(
   {
     name: {
@@ -14,6 +25,10 @@ const ProductSchema = new Schema(
     category: {
       type: String,
       required: true,
+      enum: {
+        values: EXPENSE_CATEGORIES,
+        message: '{VALUE} is not a valid expense category',
+      },
     },
     label: {
       type: String,
@@ -28,6 +43,8 @@ const ExpensesSchema = new Schema(
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
+      index: true,
     },
     date: {
       type: String,
@@ -50,10 +67,11 @@ const ExpensesSchema = new Schema(
   },
 );
 
-// validate array should be at least 1 length
 function arrayLimit(val) {
   return val.length > 0;
 }
+
+ExpensesSchema.index({ user: 1, date: 1 });
 
 const Expense = mongoose.model('Expense', ExpensesSchema);
 export default Expense;

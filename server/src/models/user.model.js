@@ -2,74 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-const PocketMoneyHistorySchema = new Schema(
-  {
-    date: {
-      type: String,
-      required: true,
-      default: () => {
-        const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const year = String(now.getFullYear()).slice(-2);
-        return `${day}-${month}-${year}`;
-      },
-    },
-    amount: {
-      type: String,
-      required: true,
-    },
-    source: {
-      type: String,
-      required: true,
-    },
-  },
-  {
-    timestamps: true,
-  },
-);
-
-const LentMoneyHistorySchema = new Schema(
-  {
-    personName: {
-      type: String,
-      required: true,
-    },
-    price: {
-      type: String,
-      required: true,
-    },
-    date: {
-      type: String,
-      required: true,
-    },
-  },
-  {
-    timestamps: true,
-  },
-);
-
-const activeSessionsSchema = new Schema(
-  {
-    token: {
-      type: String,
-      required: true,
-    },
-    ip: {
-      type: String,
-      required: true,
-    },
-    userAgent: {
-      type: String, // Chrome on Window
-      required: true,
-    },
-    lastUsedAt: { type: Date, default: Date.now },
-  },
-  {
-    timestamps: true,
-  },
-);
-
 const UserSchema = new Schema(
   {
     username: {
@@ -91,7 +23,6 @@ const UserSchema = new Schema(
       trim: true,
     },
     avatar: {
-      // https://i.postimg.cc/3wZzNhHn/saotro-2.jpg
       type: String,
       default: 'https://i.postimg.cc/cCWKmfzs/satoro-1.jpg',
     },
@@ -115,14 +46,9 @@ const UserSchema = new Schema(
       default: '',
       required: false,
     },
-    PocketMoneyHistory: {
-      type: [PocketMoneyHistorySchema],
-      default: [],
-    },
-    LentMoneyHistory: {
-      type: [LentMoneyHistorySchema],
-      default: [],
-    },
+    // Denormalized running balance. Source of truth is the deltas applied by
+    // pocket-money / expense / lent-money flows. Reconcile from those
+    // collections if it ever drifts.
     currentPocketMoney: {
       type: String,
       default: '0',
@@ -143,14 +69,6 @@ const UserSchema = new Schema(
       required: true,
       default: 'local',
     },
-    accessToken: {
-      type: String,
-      default: undefined,
-    },
-    activeSessions: {
-      type: [activeSessionsSchema],
-      default: [],
-    },
     isVerified: {
       type: Boolean,
       default: false,
@@ -169,26 +87,18 @@ const UserSchema = new Schema(
   },
 );
 
-// before save password must be encrypted using bcrypt.js
 UserSchema.pre('save', async function (next) {
-  // console.log("is password modified? ", this.isModified("password"));
-  // this refers to instance document
   if (!this.isModified('password')) {
-    // console.log("password not changed");
     return next();
-  } // is there req to change password field of current document
-  this.password = await bcrypt.hash(this.password, 10); // before save input password hashed and modified in password field and then save
-  // console.log("password changed");
+  }
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// password match when login
 UserSchema.methods.isPasswordMatch = async function (password) {
-  // document data have method to access this new method
-  return bcrypt.compare(password, this.password); // user password and stored document password
+  return bcrypt.compare(password, this.password);
 };
 
-// method which generate token
 UserSchema.methods.generateAccessToken = async function () {
   return await jwt.sign(
     {
@@ -203,7 +113,6 @@ UserSchema.methods.generateAccessToken = async function () {
   );
 };
 
-// method which generate token for reset-password
 UserSchema.methods.generateResetPasswordToken = async function () {
   return await jwt.sign(
     {
@@ -216,7 +125,6 @@ UserSchema.methods.generateResetPasswordToken = async function () {
   );
 };
 
-// method which generate token for reset-password
 UserSchema.methods.generateAccountVerificationToken = async function () {
   return await jwt.sign(
     {

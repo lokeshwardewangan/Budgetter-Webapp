@@ -1,98 +1,151 @@
-import { UAParser } from 'ua-parser-js';
-import UserModel from '../models/user.model.js';
-import { generateUniqueUsername } from '../utils/utilities.js';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
+import UserModel from '../models/user.model.js';
 import { ApiError } from '../utils/ApiError.js';
 import { sendMessageToUser } from '../utils/EmailSend.js';
+import { generateUniqueUsername } from './user.service.js';
+import { createSession } from './session.service.js';
 
-// Extract client info (IP, Browser, OS, Device)
-export function getClientInfo(req) {
-  const ip =
-    req.headers['x-forwarded-for']?.split(',').shift() || req.ip || req.socket.remoteAddress;
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-  console.log('agent', req.headers['user-agent']);
-  const parser = new UAParser(req.headers['user-agent']);
-
-  const ua = parser.getResult();
-
-  return {
-    ip: ip || 'Unknown',
-    browser: ua.browser.name || 'Unknown',
-    os: ua.os.name || 'Unknown',
-    deviceType: ua.device.type || 'Desktop',
-  };
-}
-
-// Create and save a new active session for a user
-export async function createSession(user, req) {
-  const token = await user.generateAccessToken();
-  const clientInfo = getClientInfo(req);
-
-  const newSession = {
-    token,
-    ip: clientInfo.ip,
-    userAgent: `${clientInfo.browser} on ${clientInfo.os} (${clientInfo.deviceType})`,
-  };
-
-  user.activeSessions.push(newSession);
-
-  // Update last login time
-  // Handle first time login case where currentLogin is null
-  user.lastLogin = user.currentLogin || new Date();
-  user.currentLogin = new Date();
-  await user.save({ validateBeforeSave: false });
-  return token;
-}
-
-// Create a new user and send account verification email
-export async function createUserAndSendVerification(req, name, email, password, googleId, picture) {
-  const uniqueUsername = await generateUniqueUsername(name);
-
-  const userData = {
-    username: uniqueUsername,
-    name,
-    email,
-  };
-
-  if (password) {
-    userData.password = password; // Only set if provided
-  }
-  if (googleId) {
-    userData.googleId = googleId;
-    userData.authProvider = 'google';
-  }
-  if (picture) {
-    userData.avatar = picture;
-  }
-
-  const user = await UserModel.create(userData);
-
-  await createSession(user, req);
-
-  const createdUser = await UserModel.findById(user._id).select('-password');
-
-  if (!createdUser) {
-    throw new ApiError(500, `${name} - unable to register user!!`);
-  }
-
-  console.log(`${createdUser.name} - Your Account Successfully created!!`);
-  console.log('Sending Email for Verification....');
-
-  const token = jwt.sign({ _id: createdUser._id }, process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET, {
+async function sendVerificationEmail(user) {
+  const token = jwt.sign({ _id: user._id }, process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET, {
     expiresIn: process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET_EXPIRY,
   });
-
-  const isSentGmail = await sendMessageToUser(
-    createdUser.name,
+  const ok = await sendMessageToUser(
+    user.name,
     'VERIFY_ACCOUNT',
-    createdUser.email,
+    user.email,
     'Budgetter Account Verification',
     token,
   );
+  if (!ok) console.error(`Verification email failed for ${user.email}`);
+}
 
-  if (!isSentGmail) {
-    console.log(`Failed to send email to - ${createdUser.email}`);
+async function buildUserAndSession({ name, email, password, googleId, picture }, req) {
+  const username = await generateUniqueUsername(name);
+  const data = { username, name, email };
+  if (password) data.password = password;
+  if (googleId) {
+    data.googleId = googleId;
+    data.authProvider = 'google';
+    data.isVerified = true;
+  }
+  if (picture) data.avatar = picture;
+
+  const user = await UserModel.create(data);
+  const token = await createSession(user, req);
+  const safeUser = await UserModel.findById(user._id).select('-password');
+  return { user: safeUser, token };
+}
+
+export async function registerLocal({ username, name, email, password }, req) {
+  if (!username || username.length < 5 || !name || !email || !password) {
+    throw new ApiError(400, 'All fields are required (username min 5 chars)');
   }
 
-  return createdUser;
+  const existing = await UserModel.findOne({ $or: [{ username }, { email }] });
+  if (existing) throw new ApiError(409, 'User with this username or email already exists');
+
+  const { user, token } = await buildUserAndSession({ name, email, password }, req);
+  sendVerificationEmail(user).catch((err) => console.error('verify email failed:', err));
+  return { user, token };
+}
+
+export async function loginLocal({ username, email, password }, req) {
+  if ((!username && !email) || !password) {
+    throw new ApiError(400, 'Username or email, and password, are required');
+  }
+
+  const existing = await UserModel.findOne({ $or: [{ email }, { username }] }).select('+password');
+  if (!existing) throw new ApiError(404, 'User does not exist');
+
+  const ok = await existing.isPasswordMatch(password);
+  if (!ok) throw new ApiError(401, 'Invalid credentials');
+
+  const token = await createSession(existing, req);
+  const user = await UserModel.findById(existing._id).select('-password');
+  return { user, token };
+}
+
+export async function loginWithGoogle(idToken, req) {
+  if (!idToken) throw new ApiError(400, 'Google ID token is required');
+
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  const { sub: googleId, email, name, picture } = payload;
+
+  const existing = await UserModel.findOne({ $or: [{ googleId }, { email }] });
+  if (existing) {
+    const token = await createSession(existing, req);
+    return { user: existing, token, isNewUser: false };
+  }
+
+  const { user, token } = await buildUserAndSession({ name, email, googleId, picture }, req);
+  return { user, token, isNewUser: true };
+}
+
+export async function verifyAccountToken(token) {
+  if (!token) throw new ApiError(400, 'Token is required');
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET);
+  } catch {
+    throw new ApiError(400, 'Invalid or expired verification token');
+  }
+  const user = await UserModel.findById(decoded._id);
+  if (!user) throw new ApiError(404, 'User not found');
+
+  if (user.isVerified) return { alreadyVerified: true };
+  user.isVerified = true;
+  await user.save({ validateBeforeSave: false });
+  return { alreadyVerified: false };
+}
+
+export async function requestPasswordReset(email) {
+  if (!email) throw new ApiError(400, 'Email is required');
+  const user = await UserModel.findOne({ email });
+  if (!user) throw new ApiError(404, 'User not found');
+
+  const token = jwt.sign({ _id: user._id }, process.env.RESET_PASSWORD_TOKEN_SECRET, {
+    expiresIn: process.env.RESET_PASSWORD_TOKEN_SECRET_EXPIRY,
+  });
+
+  const ok = await sendMessageToUser(
+    user.name,
+    'RESET_PASSWORD',
+    user.email,
+    'Budgetter Password Reset',
+    token,
+  );
+  if (!ok) throw new ApiError(500, 'Failed to send password reset email');
+}
+
+export async function validatePasswordResetToken(token) {
+  if (!token) throw new ApiError(400, 'Token is required');
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.RESET_PASSWORD_TOKEN_SECRET);
+  } catch {
+    throw new ApiError(400, 'Invalid or expired reset token');
+  }
+  const user = await UserModel.findById(decoded._id).select('_id');
+  if (!user) throw new ApiError(404, 'User not found');
+  return user._id;
+}
+
+export async function resetPassword(userId, newPassword) {
+  if (!userId || !newPassword) throw new ApiError(400, 'User ID and new password are required');
+  const hash = await bcrypt.hash(newPassword, 10);
+  const updated = await UserModel.findByIdAndUpdate(
+    userId,
+    { $set: { password: hash } },
+    { new: true },
+  );
+  if (!updated) throw new ApiError(404, 'User not found');
 }
