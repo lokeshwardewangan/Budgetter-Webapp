@@ -1,7 +1,6 @@
 import ExpenseModel, { EXPENSE_CATEGORIES } from '../models/expenses.model.js';
 import PocketMoneyModel from '../models/pocketMoney.model.js';
 import LentMoneyModel from '../models/lentMoney.model.js';
-import { ApiError } from '../utils/ApiError.js';
 
 const CATEGORY_KEY_MAP = {
   Groceries: 'GroceriesExpenses',
@@ -22,10 +21,6 @@ function emptyCategoryBreakdown() {
 }
 
 export async function monthlyReport(userId, { month, year }) {
-  if (typeof month !== 'string' || typeof year !== 'string') {
-    throw new ApiError(400, 'month and year must be strings (e.g. month="03", year="2025")');
-  }
-
   const dateRegex = `^\\d{2}-${month}-${year}`;
 
   const [monthExpenses, lastExpenseDoc, pocketAgg, lentAgg] = await Promise.all([
@@ -33,21 +28,13 @@ export async function monthlyReport(userId, { month, year }) {
     ExpenseModel.findOne({ user: userId }).sort({ _id: -1 }).lean(),
     PocketMoneyModel.aggregate([
       { $match: { user: userId } },
-      {
-        $addFields: {
-          parts: { $split: ['$date', '-'] },
-        },
-      },
+      { $addFields: { parts: { $split: ['$date', '-'] } } },
       { $match: { 'parts.1': month } },
       { $group: { _id: null, total: { $sum: { $toDouble: '$amount' } } } },
     ]),
     LentMoneyModel.aggregate([
       { $match: { user: userId } },
-      {
-        $addFields: {
-          parts: { $split: ['$date', '-'] },
-        },
-      },
+      { $addFields: { parts: { $split: ['$date', '-'] } } },
       { $match: { 'parts.1': month } },
       { $group: { _id: null, total: { $sum: { $toDouble: '$price' } } } },
     ]),

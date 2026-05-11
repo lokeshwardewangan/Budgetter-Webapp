@@ -1,21 +1,15 @@
 import PocketMoneyModel from '../models/pocketMoney.model.js';
-import { ApiError } from '../utils/ApiError.js';
 import { adjustBalance } from './user.service.js';
 
 export async function addEntry(userId, { date, amount, source }) {
-  if (!date || !amount || !source) {
-    throw new ApiError(400, 'date, amount and source are required');
-  }
-  const numeric = parseFloat(amount);
-  if (Number.isNaN(numeric)) throw new ApiError(400, 'amount must be numeric');
-
+  // `amount` arrives as a positive Number from the validator's coercion.
   const entry = await PocketMoneyModel.create({
     user: userId,
     date,
     amount: amount.toString(),
     source,
   });
-  const currentPocketMoney = await adjustBalance(userId, numeric);
+  const currentPocketMoney = await adjustBalance(userId, amount);
   return { entry, currentPocketMoney };
 }
 

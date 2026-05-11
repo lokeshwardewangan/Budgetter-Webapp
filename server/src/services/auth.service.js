@@ -41,10 +41,6 @@ async function buildUserAndSession({ name, email, password, googleId, picture },
 }
 
 export async function registerLocal({ username, name, email, password }, req) {
-  if (!username || username.length < 5 || !name || !email || !password) {
-    throw new ApiError(400, 'All fields are required (username min 5 chars)');
-  }
-
   const existing = await UserModel.findOne({ $or: [{ username }, { email }] });
   if (existing) throw new ApiError(409, 'User with this username or email already exists');
 
@@ -54,10 +50,6 @@ export async function registerLocal({ username, name, email, password }, req) {
 }
 
 export async function loginLocal({ username, email, password }, req) {
-  if ((!username && !email) || !password) {
-    throw new ApiError(400, 'Username or email, and password, are required');
-  }
-
   const existing = await UserModel.findOne({ $or: [{ email }, { username }] }).select('+password');
   if (!existing) throw new ApiError(404, 'User does not exist');
 
@@ -70,8 +62,6 @@ export async function loginLocal({ username, email, password }, req) {
 }
 
 export async function loginWithGoogle(idToken, req) {
-  if (!idToken) throw new ApiError(400, 'Google ID token is required');
-
   const ticket = await googleClient.verifyIdToken({
     idToken,
     audience: process.env.GOOGLE_CLIENT_ID,
@@ -90,8 +80,6 @@ export async function loginWithGoogle(idToken, req) {
 }
 
 export async function verifyAccountToken(token) {
-  if (!token) throw new ApiError(400, 'Token is required');
-
   let decoded;
   try {
     decoded = jwt.verify(token, process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET);
@@ -108,7 +96,6 @@ export async function verifyAccountToken(token) {
 }
 
 export async function requestPasswordReset(email) {
-  if (!email) throw new ApiError(400, 'Email is required');
   const user = await UserModel.findOne({ email });
   if (!user) throw new ApiError(404, 'User not found');
 
@@ -127,7 +114,6 @@ export async function requestPasswordReset(email) {
 }
 
 export async function validatePasswordResetToken(token) {
-  if (!token) throw new ApiError(400, 'Token is required');
   let decoded;
   try {
     decoded = jwt.verify(token, process.env.RESET_PASSWORD_TOKEN_SECRET);
@@ -140,7 +126,6 @@ export async function validatePasswordResetToken(token) {
 }
 
 export async function resetPassword(userId, newPassword) {
-  if (!userId || !newPassword) throw new ApiError(400, 'User ID and new password are required');
   const hash = await bcrypt.hash(newPassword, 10);
   const updated = await UserModel.findByIdAndUpdate(
     userId,

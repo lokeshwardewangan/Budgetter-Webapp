@@ -27,7 +27,8 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.14",
-    "ua-parser-js": "^2.0.4"
+    "ua-parser-js": "^2.0.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "prettier": "^3.3.3"

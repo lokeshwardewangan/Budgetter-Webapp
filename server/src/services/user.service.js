@@ -52,26 +52,14 @@ export async function getMe(userId, currentToken) {
 export async function updateProfile(userId, body) {
   const { name, dob, currentPassword, newPassword, instagramLink, facebookLink, profession } = body;
 
-  if (
-    !name &&
-    !dob &&
-    !currentPassword &&
-    !newPassword &&
-    !instagramLink &&
-    !facebookLink &&
-    !profession
-  ) {
-    throw new ApiError(400, 'At least one field must be provided to update.');
-  }
-
   const updates = {};
   if (name) updates.name = name;
   if (dob) updates.dateOfBirth = dob;
-  if (instagramLink) updates.instagramLink = instagramLink;
-  if (facebookLink) updates.facebookLink = facebookLink;
-  if (profession) updates.profession = profession;
+  if (instagramLink !== undefined) updates.instagramLink = instagramLink;
+  if (facebookLink !== undefined) updates.facebookLink = facebookLink;
+  if (profession !== undefined) updates.profession = profession;
 
-  if (currentPassword && newPassword) {
+  if (newPassword) {
     const user = await UserModel.findById(userId).select('+password');
     if (!user?.password) throw new ApiError(500, 'User password not set.');
     const ok = await bcrypt.compare(currentPassword, user.password);

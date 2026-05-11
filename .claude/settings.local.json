@@ -8,7 +8,10 @@
       "Bash(docker compose *)",
       "Bash(git check-ignore *)",
       "Bash(npm run *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(npm install *)",
+      "Bash(node -e \"console.log\\('zod', require\\('./package.json'\\).dependencies.zod\\)\")",
+      "Bash(node --input-type=module -e ' *)"
     ]
   }
 }
