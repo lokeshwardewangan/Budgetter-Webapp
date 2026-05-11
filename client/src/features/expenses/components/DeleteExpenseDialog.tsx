@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AlertTriangle, Loader2, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import {
   Dialog,
   DialogContent,
@@ -10,58 +11,36 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteUserExpense } from '@/services/expenses';
-import toast from 'react-hot-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { useDispatch } from 'react-redux';
-import { deleteFilteredExpense } from '@/features/user/user';
-import { deleteExpensesFromAllCollection } from '@/features/expenses/expenses';
-import { ExpenseProduct } from '@/types/api/expenses/expenses';
+import { useDialogState } from '@/shared/hooks/useDialogState';
+import type { ExpenseProduct } from '@/types/api/expenses/expenses';
+import { useDeleteExpense } from '../hooks';
 
-interface DeleteExpensesDialogPropType {
-  storedExpenseDate: string;
-  info: ExpenseProduct;
-}
+type Props = {
+  actualDate: string;
+  product: ExpenseProduct;
+};
 
-const DeleteExpensesDialog: React.FC<DeleteExpensesDialogPropType> = ({
-  storedExpenseDate,
-  info,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isUpdatePriceToPocketMoney, setIsUpdatePriceToPocketMoney] =
-    useState<boolean>(true);
-  const queryClient = useQueryClient();
-  const dispatch = useDispatch();
+export default function DeleteExpenseDialog({ actualDate, product }: Props) {
+  const { isOpen, setIsOpen, close } = useDialogState(false);
+  const [refund, setRefund] = useState(true);
+  const { mutateAsync: doDelete, isPending } = useDeleteExpense();
 
-  const { mutateAsync: deleteExpenseMutate, isPending } = useMutation({
-    mutationFn: deleteUserExpense,
-    onSuccess: (data, cred) => {
-      console.log(data?.message);
-      toast.success('Successfully expense deleted!!');
-      setIsOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      dispatch(deleteFilteredExpense({ id: cred?.expenseId }));
-      dispatch(
-        deleteExpensesFromAllCollection({
-          id: cred?.expenseId,
-          expenseDate: cred?.expenseDate,
-        })
-      );
-    },
-    onError: (error) => {
-      console.log(error);
-      toast.error('Unable to delete expense!!');
-    },
-  });
-
-  const handleDelete = () => {
-    deleteExpenseMutate({
-      expenseId: info?._id,
-      expenseDate: storedExpenseDate,
-      isAddPriceToPocketMoney: isUpdatePriceToPocketMoney,
-    });
+  const onConfirm = async () => {
+    await toast.promise(
+      doDelete({
+        expenseId: product._id,
+        expenseDate: actualDate,
+        isAddPriceToPocketMoney: refund,
+      }),
+      {
+        loading: 'Deleting...',
+        success: 'Expense deleted.',
+        error: 'Unable to delete expense.',
+      },
+    );
+    close();
   };
 
   return (
@@ -71,7 +50,6 @@ const DeleteExpensesDialog: React.FC<DeleteExpensesDialogPropType> = ({
           <Trash2 className="h-4 w-4" />
         </button>
       </DialogTrigger>
-
       <DialogContent aria-describedby={undefined} className="overflow-visible">
         <DialogHeader>
           <DialogTitle className="flex items-center text-destructive dark:text-red-300">
@@ -79,31 +57,28 @@ const DeleteExpensesDialog: React.FC<DeleteExpensesDialogPropType> = ({
             Delete Expense
           </DialogTitle>
           <DialogDescription className="pt-2 text-slate-700">
-            Are you sure you want to remove your expense? <br />
+            Are you sure you want to remove this expense? <br />
             This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <div className="content_here mb-1 flex items-center justify-start gap-1.5">
           <Checkbox
             id="updatePrice"
-            checked={isUpdatePriceToPocketMoney}
-            onCheckedChange={(checked) =>
-              setIsUpdatePriceToPocketMoney(checked === true)
-            }
+            checked={refund}
+            onCheckedChange={(checked) => setRefund(checked === true)}
           />
           <Label htmlFor="updatePrice" className="cursor-pointer">
-            Update Price to Pocket Money??
+            Refund price to pocket money?
             <span className="font-semibold text-green-700">
-              {isUpdatePriceToPocketMoney ? ` + ${info?.price}₹ ` : ''}
+              {refund ? ` + ${product.price}₹ ` : ''}
             </span>
           </Label>
         </div>
-
         <DialogFooter className="flex gap-3 sm:gap-0 sm:space-x-4">
           <Button
             type="button"
             variant="outline"
-            onClick={() => setIsOpen(false)}
+            onClick={close}
             className="w-full flex-1"
           >
             Cancel
@@ -112,7 +87,7 @@ const DeleteExpensesDialog: React.FC<DeleteExpensesDialogPropType> = ({
             disabled={isPending}
             type="button"
             variant="destructive"
-            onClick={handleDelete}
+            onClick={onConfirm}
             className="w-full flex-1"
           >
             {isPending ? (
@@ -131,6 +106,4 @@ const DeleteExpensesDialog: React.FC<DeleteExpensesDialogPropType> = ({
       </DialogContent>
     </Dialog>
   );
-};
-
-export default DeleteExpensesDialog;
+}

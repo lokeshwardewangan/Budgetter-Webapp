@@ -1,14 +1,11 @@
-import ShowMoney from '@/components/user/addMoney/ShowMoney';
-import FilterShowExpenses from '@/components/user/showExpenses/FilterShowExpenses';
-import React from 'react';
+import ExpensesByDatePanel from '@/features/expenses/components/ExpensesByDatePanel';
+import CurrentBalanceCard from '@/features/pocketMoney/components/CurrentBalanceCard';
 
-const ShowExpenses: React.FC = () => {
+export default function ShowExpenses() {
   return (
     <>
-      <ShowMoney />
-      <FilterShowExpenses />
+      <CurrentBalanceCard />
+      <ExpensesByDatePanel />
     </>
   );
-};
-
-export default ShowExpenses;
+}

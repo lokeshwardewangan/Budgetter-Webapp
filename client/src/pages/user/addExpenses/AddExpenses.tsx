@@ -1,16 +1,13 @@
-import ExpenseDetailsTable from '@/components/user/addExpenses/ExpenseDetailsTable';
-import FilterSection from '@/components/user/addExpenses/FilterSection';
-import ShowMoney from '@/components/user/addMoney/ShowMoney';
-import React from 'react';
+import AddExpenseForm from '@/features/expenses/components/AddExpenseForm';
+import TodayExpensesPanel from '@/features/expenses/components/TodayExpensesPanel';
+import CurrentBalanceCard from '@/features/pocketMoney/components/CurrentBalanceCard';
 
-const AddExpenses: React.FC = () => {
+export default function AddExpenses() {
   return (
     <>
-      <ShowMoney />
-      <FilterSection />
-      <ExpenseDetailsTable />
+      <CurrentBalanceCard />
+      <AddExpenseForm />
+      <TodayExpensesPanel />
     </>
   );
-};
-
-export default AddExpenses;
+}
