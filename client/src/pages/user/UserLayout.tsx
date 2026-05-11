@@ -1,40 +1,17 @@
-import SideNavbar from '@/components/navbar/SideNavbar';
-import TopHeader from '@/components/header/TopHeader';
-import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
+import SideNavbar from '@/features/layout/sidebar/SideNavbar';
+import TopHeader from '@/features/layout/header/TopHeader';
 import DashboardLoader from './Loader/DashboardLoader';
 import TopHeaderLoader from './Loader/TopHeaderLoader';
-import React, { useEffect } from 'react';
 import { userSidenavbarList } from '@/data/UserSideNavbarList';
-import { getUserAllExpenses } from '@/services/expenses';
-import { useQuery } from '@tanstack/react-query';
-import { setAllExpenses } from '@/features/expenses/expenses';
+import { useMe } from '@/features/user/hooks';
+import { useSidebar } from '@/shared/contexts/SidebarContext';
+import { useIsMobile } from '@/shared/hooks/useMediaQuery';
 
-const UserLayout: React.FC = () => {
-  const dispatch = useDispatch();
-  // get from reducer state
-  const isSideNavbarOpen = useSelector(
-    (state: any) => state.sideNavbar.isSideNavbarOpen
-  );
-  // const windowWidth = useSelector(
-  //   (state: any) => state.windowWidth.windowWidth
-  // );
-  const isMobile = useSelector((state: any) => state.windowWidth.isMobile);
-
-  const user = useSelector((state: any) => state.user?.user);
-
-  // Use useQuery to fetch data only when necessary
-  const { data: allExpensesResData } = useQuery({
-    queryFn: getUserAllExpenses,
-    queryKey: ['user-all-expenses'],
-  });
-
-  // Update Redux store with fetched data when available
-  useEffect(() => {
-    if (allExpensesResData?.success) {
-      dispatch(setAllExpenses(allExpensesResData.data));
-    }
-  }, [allExpensesResData, dispatch]);
+export default function UserLayout() {
+  const { isOpen: isSideNavbarOpen } = useSidebar();
+  const isMobile = useIsMobile();
+  const { data: user } = useMe();
 
   return (
     <>
@@ -49,6 +26,4 @@ const UserLayout: React.FC = () => {
       </div>
     </>
   );
-};
-
-export default UserLayout;
+}

@@ -2,12 +2,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, X } from 'lucide-react';
 import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import ReactSelect, { MultiValue, StylesConfig } from 'react-select';
 import toast from 'react-hot-toast';
 import { GetAppUsersDetails } from '@/services/adminAccess';
 import { useQuery } from '@tanstack/react-query';
 import { User } from '@/types/api/admin/reports/userReports';
+import { useTheme } from '@/shared/contexts/ThemeContext';
 
 interface UploadFormProps {
   heading: string;
@@ -23,12 +23,6 @@ interface Option {
   label: string;
 }
 
-export interface RootState {
-  themeMode: {
-    isDarkMode: boolean;
-  };
-}
-
 const UploadForm: React.FC<UploadFormProps> = ({
   heading,
   setHeading,
@@ -37,9 +31,7 @@ const UploadForm: React.FC<UploadFormProps> = ({
   showEditor,
   setUsersEmails,
 }) => {
-  const isDarkMode = useSelector(
-    (state: RootState) => state.themeMode.isDarkMode
-  );
+  const { isDarkMode } = useTheme();
 
   const [allUsers, setAllUsers] = useState<User[]>([]);
 

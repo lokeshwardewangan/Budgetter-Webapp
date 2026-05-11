@@ -1,13 +1,11 @@
 import React from 'react';
 import { MoonIcon, SunIcon } from 'lucide-react';
-import { toggleThemeMode as setTheme } from '@/features/theme/themeModeSlice';
+import { useTheme } from '@/shared/contexts/ThemeContext';
 import { createAnimation } from '../theme/theme-animations';
 import type {
   AnimationStart,
   AnimationVariant,
 } from '../theme/theme-animations';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../admin/NewsLetter/UploadForm';
 
 interface ThemeToggleAnimationProps {
   variant?: AnimationVariant;
@@ -22,16 +20,12 @@ export function ThemeToggleButton({
   showLabel = false,
   url = '',
 }: ThemeToggleAnimationProps) {
-  const dispatch = useDispatch();
-  const darkMode = useSelector(
-    (state: RootState) => state.themeMode.isDarkMode
-  );
+  const { isDarkMode, toggle } = useTheme();
 
   const styleId = 'theme-transition-styles';
 
   const updateStyles = React.useCallback((css: string) => {
     if (typeof window === 'undefined') return;
-
     let styleElement = document.getElementById(styleId) as HTMLStyleElement;
     if (!styleElement) {
       styleElement = document.createElement('style');
@@ -44,20 +38,13 @@ export function ThemeToggleButton({
   const toggleTheme = React.useCallback(() => {
     const animation = createAnimation(variant, start, url);
     updateStyles(animation.css);
-
     if (typeof window === 'undefined') return;
-
-    const switchTheme = () => {
-      dispatch(setTheme());
-    };
-
     if (!document.startViewTransition) {
-      switchTheme();
+      toggle();
       return;
     }
-
-    document.startViewTransition(switchTheme);
-  }, [darkMode, dispatch, variant, start, url, updateStyles]);
+    document.startViewTransition(() => toggle());
+  }, [toggle, variant, start, url, updateStyles]);
 
   return (
     <button
@@ -66,7 +53,7 @@ export function ThemeToggleButton({
       className="theme_container_toggle group flex h-10 w-10 cursor-pointer items-center overflow-hidden rounded-full bg-[#f2f5fa] p-2.5 text-black transition-all duration-300 hover:bg-[#047857]/20 focus:outline-none dark:bg-[#10101c] dark:text-white dark:hover:bg-slate-700 sm:hover:h-9 sm:hover:w-[156px] sm:hover:px-4 sm:active:w-[156px]"
       name="Theme Toggle Button"
     >
-      {!darkMode ? (
+      {!isDarkMode ? (
         <MoonIcon className="h-5 w-5 shrink-0 transition-all duration-300" />
       ) : (
         <SunIcon className="h-5 w-5 shrink-0 transition-all duration-300" />
@@ -83,7 +70,7 @@ export function ThemeToggleButton({
         </>
       )}
       <span className="ml-1.5 whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-300 sm:group-hover:opacity-100">
-        {darkMode ? 'Switch to Light' : 'Switch to Dark'}
+        {isDarkMode ? 'Switch to Light' : 'Switch to Dark'}
       </span>
     </button>
   );

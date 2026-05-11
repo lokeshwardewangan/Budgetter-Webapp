@@ -1,45 +1,31 @@
-import SideNavbar from '@/components/navbar/SideNavbar';
-import TopHeader from '@/components/header/TopHeader';
-import { useSelector } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import React, { useEffect, useRef, useState } from 'react';
+import SideNavbar from '@/features/layout/sidebar/SideNavbar';
+import TopHeader from '@/features/layout/header/TopHeader';
 import { adminSidenavbarList } from '@/data/AdminSidebarList';
+import { useSidebar } from '@/shared/contexts/SidebarContext';
+import { useIsMobile } from '@/shared/hooks/useMediaQuery';
+
 const adminPassword = import.meta.env.VITE_BUDGETTER_ADMIN_PASSWORD;
 
-const AdminLayout: React.FC = () => {
-  // get from reducer state
-  const isSideNavbarOpen = useSelector(
-    (state: any) => state.sideNavbar.isSideNavbarOpen
-  );
-  // const windowWidth = useSelector(
-  //   (state: any) => state.windowWidth.windowWidth
-  // );
-  const isMobile = useSelector((state: any) => state.windowWidth.isMobile);
-
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+export default function AdminLayout() {
+  const { isOpen: isSideNavbarOpen } = useSidebar();
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const hasPrompted = useRef(false); // To track if the prompt has been shown already
+  const hasPrompted = useRef(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (hasPrompted.current) return; // Prevent re-executing the prompt if it's already done
-
+    if (hasPrompted.current) return;
     const password = prompt('Admin Password ???');
-
     const isAuthenticated = password === adminPassword;
-
     setIsAdminAuthenticated(isAuthenticated);
-    hasPrompted.current = true; // Mark the prompt as shown
-
-    // Redirect only if authentication fails
-    if (!isAuthenticated) {
-      navigate('/user/dashboard');
-    }
+    hasPrompted.current = true;
+    if (!isAuthenticated) navigate('/user/dashboard');
   }, [navigate]);
 
   return (
-    <div
-      className={`h-full w-full ${isAdminAuthenticated ? 'block' : 'hidden'}`}
-    >
+    <div className={`h-full w-full ${isAdminAuthenticated ? 'block' : 'hidden'}`}>
       <SideNavbar userSidenavbarList={adminSidenavbarList} />
       <div
         className={`dashboard_layout_container absolute right-0 top-0 flex flex-col ${isSideNavbarOpen && !isMobile && 'dashboard_layout_container_large_screen_open'} ${!isSideNavbarOpen && !isMobile && 'dashboard_layout_container_large_screen_close'} ${isMobile && 'dashboard_layout_container_small_screen_close'} `}
@@ -51,6 +37,4 @@ const AdminLayout: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default AdminLayout;
+}

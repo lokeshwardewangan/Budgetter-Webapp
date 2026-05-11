@@ -6,15 +6,7 @@ interface UserCardProps {
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user }) => {
-  const {
-    avatar,
-    username,
-    name,
-    email,
-    currentPocketMoney,
-    isVerified,
-    LentMoneyHistory,
-  } = user;
+  const { avatar, username, name, email, currentPocketMoney, isVerified } = user;
 
   return (
     <div className="user_card_container col-span-12 flex flex-col items-center gap-2 rounded-2xl border-[#6a718533] bg-white p-5 dark:border dark:bg-bg_primary_dark md:col-span-12 lg:col-span-6 2xl:col-span-3">
@@ -69,9 +61,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
           <div className="absolute right-0 top-2/4 h-5 w-px -translate-y-1/2 bg-gray-300"></div>
         </li>
         <li className="flex flex-col items-center gap-0 px-4 py-0">
-          <h5 className="text-base font-semibold dark:text-white">
-            {LentMoneyHistory.length}
-          </h5>
+          <h5 className="text-base font-semibold dark:text-white">—</h5>
           <span className="flex flex-col items-center justify-center text-center text-sm font-medium leading-4 text-[#888888] dark:text-white">
             <span>Total</span>
             <span>Lent</span>

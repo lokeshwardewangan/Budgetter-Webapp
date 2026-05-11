@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { karlaFont } from '../../utils/font';
 import { Button } from '../ui/button';
-import { useSelector } from 'react-redux';
+import { useMe } from '@/features/user/hooks';
 
 // Extend jsPDF type to include lastAutoTable
 declare module 'jspdf' {
@@ -31,7 +31,7 @@ const PDFExportComponent: React.FC<ExportTableProps> = ({
   expenses,
   createdAt,
 }) => {
-  const user = useSelector((state: any) => state.user?.user);
+  const { data: user } = useMe();
   const userDetails = {
     name: user?.name,
     username: user?.username,

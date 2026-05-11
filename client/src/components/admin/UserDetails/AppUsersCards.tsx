@@ -1,15 +1,14 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import UserCard from './Cards/UserCard';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { GetAppUsersDetails } from '@/services/adminAccess';
 import { User } from '@/types/api/admin/reports/userReports';
+import { useMe } from '@/features/user/hooks';
 
 const AppUsersCards: React.FC = () => {
-  // current loggedin user
-  const user = useSelector((state: any) => state.user.user);
+  const { data: user } = useMe();
 
   // get all app users
   const { data } = useQuery({
