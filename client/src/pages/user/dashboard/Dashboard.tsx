@@ -1,174 +1,69 @@
-import SummarizeBoxes from '@/components/user/dashbaord/SummarizeBoxes';
-import CategoryWiseExpensesChart from '@/components/user/dashbaord/charts/CategoryWiseExpensesChart';
-import CategoryWiseLineChart from '@/components/user/dashbaord/charts/CategoryWiseLineChart';
-import { getTotalExpensesAndAddedMoneyInMonth } from '@/services/reports';
-import { useMutation } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  monthsNames,
-  prevYearsName,
-  getMonthInNumber,
-  getCurrentMonth,
-} from '@/utils/date/date';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
-import CategoryInsightsTable from '@/components/user/dashbaord/table/CategoryInsightsTable';
-import { CategoryWiseExpensesData } from '@/types/api/reports/reports';
+import { getCurrentMonth, getMonthInNumber } from '@/utils/date/date';
+import { useMonthlyReport } from '@/features/dashboard/hooks';
+import { useMe } from '@/features/user/hooks';
+import DashboardFilters from '@/features/dashboard/components/DashboardFilters';
+import SummaryBoxes from '@/features/dashboard/components/SummaryBoxes';
+import CategoryDonutChart from '@/features/dashboard/components/CategoryDonutChart';
+import ExpensesTimelineChart from '@/features/dashboard/components/ExpensesTimelineChart';
+import CategoryInsightsTable from '@/features/dashboard/components/CategoryInsightsTable';
 
-const Dashboard: React.FC = () => {
-  const user = useSelector((state: any) => state.user.user);
-  const [totalExpensesOfMonth, setTotalExpensesOfMonth] = useState<number>(0);
-  const [totalAddedMoneyOfMonth, setTotalAddedMoneyOfMonth] =
-    useState<number>(0);
-  const [lastTotalExpenses, setlastTotalExpenses] = useState<number>(0);
-  const [totalLentMoney, setTotalLentMoney] = useState<number>(0);
-  const [filterMonthValue, setFilterMonthValue] =
-    useState<string>(getCurrentMonth());
-  const [filterYearValue, setFilterYearValue] = useState<string>(
-    new Date().getFullYear().toString()
-  );
+export default function Dashboard() {
+  const { data: user } = useMe();
+  const [monthLabel, setMonthLabel] = useState<string>(getCurrentMonth());
+  const [yearLabel, setYearLabel] = useState<string>(new Date().getFullYear().toString());
 
-  const [CategoryWiseData, setCategoryWiseData] =
-    useState<CategoryWiseExpensesData>();
+  const monthNum = getMonthInNumber(monthLabel);
+  const { data, isLoading } = useMonthlyReport(monthNum, yearLabel);
 
-  const { mutateAsync: getTotalExpensesAndAddedMoneyMutate, isPending } =
-    useMutation({
-      mutationFn: getTotalExpensesAndAddedMoneyInMonth,
-      onSuccess: (data) => {
-        setTotalExpensesOfMonth(data?.data.totalExpenses);
-        setTotalAddedMoneyOfMonth(data?.data.totalAddedMoney);
-        setlastTotalExpenses(data?.data.lastTotalExpenses);
-        setTotalLentMoney(data?.data.totalLentMoney);
-        setCategoryWiseData(data?.data.categoryWiseExpensesData);
-        // console.log(data?.data.categoryWiseExpensesData);
-      },
-      onError: (error) => {
-        console.log(error);
-      },
-    });
-
-  useEffect(() => {
-    const currentMonthInNumber = (new Date().getMonth() + 1)
-      .toString()
-      .padStart(2, '0');
-    getTotalExpensesAndAddedMoneyMutate({
-      month: currentMonthInNumber,
-      year: filterYearValue,
-    });
-  }, []);
-
-  const handleDashboardFilterMonthExpenses = (month: string) => {
-    if (!month) {
-      toast.error('Please Select Month!!');
-      return;
-    }
-    const monthInNum = getMonthInNumber(month);
-    // console.log('real selected value', month, filterMonthValue, monthInNum);
-    setFilterMonthValue(month);
-    getTotalExpensesAndAddedMoneyMutate({
-      month: monthInNum,
-      year: filterYearValue,
-    });
+  const onMonthChange = (m: string) => {
+    if (!m) return toast.error('Please select a month');
+    setMonthLabel(m);
   };
-  const handleDashboardFilterYearExpenses = (year: string) => {
-    if (!year) {
-      toast.error('Please Select Year!!');
-      return;
-    }
-    // console.log('real selected value', year, filterMonthValue);
-    getTotalExpensesAndAddedMoneyMutate({ month: filterMonthValue, year });
-    setFilterYearValue(year);
+  const onYearChange = (y: string) => {
+    if (!y) return toast.error('Please select a year');
+    setYearLabel(y);
   };
 
   return (
-    <>
-      <div className="dashboard_page_ flex w-full flex-col items-start justify-start gap-5">
-        <div className="heading_dashboard_page flex w-full items-start justify-start">
-          <h3 className="text-left text-lg font-semibold">
-            {user && user?.name && (
-              <>
-                {' '}
-                <span className="font-bold text-text_heading_light dark:text-text_primary_dark">
-                  Welcome! {user.name}
-                </span>
-              </>
-            )}{' '}
-          </h3>
-        </div>
-        <div className="summarize_box_container flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2.5 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark sm:justify-between">
-          <h4 className="text-base font-semibold">
-            Your {filterMonthValue} Month Report
-          </h4>
-          <div
-            id="filter_report_section"
-            className="filters flex items-center justify-center gap-2 font-medium"
-          >
-            <p className="mr-1 whitespace-nowrap">Filter Report</p>
-            {/* month */}
-            <Select onValueChange={handleDashboardFilterMonthExpenses}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={filterMonthValue} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {monthsNames.map((monthName) => (
-                    <SelectItem key={monthName} value={monthName}>
-                      {monthName}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            {/* year */}
-            <Select onValueChange={handleDashboardFilterYearExpenses}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={filterYearValue} />
-              </SelectTrigger>
-              <SelectContent>
-                {/* <SelectItem value="all">All Year</SelectItem> */}
-                <SelectGroup>
-                  {prevYearsName.map((year) => (
-                    <SelectItem key={year} value={year}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <SummarizeBoxes
-          totalExpensesOfMonth={totalExpensesOfMonth}
-          totalAddedMoneyOfMonth={totalAddedMoneyOfMonth}
-          lastTotalExpenses={lastTotalExpenses}
-          totalLentMoney={totalLentMoney}
-          isPending={isPending}
-        />
-        <div className="visual_graph_container grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
-          <CategoryWiseExpensesChart
-            totalExpensesOfMonth={totalExpensesOfMonth}
-            CategoryWiseData={CategoryWiseData}
-            isPending={isPending}
-          />
-          <CategoryWiseLineChart />
-        </div>
-        <div className="category_insights_container mb-10 w-full">
-          <CategoryInsightsTable
-            filterMonthValue={filterMonthValue}
-            filterYearValue={filterYearValue}
-          />
-        </div>
+    <div className="dashboard_page_ flex w-full flex-col items-start justify-start gap-5">
+      <div className="heading_dashboard_page flex w-full items-start justify-start">
+        <h3 className="text-left text-lg font-semibold">
+          {user?.name && (
+            <span className="font-bold text-text_heading_light dark:text-text_primary_dark">
+              Welcome! {user.name}
+            </span>
+          )}
+        </h3>
       </div>
-    </>
-  );
-};
 
-export default Dashboard;
+      <DashboardFilters
+        monthLabel={monthLabel}
+        yearLabel={yearLabel}
+        onMonthChange={onMonthChange}
+        onYearChange={onYearChange}
+      />
+
+      <SummaryBoxes
+        totalExpenses={data?.totalExpenses ?? 0}
+        totalAddedMoney={data?.totalAddedMoney ?? 0}
+        totalLentMoney={data?.totalLentMoney ?? 0}
+        isLoading={isLoading}
+      />
+
+      <div className="visual_graph_container grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
+        <CategoryDonutChart
+          totalExpenses={data?.totalExpenses ?? 0}
+          data={data?.categoryWiseExpensesData}
+          isLoading={isLoading}
+        />
+        <ExpensesTimelineChart />
+      </div>
+
+      <div className="category_insights_container mb-10 w-full">
+        <CategoryInsightsTable filterMonthValue={monthLabel} filterYearValue={yearLabel} />
+      </div>
+    </div>
+  );
+}
