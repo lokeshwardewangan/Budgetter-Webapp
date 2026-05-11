@@ -1,96 +1,40 @@
-import React, { useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { getCurrentUser } from '@/services/auth';
-import { useSentryIntegration } from '@/hooks/useSentryIntegration';
-import { useQuery } from '@tanstack/react-query';
-import { useDispatch } from 'react-redux';
-import { setUser } from '@/features/user/user';
+import { useEffect } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Cookies from 'universal-cookie';
+import { useSentryIntegration } from '@/hooks/useSentryIntegration';
+import { useMe } from '@/features/user/hooks';
 import {
   navigateToLandingPage,
   navigateToUserPage,
 } from '@/utils/navigate/NavigateRightPath';
 import { getPageTitle } from '@/utils/utility';
 
-const MainLayout: React.FC = () => {
+export default function MainLayout() {
   const navigate = useNavigate();
-  const location = useLocation(); // Replaces implicit/global location usage
-  useSentryIntegration(); // Initialize Sentry tracking
+  const location = useLocation();
+  useSentryIntegration();
   const cookie = new Cookies();
-  const dispatch = useDispatch();
+
+  // Trigger the /me query early so it's primed by the time pages mount.
+  // Theme + sidebar state now live in their own context providers.
+  const { data } = useMe();
 
   useEffect(() => {
     const accessToken = cookie.get('accessToken');
-    // console.log(accessToken);
-    if (!accessToken || accessToken === undefined) {
+    if (!accessToken) {
       navigate(navigateToLandingPage());
       return;
-    } else {
-      navigate(navigateToUserPage());
     }
+    navigate(navigateToUserPage());
   }, [location.pathname]);
 
-  const { data } = useQuery({
-    queryFn: () => getCurrentUser(),
-    queryKey: ['user'],
-  });
-
   useEffect(() => {
-    if (data?.data) {
-      const {
-        _id,
-        username,
-        name,
-        email,
-        avatar,
-        currentPocketMoney,
-        PocketMoneyHistory,
-        LentMoneyHistory,
-        isVerified,
-        profession,
-        dob,
-        instagramLink,
-        facebookLink,
-        createdAt,
-        lastLogin,
-        activeSessions,
-      } = data.data;
-      dispatch(
-        setUser({
-          _id,
-          username,
-          name,
-          email,
-          avatar,
-          currentPocketMoney,
-          PocketMoneyHistory,
-          LentMoneyHistory,
-          isVerified,
-          profession,
-          dob,
-          instagramLink,
-          facebookLink,
-          createdAt,
-          lastLogin,
-          activeSessions,
-        })
-      );
-      navigate(navigateToUserPage());
-    }
+    if (data) navigate(navigateToUserPage());
   }, [data]);
 
   useEffect(() => {
-    const localIsDarkMode = localStorage.getItem('isDarkMode') === 'true';
-    if (localIsDarkMode) {
-      document.body.classList.toggle('dark', localIsDarkMode);
-    }
-  }, []);
-
-  // get current route and set to as title
-  useEffect(() => {
-    const getCurrentPageTitle = getPageTitle();
-    document.title = getCurrentPageTitle;
+    document.title = getPageTitle();
   }, [location.pathname]);
 
   return (
@@ -101,6 +45,4 @@ const MainLayout: React.FC = () => {
       <Toaster />
     </>
   );
-};
-
-export default MainLayout;
+}
