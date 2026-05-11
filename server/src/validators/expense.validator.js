@@ -21,8 +21,18 @@ export const dateQuerySchema = z.object({
   date: dateString,
 });
 
-export const expenseProductParamSchema = z.object({
-  expenseId: objectIdSchema,
+// Coerce `page` and `limit` from query strings; the controller clamps `limit`
+// to [1, 100] separately.
+export const feedQuerySchema = z.object({
+  page: z.coerce.number().int().nonnegative().optional(),
+  limit: z.coerce.number().int().positive().max(100).optional(),
+  month: z.string().regex(/^(0[1-9]|1[0-2])$/).optional(),
+  year: z.string().regex(/^\d{4}$/).optional(),
+  search: z.string().max(80).optional(),
+  category: z.enum(EXPENSE_CATEGORIES).optional(),
+});
+
+export const productIdParamSchema = z.object({
   productId: objectIdSchema,
 });
 

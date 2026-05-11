@@ -41,28 +41,36 @@ export const getAll = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, docs, 'All expenses retrieved'));
 });
 
+export const feed = asyncHandler(async (req, res) => {
+  const data = await expenseService.getExpensesFeed(req.user._id, {
+    page: Number(req.query.page) || 0,
+    limit: Math.min(Number(req.query.limit) || 10, 100),
+    month: req.query.month || undefined,
+    year: req.query.year || undefined,
+    search: req.query.search || undefined,
+    category: req.query.category || undefined,
+  });
+  res.status(200).json(new ApiResponse(200, data, 'Expenses feed retrieved'));
+});
+
 export const update = asyncHandler(async (req, res) => {
-  const { expenseId, productId } = req.params;
   const data = await expenseService.updateExpenseProduct(req.user._id, {
-    expenseId: productId,
-    actualDate: req.body?.actualDate,
-    expenseName: req.body?.expenseName,
-    selectedLabel: req.body?.selectedLabel,
-    expensePrice: req.body?.expensePrice,
-    expenseCategory: req.body?.expenseCategory,
-    expenseDate: req.body?.expenseDate,
-    parentExpenseId: expenseId,
+    expenseId: req.params.productId,
+    actualDate: req.body.actualDate,
+    expenseName: req.body.expenseName,
+    selectedLabel: req.body.selectedLabel,
+    expensePrice: req.body.expensePrice,
+    expenseCategory: req.body.expenseCategory,
+    expenseDate: req.body.expenseDate,
   });
   res.status(200).json(new ApiResponse(200, data, 'Expense updated successfully'));
 });
 
 export const remove = asyncHandler(async (req, res) => {
-  const { productId } = req.params;
   const data = await expenseService.deleteExpenseProduct(req.user._id, {
-    expenseId: productId,
-    expenseDate: req.body?.expenseDate || req.query?.expenseDate,
-    isAddPriceToPocketMoney:
-      req.body?.isAddPriceToPocketMoney ?? req.query?.isAddPriceToPocketMoney === 'true',
+    expenseId: req.params.productId,
+    expenseDate: req.body.expenseDate,
+    isAddPriceToPocketMoney: req.body.isAddPriceToPocketMoney ?? false,
   });
   res.status(200).json(new ApiResponse(200, data, 'Expense deleted successfully'));
 });

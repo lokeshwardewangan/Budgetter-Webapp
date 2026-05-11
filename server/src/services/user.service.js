@@ -3,6 +3,7 @@ import UserModel from '../models/user.model.js';
 import PocketMoneyModel from '../models/pocketMoney.model.js';
 import LentMoneyModel from '../models/lentMoney.model.js';
 import ActiveSessionModel from '../models/activeSession.model.js';
+// PocketMoney + LentMoney imports kept because deleteAccount still cascades into them.
 import ExpenseModel from '../models/expenses.model.js';
 import DeletedUserModel from '../models/deletedUser.model.js';
 import { ApiError } from '../utils/ApiError.js';
@@ -19,11 +20,13 @@ export async function generateUniqueUsername(name) {
   return username;
 }
 
+// /me now returns user identity + current session only. Pocket-money and
+// lent-money histories are fetched separately via their dedicated endpoints,
+// which gives smaller payloads on first paint, granular query invalidation,
+// and lets each feature own its cache.
 export async function getMe(userId, currentToken) {
-  const [user, pocketMoneyHistory, lentMoneyHistory, currentSession] = await Promise.all([
+  const [user, currentSession] = await Promise.all([
     UserModel.findById(userId).select('-password'),
-    PocketMoneyModel.find({ user: userId }).sort({ createdAt: -1 }).lean(),
-    LentMoneyModel.find({ user: userId }).sort({ createdAt: -1 }).lean(),
     ActiveSessionModel.findOne({ user: userId, token: currentToken }).lean(),
   ]);
 
@@ -43,8 +46,6 @@ export async function getMe(userId, currentToken) {
     facebookLink: user.facebookLink,
     createdAt: user.createdAt,
     lastLogin: user.lastLogin,
-    pocketMoneyHistory,
-    lentMoneyHistory,
     currentSession: currentSession ? [currentSession] : [],
   };
 }

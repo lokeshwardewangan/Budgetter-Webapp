@@ -50,6 +50,48 @@ export async function getAllExpenses(userId) {
   return ExpenseModel.find({ user: userId }).sort({ date: -1 }).lean();
 }
 
+// Paginated flat feed of product-level expense rows. Filters month/year/search/
+// category server-side via an aggregation pipeline so the client only ever
+// loads `limit` rows (default 10) at a time.
+export async function getExpensesFeed(userId, { page = 0, limit = 10, month, year, search, category }) {
+  const match = { user: userId };
+  if (month && year) match.date = { $regex: `^\\d{2}-${month}-${year}` };
+  else if (month) match.date = { $regex: `^\\d{2}-${month}-\\d{4}` };
+  else if (year) match.date = { $regex: `^\\d{2}-\\d{2}-${year}` };
+
+  const productMatch = {};
+  if (category) productMatch['product.category'] = category;
+  if (search) productMatch['product.name'] = { $regex: search, $options: 'i' };
+
+  const pipeline = [
+    { $match: match },
+    { $unwind: '$products' },
+    { $project: { _id: 0, date: 1, parentId: '$_id', product: '$products' } },
+    ...(Object.keys(productMatch).length ? [{ $match: productMatch }] : []),
+    {
+      $facet: {
+        items: [
+          { $sort: { date: -1, 'product.createdAt': -1 } },
+          { $skip: page * limit },
+          { $limit: limit },
+        ],
+        total: [{ $count: 'count' }],
+      },
+    },
+  ];
+
+  const [result] = await ExpenseModel.aggregate(pipeline);
+  const items = result?.items || [];
+  const total = result?.total?.[0]?.count || 0;
+  return {
+    items,
+    total,
+    page,
+    limit,
+    hasMore: (page + 1) * limit < total,
+  };
+}
+
 export async function updateExpenseProduct(userId, body) {
   const {
     expenseId,
