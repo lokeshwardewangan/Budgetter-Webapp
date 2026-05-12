@@ -18,6 +18,7 @@ export default function AddPocketMoneyForm() {
     formState: { errors },
   } = useForm<AddPocketMoneyForm>({
     resolver: zodResolver(addPocketMoneySchema),
+    mode: 'onTouched',
     defaultValues: { amount: '', source: '', date: '' },
   });
 
@@ -51,14 +52,14 @@ export default function AddPocketMoneyForm() {
               placeholder="Enter Money"
             />
             {errors.amount && (
-              <span className="text-xs text-red-500">{errors.amount.message}</span>
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.amount.message}</span>
             )}
           </div>
           <div className="input_section col-span-12 flex w-full flex-col items-start justify-start gap-1 sm:col-span-6 lg:col-span-3">
             <p className="text-sm">Money Source</p>
             <Input {...register('source')} type="text" placeholder="Enter Source" />
             {errors.source && (
-              <span className="text-xs text-red-500">{errors.source.message}</span>
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.source.message}</span>
             )}
           </div>
         </div>

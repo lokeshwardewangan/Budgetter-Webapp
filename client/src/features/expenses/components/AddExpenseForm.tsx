@@ -29,6 +29,7 @@ export default function AddExpenseForm() {
     formState: { errors },
   } = useForm<AddExpenseFormInput>({
     resolver: zodResolver(addExpenseFormSchema),
+    mode: 'onTouched',
     defaultValues: {
       inputDate: new Date(),
       expenseName: '',
@@ -97,7 +98,7 @@ export default function AddExpenseForm() {
               )}
             />
             {errors.inputDate && (
-              <span className="ml-1 text-sm text-red-500">
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
                 {errors.inputDate.message as string}
               </span>
             )}
@@ -109,7 +110,7 @@ export default function AddExpenseForm() {
             </p>
             <Input {...register('expenseName')} type="text" placeholder="Enter Expense" />
             {errors.expenseName && (
-              <span className="ml-1 text-sm text-red-500">
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
                 {errors.expenseName.message}
               </span>
             )}
@@ -143,7 +144,7 @@ export default function AddExpenseForm() {
               placeholder="Enter Price"
             />
             {errors.price && (
-              <span className="ml-1 text-sm text-red-500">{errors.price.message}</span>
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.price.message}</span>
             )}
           </div>
 

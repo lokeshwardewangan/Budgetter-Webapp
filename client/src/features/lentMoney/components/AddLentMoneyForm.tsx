@@ -20,6 +20,7 @@ export default function AddLentMoneyForm() {
     formState: { errors },
   } = useForm<AddLentMoneyForm>({
     resolver: zodResolver(addLentMoneySchema),
+    mode: 'onTouched',
     // DatePicker emits a Date object; we format it to dd-mm-yyyy on submit.
     defaultValues: { personName: '', price: '', date: formatDate(new Date()) },
   });
@@ -56,7 +57,7 @@ export default function AddLentMoneyForm() {
               )}
             />
             {errors.date && (
-              <span className="text-xs text-red-500">{errors.date.message}</span>
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.date.message}</span>
             )}
           </div>
           <div className="input_section col-span-12 flex w-full flex-col items-start justify-start gap-1 sm:col-span-6 xl:col-span-3">
@@ -67,7 +68,7 @@ export default function AddLentMoneyForm() {
               placeholder="Enter Person Name"
             />
             {errors.personName && (
-              <span className="text-xs text-red-500">{errors.personName.message}</span>
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.personName.message}</span>
             )}
           </div>
           <div className="input_section col-span-12 flex w-full flex-col items-start justify-start gap-1 sm:col-span-6 xl:col-span-3">
@@ -79,7 +80,7 @@ export default function AddLentMoneyForm() {
               placeholder="Enter Money"
             />
             {errors.price && (
-              <span className="text-xs text-red-500">{errors.price.message}</span>
+              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.price.message}</span>
             )}
           </div>
         </div>

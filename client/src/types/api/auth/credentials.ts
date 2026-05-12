@@ -5,9 +5,12 @@ export interface RegisterCredentialsType {
   password: string;
 }
 
+// Either `username` or `email` must be provided. Don't send both as the
+// same string — the server's Zod validator runs .email() on the email
+// field as soon as it's populated.
 export interface LoginCredentialsType {
-  username: string;
-  email: string;
+  username?: string;
+  email?: string;
   password: string;
 }
 

@@ -59,7 +59,11 @@ export function SelectField({
           </SelectGroup>
         </SelectContent>
       </Select>
-      {error && <span className="ml-1 text-sm text-red-500">{error}</span>}
+      {error && (
+        <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
+          {error}
+        </span>
+      )}
     </div>
   );
 }

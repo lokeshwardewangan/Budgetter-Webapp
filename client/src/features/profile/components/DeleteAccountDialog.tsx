@@ -29,6 +29,7 @@ export default function DeleteAccountDialog() {
     formState: { errors },
   } = useForm<DeleteAccountForm>({
     resolver: zodResolver(deleteAccountSchema),
+    mode: 'onTouched',
     defaultValues: { password: '' },
   });
 

@@ -18,6 +18,7 @@ export default function SignupForm() {
     formState: { errors },
   } = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
+    mode: 'onTouched',
     defaultValues: { username: '', name: '', email: '', password: '' },
   });
 
