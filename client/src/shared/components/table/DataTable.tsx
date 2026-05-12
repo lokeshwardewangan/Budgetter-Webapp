@@ -6,9 +6,16 @@ import {
 } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 
-type DataTableProps<TData, TValue> = {
+// `TValue` is intentionally `any` here. TanStack's `ColumnDef` is
+// invariant in its second generic, so a column that accessor-keys into a
+// `string` field can't be widened to `ColumnDef<T, unknown>`. Callers
+// mix column types within a single table (string, number, Date), and
+// `any` is the canonical TanStack escape hatch.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DataTableProps<TData> = {
   data: TData[];
-  columns: ColumnDef<TData, TValue>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  columns: ColumnDef<TData, any>[];
   emptyMessage?: string;
   isLoading?: boolean;
   className?: string;
@@ -18,13 +25,13 @@ type DataTableProps<TData, TValue> = {
 // duplicated header/body markup previously copy-pasted across every list
 // view (pocket money, lent money, expenses, sessions). Consumers only need
 // to provide a `data` array and `columns` definition.
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
   data,
   columns,
   emptyMessage = 'No records found',
   isLoading,
   className,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const table = useReactTable({
     data,
     columns,
