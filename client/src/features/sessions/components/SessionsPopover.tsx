@@ -8,7 +8,11 @@ import LogOutOtherDevicesButton from './LogOutOtherDevicesButton';
 
 export default function SessionsPopover() {
   const { isOpen, setIsOpen } = useDialogState(false);
-  const { data: sessions = [], isLoading, refetch } = useSessions({ enabled: isOpen });
+  const {
+    data: sessions = [],
+    isLoading,
+    refetch,
+  } = useSessions({ enabled: isOpen });
   const { data: user } = useMe();
 
   // /me returns the current device's session under `currentSession[0]`.

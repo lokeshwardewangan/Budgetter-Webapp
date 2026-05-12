@@ -23,7 +23,11 @@ export default function AdvancedOptions() {
         <Button variant="outline" className="w-full">
           <Settings2 className="mr-2 h-4 w-4" />
           Advance Options
-          {!isOpen ? <ChevronUp className="ml-1 h-5 w-5" /> : <ChevronDown className="ml-1 h-5 w-5" />}
+          {!isOpen ? (
+            <ChevronUp className="ml-1 h-5 w-5" />
+          ) : (
+            <ChevronDown className="ml-1 h-5 w-5" />
+          )}
         </Button>
       </CollapsibleTrigger>
     </Collapsible>

@@ -25,7 +25,10 @@ export default function AddPocketMoneyForm() {
   const onSubmit = handleSubmit(async (values) => {
     // `date` is always set to today here. The form input only collects
     // amount + source; users on this page are recording today's income.
-    const parsed = addPocketMoneySchema.parse({ ...values, date: getTodayDate() });
+    const parsed = addPocketMoneySchema.parse({
+      ...values,
+      date: getTodayDate(),
+    });
     await toast.promise(addMoney(parsed), {
       loading: 'Adding pocket money...',
       success: 'Pocket money added!',
@@ -52,14 +55,28 @@ export default function AddPocketMoneyForm() {
               placeholder="Enter Money"
             />
             {errors.amount && (
-              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.amount.message}</span>
+              <span
+                role="alert"
+                className="mt-1 block text-xs font-medium text-red-500"
+              >
+                {errors.amount.message}
+              </span>
             )}
           </div>
           <div className="input_section col-span-12 flex w-full flex-col items-start justify-start gap-1 sm:col-span-6 lg:col-span-3">
             <p className="text-sm">Money Source</p>
-            <Input {...register('source')} type="text" placeholder="Enter Source" />
+            <Input
+              {...register('source')}
+              type="text"
+              placeholder="Enter Source"
+            />
             {errors.source && (
-              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.source.message}</span>
+              <span
+                role="alert"
+                className="mt-1 block text-xs font-medium text-red-500"
+              >
+                {errors.source.message}
+              </span>
             )}
           </div>
         </div>

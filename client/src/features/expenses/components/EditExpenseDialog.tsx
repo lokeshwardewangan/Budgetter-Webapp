@@ -78,7 +78,7 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
         loading: 'Updating expense...',
         success: 'Expense updated.',
         error: 'Could not update expense.',
-      },
+      }
     );
     close();
   });
@@ -113,14 +113,19 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
                       type="date"
                       value={field.value ? toInputDate(field.value) : ''}
                       onChange={(e) =>
-                        field.onChange(e.target.value ? fromInputDate(e.target.value) : '')
+                        field.onChange(
+                          e.target.value ? fromInputDate(e.target.value) : ''
+                        )
                       }
                       className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-bg_secondary_dark"
                     />
                   )}
                 />
                 {errors.expenseDate && (
-                  <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
+                  <span
+                    role="alert"
+                    className="mt-1 block text-xs font-medium text-red-500"
+                  >
                     {errors.expenseDate.message}
                   </span>
                 )}
@@ -134,7 +139,10 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
                   placeholder="Enter Expense"
                 />
                 {errors.expenseName && (
-                  <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
+                  <span
+                    role="alert"
+                    className="mt-1 block text-xs font-medium text-red-500"
+                  >
                     {errors.expenseName.message}
                   </span>
                 )}
@@ -166,7 +174,10 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
                   placeholder="Enter Price"
                 />
                 {errors.expensePrice && (
-                  <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
+                  <span
+                    role="alert"
+                    className="mt-1 block text-xs font-medium text-red-500"
+                  >
                     {errors.expensePrice.message}
                   </span>
                 )}
@@ -197,7 +208,12 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
             </div>
 
             <div className="mt-2 flex items-center justify-end gap-4">
-              <Button type="button" variant="outline" onClick={close} className="w-32">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={close}
+                className="w-32"
+              >
                 Cancel
               </Button>
               <Button

@@ -15,16 +15,20 @@ export type AddPocketMoneyResult = {
 };
 
 export async function addPocketMoney(
-  input: AddPocketMoneyInput,
+  input: AddPocketMoneyInput
 ): Promise<ApiResponse<AddPocketMoneyResult>> {
   const { data } = await apiURL.post<ApiResponse<AddPocketMoneyResult>>(
     endpoints.pocketMoney.root,
-    { ...input, amount: input.amount.toString() },
+    { ...input, amount: input.amount.toString() }
   );
   return data;
 }
 
-export async function getPocketMoneyHistory(): Promise<ApiResponse<PocketMoneyEntry[]>> {
-  const { data } = await apiURL.get<ApiResponse<PocketMoneyEntry[]>>(endpoints.pocketMoney.root);
+export async function getPocketMoneyHistory(): Promise<
+  ApiResponse<PocketMoneyEntry[]>
+> {
+  const { data } = await apiURL.get<ApiResponse<PocketMoneyEntry[]>>(
+    endpoints.pocketMoney.root
+  );
   return data;
 }

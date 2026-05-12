@@ -21,25 +21,29 @@ export type MarkReceivedResult = {
 };
 
 export async function addLentMoney(
-  input: AddLentMoneyInput,
+  input: AddLentMoneyInput
 ): Promise<ApiResponse<AddLentMoneyResult>> {
   const { data } = await apiURL.post<ApiResponse<AddLentMoneyResult>>(
     endpoints.lentMoney.root,
-    { ...input, price: input.price.toString() },
+    { ...input, price: input.price.toString() }
   );
   return data;
 }
 
-export async function getLentMoneyHistory(): Promise<ApiResponse<LentMoneyEntry[]>> {
-  const { data } = await apiURL.get<ApiResponse<LentMoneyEntry[]>>(endpoints.lentMoney.root);
+export async function getLentMoneyHistory(): Promise<
+  ApiResponse<LentMoneyEntry[]>
+> {
+  const { data } = await apiURL.get<ApiResponse<LentMoneyEntry[]>>(
+    endpoints.lentMoney.root
+  );
   return data;
 }
 
 export async function markLentMoneyReceived(
-  lentMoneyId: string,
+  lentMoneyId: string
 ): Promise<ApiResponse<MarkReceivedResult>> {
   const { data } = await apiURL.patch<ApiResponse<MarkReceivedResult>>(
-    endpoints.lentMoney.receive(lentMoneyId),
+    endpoints.lentMoney.receive(lentMoneyId)
   );
   return data;
 }

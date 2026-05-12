@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { qk } from '@/shared/lib/queryKeys';
-import { addLentMoney, getLentMoneyHistory, markLentMoneyReceived } from './api';
+import {
+  addLentMoney,
+  getLentMoneyHistory,
+  markLentMoneyReceived,
+} from './api';
 
 export function useLentMoneyHistory() {
   return useQuery({

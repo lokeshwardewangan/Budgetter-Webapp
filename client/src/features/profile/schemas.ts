@@ -6,7 +6,11 @@ const optionalUrl = z
 
 export const updateProfileSchema = z
   .object({
-    name: z.string().trim().min(2, 'Name must be at least 2 characters').optional(),
+    name: z
+      .string()
+      .trim()
+      .min(2, 'Name must be at least 2 characters')
+      .optional(),
     dob: z.string().optional(),
     profession: z.string().optional(),
     instagramLink: optionalUrl,
@@ -25,7 +29,7 @@ export const updateProfileSchema = z
     {
       message: 'Provide both current and new password',
       path: ['newPassword'],
-    },
+    }
   );
 
 export const deleteAccountSchema = z.object({

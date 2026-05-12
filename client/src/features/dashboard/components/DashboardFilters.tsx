@@ -23,7 +23,9 @@ export default function DashboardFilters({
 }: Props) {
   return (
     <div className="summarize_box_container flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2.5 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark sm:justify-between">
-      <h4 className="text-base font-semibold">Your {monthLabel} Month Report</h4>
+      <h4 className="text-base font-semibold">
+        Your {monthLabel} Month Report
+      </h4>
       <div
         id="filter_report_section"
         className="filters flex items-center justify-center gap-2 font-medium"

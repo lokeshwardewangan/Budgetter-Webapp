@@ -11,7 +11,9 @@ import ExpensesTable from './ExpensesTable';
 // shared ExpensesTable used elsewhere.
 export default function ExpensesByDatePanel() {
   const [pickerDate, setPickerDate] = useState<Date | undefined>(new Date());
-  const [submittedDate, setSubmittedDate] = useState<string>(formatDate(new Date()));
+  const [submittedDate, setSubmittedDate] = useState<string>(
+    formatDate(new Date())
+  );
 
   const { data, isFetching, refetch } = useExpensesByDate(submittedDate);
 
@@ -42,7 +44,11 @@ export default function ExpensesByDatePanel() {
             </div>
           </div>
           <div className="action_buttons flex items-center justify-start gap-4 py-2">
-            <Button disabled={isFetching} onClick={onShow} className="bg-green-500">
+            <Button
+              disabled={isFetching}
+              onClick={onShow}
+              className="bg-green-500"
+            >
               {isFetching ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

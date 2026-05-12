@@ -17,11 +17,11 @@ export type MonthlyReportData = {
 };
 
 export async function getMonthlyReport(
-  input: MonthlyReportInput,
+  input: MonthlyReportInput
 ): Promise<ApiResponse<MonthlyReportData>> {
   const { data } = await apiURL.get<ApiResponse<MonthlyReportData>>(
     endpoints.reports.monthly,
-    { params: input },
+    { params: input }
   );
   return data;
 }

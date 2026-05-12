@@ -27,10 +27,13 @@ export type ExpenseFeedFilters = {
 };
 
 export async function getExpensesFeed(
-  filters: ExpenseFeedFilters,
+  filters: ExpenseFeedFilters
 ): Promise<ApiResponse<ExpenseFeedPage>> {
-  const { data } = await apiURL.get<ApiResponse<ExpenseFeedPage>>(endpoints.expenses.feed, {
-    params: filters,
-  });
+  const { data } = await apiURL.get<ApiResponse<ExpenseFeedPage>>(
+    endpoints.expenses.feed,
+    {
+      params: filters,
+    }
+  );
   return data;
 }

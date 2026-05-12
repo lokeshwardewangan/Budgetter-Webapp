@@ -75,7 +75,9 @@ export default function CategoryInsightsTable({
                 : 'text-green-600 dark:text-green-400';
         }
         return (
-          <span className={`${styleClass} rounded px-2 py-1 font-semibold`}>{value}%</span>
+          <span className={`${styleClass} rounded px-2 py-1 font-semibold`}>
+            {value}%
+          </span>
         );
       },
     }),
@@ -122,9 +124,14 @@ export default function CategoryInsightsTable({
           allExpenses,
           category,
           filterMonthValue,
-          filterYearValue,
+          filterYearValue
         );
-        return <ViewCategoryExpensesDialog fullExpenses={fullExpenses as any} category={category} />;
+        return (
+          <ViewCategoryExpensesDialog
+            fullExpenses={fullExpenses as any}
+            category={category}
+          />
+        );
       },
     }),
   ];
@@ -139,7 +146,9 @@ export default function CategoryInsightsTable({
       ) : (
         <div className="w-full overflow-x-auto">
           <div className="flex w-full items-center justify-between gap-3 px-8 pb-5">
-            <span className="text-lg font-medium">Your Categorized Expense Stats</span>
+            <span className="text-lg font-medium">
+              Your Categorized Expense Stats
+            </span>
           </div>
           <div className="table_container min-w-full overflow-x-auto">
             <DataTable data={stats} columns={columns} />

@@ -25,7 +25,7 @@ export const SubmitButton: React.FC<SubmitButtonProps> = ({
     className={cn(
       'h-10 w-full rounded-md bg-blue-600 px-4 text-base font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none',
       (isLoading || disabled) && 'cursor-not-allowed',
-      className,
+      className
     )}
     {...rest}
   >

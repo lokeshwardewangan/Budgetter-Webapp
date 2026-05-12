@@ -57,15 +57,22 @@ export default function ExpensesTable({
     columnHelper.accessor('category', { header: 'Category' }),
     columnHelper.accessor('createdAt', {
       header: 'Time',
-      cell: (info) => new Date(info.getValue<string>()).toLocaleString().split(',')[1],
+      cell: (info) =>
+        new Date(info.getValue<string>()).toLocaleString().split(',')[1],
     }),
     columnHelper.display({
       id: 'action',
       header: 'Action',
       cell: (info) => (
         <div className="flex w-full items-center justify-start space-x-2">
-          <EditExpenseDialog actualDate={actualDate} product={info.row.original} />
-          <DeleteExpenseDialog actualDate={actualDate} product={info.row.original} />
+          <EditExpenseDialog
+            actualDate={actualDate}
+            product={info.row.original}
+          />
+          <DeleteExpenseDialog
+            actualDate={actualDate}
+            product={info.row.original}
+          />
         </div>
       ),
     }),
@@ -84,7 +91,9 @@ export default function ExpensesTable({
         <>
           {showPdfExport && (
             <div className="flex w-full items-center justify-between gap-3 px-5 pb-3">
-              <span className="text-base font-medium">Your {actualDate} Expenses</span>
+              <span className="text-base font-medium">
+                Your {actualDate} Expenses
+              </span>
               <PDFExportComponent
                 createdAt={
                   products[0]?.createdAt

@@ -34,7 +34,7 @@ export function SelectField({
   className,
 }: SelectFieldProps) {
   const normalised: Option[] = options.map((o) =>
-    typeof o === 'string' ? { value: o, label: o } : o,
+    typeof o === 'string' ? { value: o, label: o } : o
   );
 
   return (
@@ -42,7 +42,9 @@ export function SelectField({
       {label && (
         <p className="text-sm">
           {label}{' '}
-          {required && <span className="text-red-500 dark:text-red-200">*</span>}
+          {required && (
+            <span className="text-red-500 dark:text-red-200">*</span>
+          )}
         </p>
       )}
       <Select value={value} onValueChange={onChange}>
@@ -60,7 +62,10 @@ export function SelectField({
         </SelectContent>
       </Select>
       {error && (
-        <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
+        <span
+          role="alert"
+          className="mt-1 block text-xs font-medium text-red-500"
+        >
           {error}
         </span>
       )}

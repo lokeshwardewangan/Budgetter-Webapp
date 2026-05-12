@@ -14,9 +14,20 @@ type Props = {
 };
 
 const formatDate = (d?: string | Date) =>
-  d ? new Date(d).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+  d
+    ? new Date(d).toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+    : '—';
 
-export default function AvatarSection({ name, avatarUrl, memberSince, lastLogin }: Props) {
+export default function AvatarSection({
+  name,
+  avatarUrl,
+  memberSince,
+  lastLogin,
+}: Props) {
   const { mutateAsync: upload, isPending } = useUpdateAvatar();
 
   const onChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -73,10 +84,24 @@ export default function AvatarSection({ name, avatarUrl, memberSince, lastLogin 
 
       <div className="information_details_user flex w-fit flex-col items-start justify-center space-y-1 rounded-lg">
         {memberSince && (
-          <InfoRow icon={<Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />} label="Member Since" value={formatDate(memberSince)} tint="blue" />
+          <InfoRow
+            icon={
+              <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            }
+            label="Member Since"
+            value={formatDate(memberSince)}
+            tint="blue"
+          />
         )}
         {lastLogin && (
-          <InfoRow icon={<Clock className="h-4 w-4 text-green-600 dark:text-green-400" />} label="Last Active" value={formatDate(lastLogin)} tint="green" />
+          <InfoRow
+            icon={
+              <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
+            }
+            label="Last Active"
+            value={formatDate(lastLogin)}
+            tint="green"
+          />
         )}
       </div>
     </div>
@@ -97,12 +122,18 @@ function InfoRow({
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-white shadow-sm dark:bg-bg_primary_dark">
       <div className="flex items-center gap-2">
-        <div className={`rounded-full p-2 ${tint === 'blue' ? 'bg-blue-100/50 dark:bg-blue-900/20' : 'bg-green-100/50 dark:bg-green-900/20'}`}>
+        <div
+          className={`rounded-full p-2 ${tint === 'blue' ? 'bg-blue-100/50 dark:bg-blue-900/20' : 'bg-green-100/50 dark:bg-green-900/20'}`}
+        >
           {icon}
         </div>
-        <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
+        <span className="text-sm text-gray-600 dark:text-gray-400">
+          {label}
+        </span>
       </div>
-      <span className="text-sm font-medium text-gray-900 dark:text-gray-200">{value}</span>
+      <span className="text-sm font-medium text-gray-900 dark:text-gray-200">
+        {value}
+      </span>
     </div>
   );
 }

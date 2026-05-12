@@ -4,12 +4,18 @@ import type { ApiResponse } from '@/shared/api/types';
 import type { SessionEntry } from '@/types/api/auth/auth';
 
 export async function getSessions(): Promise<ApiResponse<SessionEntry[]>> {
-  const { data } = await apiURL.get<ApiResponse<SessionEntry[]>>(endpoints.sessions.list);
+  const { data } = await apiURL.get<ApiResponse<SessionEntry[]>>(
+    endpoints.sessions.list
+  );
   return data;
 }
 
-export async function deleteSession(sessionId: string): Promise<ApiResponse<null>> {
-  const { data } = await apiURL.delete<ApiResponse<null>>(endpoints.sessions.one(sessionId));
+export async function deleteSession(
+  sessionId: string
+): Promise<ApiResponse<null>> {
+  const { data } = await apiURL.delete<ApiResponse<null>>(
+    endpoints.sessions.one(sessionId)
+  );
   return data;
 }
 
@@ -17,6 +23,8 @@ export async function deleteSession(sessionId: string): Promise<ApiResponse<null
 // current session keeps working after the call. To fully sign out everywhere
 // the user must call this and then also log out their current session.
 export async function deleteOtherSessions(): Promise<ApiResponse<null>> {
-  const { data } = await apiURL.delete<ApiResponse<null>>(endpoints.sessions.list);
+  const { data } = await apiURL.delete<ApiResponse<null>>(
+    endpoints.sessions.list
+  );
   return data;
 }

@@ -16,19 +16,20 @@ export default function ReportsPanel() {
   // Debounce the search input so we don't fire a fetch on every keystroke.
   const debouncedSearch = useDebounce(search, 300);
 
-  const filters = { limit: PAGE_SIZE, search: debouncedSearch || undefined, month, year, category };
+  const filters = {
+    limit: PAGE_SIZE,
+    search: debouncedSearch || undefined,
+    month,
+    year,
+    category,
+  };
 
-  const {
-    data,
-    isLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useExpensesFeed(filters);
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useExpensesFeed(filters);
 
   const rows = useMemo(
     () => data?.pages.flatMap((p) => p.data.items) ?? [],
-    [data],
+    [data]
   );
   const totalCount = data?.pages[0]?.data.total ?? 0;
 
@@ -48,7 +49,7 @@ export default function ReportsPanel() {
         ...r.product,
         sno: i + 1,
       })),
-    [rows],
+    [rows]
   );
 
   return (
@@ -65,12 +66,18 @@ export default function ReportsPanel() {
         onCategoryChange={setCategory}
         rightSlot={
           pdfRows.length > 0 ? (
-            <PDFExportComponent createdAt={pdfTimeline} expenses={pdfRows as any} />
+            <PDFExportComponent
+              createdAt={pdfTimeline}
+              expenses={pdfRows as any}
+            />
           ) : null
         }
       />
 
-      <div id="all_expense_data_in_table_section" className="w-full overflow-x-auto">
+      <div
+        id="all_expense_data_in_table_section"
+        className="w-full overflow-x-auto"
+      >
         <ReportsTable
           rows={rows}
           isLoading={isLoading}

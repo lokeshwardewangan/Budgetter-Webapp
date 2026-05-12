@@ -49,7 +49,8 @@ const columns = [
   columnHelper.accessor('product.category', { header: 'Category' }),
   columnHelper.accessor('product.createdAt', {
     header: 'Time',
-    cell: (info) => new Date(info.getValue<string>()).toLocaleString().split(',')[1],
+    cell: (info) =>
+      new Date(info.getValue<string>()).toLocaleString().split(',')[1],
   }),
 ];
 

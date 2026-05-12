@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { getMonthInNumber } from '@/utils/date/date';
 import { useAllExpenses } from '@/features/expenses/hooks';
-import type { ExpenseEntry, ExpenseProduct } from '@/types/api/expenses/expenses';
+import type {
+  ExpenseEntry,
+  ExpenseProduct,
+} from '@/types/api/expenses/expenses';
 
 export type CategoryStats = {
   category: string;
@@ -18,7 +21,7 @@ export type CategoryStats = {
 // with the timeline chart so this doesn't trigger a second request.
 export function useCategoryStats(
   filterMonthValue: string,
-  filterYearValue: string,
+  filterYearValue: string
 ): CategoryStats[] {
   const { data: allExpenses = [] } = useAllExpenses();
 
@@ -26,7 +29,11 @@ export function useCategoryStats(
     if (!filterMonthValue || !filterYearValue) return [];
     const monthNum = getMonthInNumber(filterMonthValue);
 
-    const products = filterProductsByMonthYear(allExpenses, monthNum, filterYearValue);
+    const products = filterProductsByMonthYear(
+      allExpenses,
+      monthNum,
+      filterYearValue
+    );
     if (products.length === 0) return [];
 
     const byCategory = new Map<string, number[]>();
@@ -44,7 +51,9 @@ export function useCategoryStats(
       return {
         category,
         totalSpent,
-        expensePercent: parseFloat(((totalSpent / totalSpentAll) * 100).toFixed(2)),
+        expensePercent: parseFloat(
+          ((totalSpent / totalSpentAll) * 100).toFixed(2)
+        ),
         transactionCount,
         avgExpense: totalSpent / transactionCount,
         maxExpense: Math.max(...prices),
@@ -62,7 +71,7 @@ export function getFullExpensesList(
   allExpenses: ExpenseEntry[],
   categoryName: string,
   filterMonthValue: string,
-  filterYearValue: string,
+  filterYearValue: string
 ) {
   const monthNum = getMonthInNumber(filterMonthValue);
   return allExpenses
@@ -70,16 +79,14 @@ export function getFullExpensesList(
       const [, m, y] = entry.date.split('-');
       return m === monthNum && y === filterYearValue;
     })
-    .flatMap((entry) =>
-      entry.products.map((p) => ({ ...p, date: entry.date })),
-    )
+    .flatMap((entry) => entry.products.map((p) => ({ ...p, date: entry.date })))
     .filter((p) => p.category === categoryName);
 }
 
 function filterProductsByMonthYear(
   allExpenses: ExpenseEntry[],
   monthNum: string,
-  year: string,
+  year: string
 ): ExpenseProduct[] {
   return allExpenses
     .filter((entry) => {

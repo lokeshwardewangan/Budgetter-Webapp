@@ -15,7 +15,10 @@ type Props = {
 
 const OPTIONS: ChartFilter[] = ['daily', 'weekly', 'monthly', 'yearly'];
 
-export default function ChartFilterOptions({ setChartFilter, initial = 'daily' }: Props) {
+export default function ChartFilterOptions({
+  setChartFilter,
+  initial = 'daily',
+}: Props) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<ChartFilter>(initial);
 

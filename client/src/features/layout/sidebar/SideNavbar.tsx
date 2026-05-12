@@ -58,7 +58,11 @@ export default function SideNavbar({ userSidenavbarList }: Props) {
           )}
           {isSideNavbarOpen && (
             <>
-              <img className="relative right-1 h-8" src={LogoImage} alt="logo" />
+              <img
+                className="relative right-1 h-8"
+                src={LogoImage}
+                alt="logo"
+              />
               <h1 className="ml-2 bg-gradient-to-r from-[#2e7dff] to-[#00b87c] bg-clip-text text-2xl font-bold text-transparent dark:text-gray-200">
                 Budgetter
               </h1>
