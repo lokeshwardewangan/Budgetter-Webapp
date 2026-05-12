@@ -13,7 +13,10 @@ import {
 
 interface DatePickerType {
   inputDate: Date | undefined;
-  setInputDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  // Accepts either a state setter or a plain callback (e.g. RHF's
+  // `field.onChange`). Typing this as `Dispatch<SetStateAction<…>>` would
+  // force RHF consumers to wrap onChange in a setter shim.
+  setInputDate: (date: Date | undefined) => void;
 }
 
 export function DatePicker({ inputDate, setInputDate }: DatePickerType) {

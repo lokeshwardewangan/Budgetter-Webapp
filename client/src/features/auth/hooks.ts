@@ -44,17 +44,17 @@ function useHandleAuthSuccess() {
 
 export function useLogin() {
   const onAuthSuccess = useHandleAuthSuccess();
-  return useMutation({ mutationFn: LoginUser, onSuccess: onAuthSuccess });
+  return useMutation({ mutationFn: LoginUser, onSuccess: (res) => onAuthSuccess(res) });
 }
 
 export function useSignup() {
   const onAuthSuccess = useHandleAuthSuccess();
-  return useMutation({ mutationFn: registerUser, onSuccess: onAuthSuccess });
+  return useMutation({ mutationFn: registerUser, onSuccess: (res) => onAuthSuccess(res) });
 }
 
 export function useGoogleSignIn() {
   const onAuthSuccess = useHandleAuthSuccess();
-  return useMutation({ mutationFn: SignupWithGoogle, onSuccess: onAuthSuccess });
+  return useMutation({ mutationFn: SignupWithGoogle, onSuccess: (res) => onAuthSuccess(res) });
 }
 
 export function useForgotPassword() {

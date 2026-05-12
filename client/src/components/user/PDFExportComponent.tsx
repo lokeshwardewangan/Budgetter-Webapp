@@ -32,12 +32,15 @@ const PDFExportComponent: React.FC<ExportTableProps> = ({
   createdAt,
 }) => {
   const { data: user } = useMe();
+  // jspdf-autotable's `CellInput` rejects `undefined`, so fall back to ''
+  // when the user query hasn't resolved yet (the button will still render
+  // a coherent PDF, just with blank user rows).
   const userDetails = {
-    name: user?.name,
-    username: user?.username,
-    email: user?.email,
-    currentPocketMoney: user?.currentPocketMoney,
-    DOB: user?.DOB,
+    name: user?.name ?? '',
+    username: user?.username ?? '',
+    email: user?.email ?? '',
+    currentPocketMoney: user?.currentPocketMoney ?? '',
+    dob: user?.dob ?? '',
   };
 
   const exportPDF = () => {
