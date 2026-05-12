@@ -63,7 +63,13 @@ apiURL.interceptors.response.use(
           if (typeof obj !== 'object' || obj === null) return obj;
 
           const clone = JSON.parse(JSON.stringify(obj));
-          const sensitive = ['password', 'token', 'secret', 'credential', 'auth'];
+          const sensitive = [
+            'password',
+            'token',
+            'secret',
+            'credential',
+            'auth',
+          ];
           const mask = (o: Record<string, unknown>) => {
             for (const key in o) {
               if (sensitive.some((s) => key.toLowerCase().includes(s))) {
@@ -98,5 +104,5 @@ apiURL.interceptors.response.use(
     });
 
     return Promise.reject(error);
-  },
+  }
 );

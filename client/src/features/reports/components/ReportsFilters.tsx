@@ -14,7 +14,11 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { useDialogState } from '@/shared/hooks/useDialogState';
-import { monthsNames, prevYearsName, getMonthInNumber } from '@/utils/date/date';
+import {
+  monthsNames,
+  prevYearsName,
+  getMonthInNumber,
+} from '@/utils/date/date';
 import { expensesCategories } from '@/utils/ui/utility';
 
 type Props = {

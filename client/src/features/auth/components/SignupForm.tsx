@@ -27,7 +27,7 @@ export default function SignupForm() {
       loading: 'Processing, sending verification email...',
       success: 'Account created successfully!',
       error: 'Something went wrong, please try again.',
-    }),
+    })
   );
 
   return (

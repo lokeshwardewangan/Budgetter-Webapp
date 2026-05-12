@@ -12,7 +12,9 @@ import CategoryInsightsTable from '@/features/dashboard/components/CategoryInsig
 export default function Dashboard() {
   const { data: user } = useMe();
   const [monthLabel, setMonthLabel] = useState<string>(getCurrentMonth());
-  const [yearLabel, setYearLabel] = useState<string>(new Date().getFullYear().toString());
+  const [yearLabel, setYearLabel] = useState<string>(
+    new Date().getFullYear().toString()
+  );
 
   const monthNum = getMonthInNumber(monthLabel);
   const { data, isLoading } = useMonthlyReport(monthNum, yearLabel);
@@ -62,7 +64,10 @@ export default function Dashboard() {
       </div>
 
       <div className="category_insights_container mb-10 w-full">
-        <CategoryInsightsTable filterMonthValue={monthLabel} filterYearValue={yearLabel} />
+        <CategoryInsightsTable
+          filterMonthValue={monthLabel}
+          filterYearValue={yearLabel}
+        />
       </div>
     </div>
   );

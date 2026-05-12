@@ -19,7 +19,11 @@ type Props = {
 // Pie/donut chart of category-wise expenses for the selected month. Drawing
 // logic untouched from the legacy component; the gradient/colour map moved
 // to features/dashboard/lib/categoryColors.ts to deduplicate it.
-export default function CategoryDonutChart({ totalExpenses, data, isLoading }: Props) {
+export default function CategoryDonutChart({
+  totalExpenses,
+  data,
+  isLoading,
+}: Props) {
   const chartRef = useRef<HTMLDivElement>(null);
   const { isDarkMode } = useTheme();
 
@@ -36,7 +40,7 @@ export default function CategoryDonutChart({ totalExpenses, data, isLoading }: P
       am5percent.PieChart.new(root, {
         layout: root.horizontalLayout,
         innerRadius: am5.percent(65),
-      }),
+      })
     );
 
     const series = chart.series.push(
@@ -44,14 +48,14 @@ export default function CategoryDonutChart({ totalExpenses, data, isLoading }: P
         valueField: 'value',
         categoryField: 'category',
         alignLabels: false,
-      }),
+      })
     );
 
     series.set(
       'colors',
       am5.ColorSet.new(root, {
         colors: categoryColorList.map((c) => am5.color(c.hex)),
-      }),
+      })
     );
 
     series.slices.template.setAll({
@@ -84,7 +88,7 @@ export default function CategoryDonutChart({ totalExpenses, data, isLoading }: P
         fontWeight: 'bold',
         fontFamily: 'Karla',
         fill: am5.color(isDarkMode ? 0xffffff : 0x000000),
-      }),
+      })
     );
 
     series.appear(1000, 100);
@@ -103,13 +107,20 @@ export default function CategoryDonutChart({ totalExpenses, data, isLoading }: P
       <div
         className={`chart_element_container ${isLoading ? 'hidden' : 'flex'} w-full flex-col items-center justify-center gap-4 sm:flex-row`}
       >
-        <div ref={chartRef} className="h-52 w-52" style={{ maxWidth: '400px' }} />
+        <div
+          ref={chartRef}
+          className="h-52 w-52"
+          style={{ maxWidth: '400px' }}
+        />
         <div className="flex flex-wrap items-center justify-center gap-2 text-sm sm:flex-col sm:items-start sm:justify-start">
           {valuesByCategory.map(({ category, value }) => {
             if (value === 0) return null;
-            const palette = categoryColorList.find((c) => c.category === category);
+            const palette = categoryColorList.find(
+              (c) => c.category === category
+            );
             const pct = total > 0 ? (value / total) * 100 : 0;
-            const display = pct.toFixed(0) === '0' ? pct.toFixed(1) : pct.toFixed(0);
+            const display =
+              pct.toFixed(0) === '0' ? pct.toFixed(1) : pct.toFixed(0);
             return (
               <div key={category} className="flex items-center space-x-2">
                 <div
@@ -141,5 +152,8 @@ function mapToCategoryValues(data?: CategoryWiseExpensesData) {
     Transportation: data?.TransportationExpenses ?? 0,
     Miscellaneous: data?.MiscellaneousExpenses ?? 0,
   };
-  return categoryColorList.map((c) => ({ category: c.category, value: lookup[c.category] }));
+  return categoryColorList.map((c) => ({
+    category: c.category,
+    value: lookup[c.category],
+  }));
 }

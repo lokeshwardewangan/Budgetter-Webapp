@@ -40,7 +40,9 @@ export function DataTable<TData>({
 
   if (isLoading) {
     return (
-      <div className="w-full rounded-md p-5 text-sm text-gray-500">Loading...</div>
+      <div className="w-full rounded-md p-5 text-sm text-gray-500">
+        Loading...
+      </div>
     );
   }
 
@@ -65,7 +67,10 @@ export function DataTable<TData>({
                 >
                   {header.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                 </th>
               ))}
             </tr>
@@ -77,7 +82,7 @@ export function DataTable<TData>({
               key={row.id}
               className={cn(
                 'dark:bg-bg_primary_dark dark:hover:bg-slate-800',
-                index % 2 === 0 ? 'bg-gray-50' : 'bg-white',
+                index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
               )}
             >
               {row.getVisibleCells().map((cell) => (

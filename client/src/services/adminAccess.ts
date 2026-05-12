@@ -12,6 +12,9 @@ export const GetAppUsersDetails = async () => {
 };
 
 export const SendNewsletter = async (credentials: NewsletterCredType) => {
-  const { data } = await apiURL.post<NewsletterResType>(endpoints.admin.newsletter, credentials);
+  const { data } = await apiURL.post<NewsletterResType>(
+    endpoints.admin.newsletter,
+    credentials
+  );
   return data;
 };

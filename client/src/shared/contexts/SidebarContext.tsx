@@ -1,4 +1,10 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
 type SidebarContextValue = {
   isOpen: boolean;
@@ -16,7 +22,9 @@ const isMobileBreakpoint = () =>
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
   // Mirrors the legacy redux slice's default: open on desktop, closed on mobile.
   const [isOpen, setIsOpen] = useState<boolean>(() => !isMobileBreakpoint());
-  const [showOverlay, setShowOverlay] = useState<boolean>(() => !isMobileBreakpoint());
+  const [showOverlay, setShowOverlay] = useState<boolean>(
+    () => !isMobileBreakpoint()
+  );
 
   const open = useCallback(() => {
     setIsOpen(true);
@@ -37,10 +45,12 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo(
     () => ({ isOpen, showOverlay, open, close, toggle }),
-    [isOpen, showOverlay, open, close, toggle],
+    [isOpen, showOverlay, open, close, toggle]
   );
 
-  return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>;
+  return (
+    <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>
+  );
 }
 
 export function useSidebar() {

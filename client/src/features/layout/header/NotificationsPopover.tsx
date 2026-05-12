@@ -55,15 +55,13 @@ export default function NotificationsPopover() {
       </PopoverTrigger>
       <PopoverContent className="mr-2 w-auto p-2 px-3">
         <p className="cursor-pointer" onClick={() => setOpen(false)}>
-          {notifications.length === 0 ? (
-            ' No Notification 😊'
-          ) : (
-            notifications.map(({ value }, i) => (
-              <span key={i} className="font-medium text-red-700">
-                {value}
-              </span>
-            ))
-          )}
+          {notifications.length === 0
+            ? ' No Notification 😊'
+            : notifications.map(({ value }, i) => (
+                <span key={i} className="font-medium text-red-700">
+                  {value}
+                </span>
+              ))}
         </p>
       </PopoverContent>
     </Popover>

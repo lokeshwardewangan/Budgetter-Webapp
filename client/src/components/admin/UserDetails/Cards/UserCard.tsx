@@ -6,7 +6,8 @@ interface UserCardProps {
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user }) => {
-  const { avatar, username, name, email, currentPocketMoney, isVerified } = user;
+  const { avatar, username, name, email, currentPocketMoney, isVerified } =
+    user;
 
   return (
     <div className="user_card_container col-span-12 flex flex-col items-center gap-2 rounded-2xl border-[#6a718533] bg-white p-5 dark:border dark:bg-bg_primary_dark md:col-span-12 lg:col-span-6 2xl:col-span-3">

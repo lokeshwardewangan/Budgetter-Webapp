@@ -21,7 +21,10 @@ export default function ExpensesTimelineChart() {
   // reads, so there's only one network call between them.
   const { data: allExpenses = [], isLoading } = useAllExpenses();
 
-  const chartData = useMemo(() => computeSeries(allExpenses, filter), [allExpenses, filter]);
+  const chartData = useMemo(
+    () => computeSeries(allExpenses, filter),
+    [allExpenses, filter]
+  );
 
   useLayoutEffect(() => {
     if (!chartRef.current) return;
@@ -37,19 +40,18 @@ export default function ExpensesTimelineChart() {
         wheelX: 'panX',
         wheelY: 'zoomX',
         pinchZoomX: true,
-      }),
+      })
     );
-    chart.set('cursor', am5xy.XYCursor.new(root, { behavior: 'none' })).lineY.set(
-      'visible',
-      false,
-    );
+    chart
+      .set('cursor', am5xy.XYCursor.new(root, { behavior: 'none' }))
+      .lineY.set('visible', false);
 
     const xAxis = chart.xAxes.push(
       am5xy.CategoryAxis.new(root, {
         categoryField: 'day',
         renderer: am5xy.AxisRendererX.new(root, { minGridDistance: 30 }),
         tooltip: am5.Tooltip.new(root, {}),
-      }),
+      })
     );
     xAxis.get('renderer').labels.template.setAll({
       fontSize: 10,
@@ -58,7 +60,7 @@ export default function ExpensesTimelineChart() {
     });
 
     const yAxis = chart.yAxes.push(
-      am5xy.ValueAxis.new(root, { renderer: am5xy.AxisRendererY.new(root, {}) }),
+      am5xy.ValueAxis.new(root, { renderer: am5xy.AxisRendererY.new(root, {}) })
     );
     yAxis.get('renderer').labels.template.setAll({
       fontSize: 10,
@@ -67,8 +69,12 @@ export default function ExpensesTimelineChart() {
     });
 
     const gridColor = am5.color(isDarkMode ? 0x666666 : 0xd9d8d8);
-    xAxis.get('renderer').grid.template.setAll({ stroke: gridColor, strokeOpacity: 0.5 });
-    yAxis.get('renderer').grid.template.setAll({ stroke: gridColor, strokeOpacity: 0.5 });
+    xAxis
+      .get('renderer')
+      .grid.template.setAll({ stroke: gridColor, strokeOpacity: 0.5 });
+    yAxis
+      .get('renderer')
+      .grid.template.setAll({ stroke: gridColor, strokeOpacity: 0.5 });
 
     const series = chart.series.push(
       am5xy.StepLineSeries.new(root, {
@@ -80,14 +86,14 @@ export default function ExpensesTimelineChart() {
         tooltip: am5.Tooltip.new(root, { labelText: '₹{valueY}' }),
         stroke: am5.color(0x6794dc),
         fill: am5.color(0x6794dc),
-      }),
+      })
     );
     series.strokes.template.setAll({ strokeWidth: 3 });
     series.fills.template.setAll({ visible: true, fillOpacity: 0.2 });
     series.bullets.push(() =>
       am5.Bullet.new(root, {
         sprite: am5.Circle.new(root, { radius: 5, fill: series.get('stroke') }),
-      }),
+      })
     );
 
     xAxis.data.setAll(chartData);
@@ -97,10 +103,12 @@ export default function ExpensesTimelineChart() {
 
     const updateLabels = () => {
       if (window.innerWidth < 500) {
-        xAxis.get('renderer').labels.template.adapters.add('text', (text, target) => {
-          const category = target.dataItem?.get('category' as any);
-          return category ? category[0] : text;
-        });
+        xAxis
+          .get('renderer')
+          .labels.template.adapters.add('text', (text, target) => {
+            const category = target.dataItem?.get('category' as any);
+            return category ? category[0] : text;
+          });
       } else {
         xAxis.get('renderer').labels.template.adapters.remove('text');
       }
@@ -123,7 +131,9 @@ export default function ExpensesTimelineChart() {
       className="flex w-full max-w-full flex-col items-center rounded-lg border border-border_light bg-bg_primary_light p-0 py-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark md:p-4"
     >
       <div className="heading_part_chart relative flex w-full items-center justify-center">
-        <h2 className="mb-4 text-left text-lg font-semibold">Expenses Details</h2>
+        <h2 className="mb-4 text-left text-lg font-semibold">
+          Expenses Details
+        </h2>
         <ChartFilterOptions setChartFilter={setFilter} />
       </div>
       <div className="chart_element_container flex h-full w-full flex-col items-center justify-center">
@@ -142,11 +152,14 @@ export default function ExpensesTimelineChart() {
 }
 
 // Build the X-axis series for the chosen filter from the full expense list.
-function computeSeries(allExpenses: ExpenseEntry[], filter: ChartFilter): Point[] {
+function computeSeries(
+  allExpenses: ExpenseEntry[],
+  filter: ChartFilter
+): Point[] {
   const sumOf = (entries: ExpenseEntry[]) =>
     entries.reduce(
       (acc, e) => acc + e.products.reduce((s, p) => s + (p.price ?? 0), 0),
-      0,
+      0
     );
 
   if (filter === 'daily') {
@@ -182,7 +195,8 @@ function computeSeries(allExpenses: ExpenseEntry[], filter: ChartFilter): Point[
       const key = `${m}-${y}`;
       byMonth.set(
         key,
-        (byMonth.get(key) ?? 0) + e.products.reduce((s, p) => s + (p.price ?? 0), 0),
+        (byMonth.get(key) ?? 0) +
+          e.products.reduce((s, p) => s + (p.price ?? 0), 0)
       );
     }
     return Array.from(byMonth, ([day, value]) => ({ day, value }));
@@ -194,7 +208,7 @@ function computeSeries(allExpenses: ExpenseEntry[], filter: ChartFilter): Point[
     const [, , y] = e.date.split('-');
     byYear.set(
       y,
-      (byYear.get(y) ?? 0) + e.products.reduce((s, p) => s + (p.price ?? 0), 0),
+      (byYear.get(y) ?? 0) + e.products.reduce((s, p) => s + (p.price ?? 0), 0)
     );
   }
   return Array.from(byYear, ([day, value]) => ({ day, value }));

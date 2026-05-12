@@ -61,7 +61,7 @@ export default function AddExpenseForm() {
         loading: 'Adding expense...',
         success: 'Expense added.',
         error: 'Something went wrong.',
-      },
+      }
     );
     // Reset name + price; keep date / category / label sticky so users can
     // add several rows in a row without re-picking the context.
@@ -85,7 +85,8 @@ export default function AddExpenseForm() {
         <div className="input_containers grid w-full max-w-7xl grid-cols-10 gap-3 md:gap-5">
           <div className="input_section col-span-10 flex w-full flex-col items-start justify-start gap-1 sm:col-span-5 xl:col-span-2">
             <p className="text-sm">
-              Date of Expense <span className="text-red-500 dark:text-red-200">*</span>
+              Date of Expense{' '}
+              <span className="text-red-500 dark:text-red-200">*</span>
             </p>
             <Controller
               name="inputDate"
@@ -98,7 +99,10 @@ export default function AddExpenseForm() {
               )}
             />
             {errors.inputDate && (
-              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
+              <span
+                role="alert"
+                className="mt-1 block text-xs font-medium text-red-500"
+              >
                 {errors.inputDate.message as string}
               </span>
             )}
@@ -106,11 +110,19 @@ export default function AddExpenseForm() {
 
           <div className="input_section col-span-10 flex w-full flex-col items-start justify-start gap-1 sm:col-span-5 xl:col-span-2">
             <p className="text-sm">
-              Name of Expense <span className="text-red-500 dark:text-red-200">*</span>
+              Name of Expense{' '}
+              <span className="text-red-500 dark:text-red-200">*</span>
             </p>
-            <Input {...register('expenseName')} type="text" placeholder="Enter Expense" />
+            <Input
+              {...register('expenseName')}
+              type="text"
+              placeholder="Enter Expense"
+            />
             {errors.expenseName && (
-              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
+              <span
+                role="alert"
+                className="mt-1 block text-xs font-medium text-red-500"
+              >
                 {errors.expenseName.message}
               </span>
             )}
@@ -135,7 +147,8 @@ export default function AddExpenseForm() {
 
           <div className="input_section col-span-10 flex w-full flex-col items-start justify-start gap-1 sm:col-span-5 xl:col-span-2">
             <p className="text-sm">
-              Expense Price <span className="text-red-500 dark:text-red-200">*</span>
+              Expense Price{' '}
+              <span className="text-red-500 dark:text-red-200">*</span>
             </p>
             <Input
               {...register('price')}
@@ -144,7 +157,12 @@ export default function AddExpenseForm() {
               placeholder="Enter Price"
             />
             {errors.price && (
-              <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.price.message}</span>
+              <span
+                role="alert"
+                className="mt-1 block text-xs font-medium text-red-500"
+              >
+                {errors.price.message}
+              </span>
             )}
           </div>
 

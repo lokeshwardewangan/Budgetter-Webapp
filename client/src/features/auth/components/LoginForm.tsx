@@ -74,7 +74,10 @@ export default function LoginForm() {
             />
             <span className="ml-2 select-none">Keep me logged in</span>
           </label>
-          <Link to="/forgot-password" className="text-sm text-blue-500 hover:underline">
+          <Link
+            to="/forgot-password"
+            className="text-sm text-blue-500 hover:underline"
+          >
             Forgot password?
           </Link>
         </div>

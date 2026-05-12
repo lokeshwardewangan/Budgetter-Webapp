@@ -31,7 +31,7 @@ export default function ResetPasswordForm() {
         loading: 'Resetting password...',
         success: 'Password changed successfully!',
         error: 'Something went wrong.',
-      },
+      }
     );
     reset();
   });

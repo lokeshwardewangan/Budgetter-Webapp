@@ -23,7 +23,10 @@ export default function ProfilePage() {
             memberSince={user?.createdAt}
             lastLogin={user?.lastLogin}
           />
-          <div id="account_advance_options" className="advance_option_container">
+          <div
+            id="account_advance_options"
+            className="advance_option_container"
+          >
             <AdvancedOptions />
           </div>
         </div>

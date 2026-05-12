@@ -38,7 +38,7 @@ export default function DeleteExpenseDialog({ actualDate, product }: Props) {
         loading: 'Deleting...',
         success: 'Expense deleted.',
         error: 'Unable to delete expense.',
-      },
+      }
     );
     close();
   };

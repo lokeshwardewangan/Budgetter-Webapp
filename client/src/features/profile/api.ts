@@ -18,13 +18,18 @@ export type UpdateProfileInput = {
 export type AvatarResponse = { avatar: string };
 
 export async function updateProfile(
-  input: UpdateProfileInput,
+  input: UpdateProfileInput
 ): Promise<ApiResponse<unknown>> {
-  const { data } = await apiURL.patch<ApiResponse<unknown>>(endpoints.users.me, input);
+  const { data } = await apiURL.patch<ApiResponse<unknown>>(
+    endpoints.users.me,
+    input
+  );
   return data;
 }
 
-export async function updateAvatar(formData: FormData): Promise<ApiResponse<AvatarResponse>> {
+export async function updateAvatar(
+  formData: FormData
+): Promise<ApiResponse<AvatarResponse>> {
   // multer expects multipart; the global axios instance hard-codes JSON, so
   // we use a bare axios call here with the same auth header.
   const config: AxiosRequestConfig = {
@@ -33,12 +38,14 @@ export async function updateAvatar(formData: FormData): Promise<ApiResponse<Avat
   const { data } = await axios.patch<ApiResponse<AvatarResponse>>(
     `${backendHostURL}${endpoints.users.avatar}`,
     formData,
-    config,
+    config
   );
   return data;
 }
 
-export async function deleteAccount(password: string): Promise<ApiResponse<null>> {
+export async function deleteAccount(
+  password: string
+): Promise<ApiResponse<null>> {
   const { data } = await apiURL.delete<ApiResponse<null>>(endpoints.users.me, {
     data: { password },
   });

@@ -68,7 +68,10 @@ const columns = [
   }),
 ];
 
-export default function ViewCategoryExpensesDialog({ category, fullExpenses }: Props) {
+export default function ViewCategoryExpensesDialog({
+  category,
+  fullExpenses,
+}: Props) {
   const { isOpen, setIsOpen } = useDialogState(false);
 
   return (
@@ -90,7 +93,9 @@ export default function ViewCategoryExpensesDialog({ category, fullExpenses }: P
         <DialogTitle className="hidden" />
         <h4 className="p-5 pb-0 text-base font-medium">
           Your{' '}
-          <span className="font-bold text-green-800 dark:text-green-400">{category}</span>{' '}
+          <span className="font-bold text-green-800 dark:text-green-400">
+            {category}
+          </span>{' '}
           Expenses
         </h4>
         <div className="table_container max-h-[80vh] min-w-full max-w-full overflow-x-auto overflow-y-auto">

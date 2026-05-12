@@ -51,11 +51,15 @@ export default function SummaryBoxes({
             key={title}
             className={`flex w-full max-w-full flex-col flex-wrap items-center justify-center gap-0 rounded-[10px] p-3 md:max-w-[13rem] 2xl:max-w-[14rem] ${bg}`}
           >
-            <p className="text-center text-lg font-semibold text-white">{title}</p>
+            <p className="text-center text-lg font-semibold text-white">
+              {title}
+            </p>
             {isLoading && title !== 'Remain Balance' ? (
               <p className="mt-1 h-7 w-2/5 animate-pulse rounded-md bg-slate-500 text-center text-2xl font-bold text-white dark:bg-slate-800" />
             ) : (
-              <p className="text-center text-2xl font-bold text-white">{value}</p>
+              <p className="text-center text-2xl font-bold text-white">
+                {value}
+              </p>
             )}
           </div>
         ))}

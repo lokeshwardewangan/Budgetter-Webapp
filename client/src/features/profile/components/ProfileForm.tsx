@@ -82,7 +82,11 @@ export default function ProfileForm() {
       className="col-span-12 flex h-full w-full flex-col space-y-6 rounded-lg bg-bg_primary_light p-6 shadow-sm dark:bg-bg_primary_dark lg:col-span-8 lg:p-7 lg:pb-10"
     >
       <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-        <ReadOnlyRow icon={<User className="h-4 w-4 text-gray-400" />} label="Username" value={user?.username ?? ''} />
+        <ReadOnlyRow
+          icon={<User className="h-4 w-4 text-gray-400" />}
+          label="Username"
+          value={user?.username ?? ''}
+        />
         <EditableField
           id="fullName"
           label="Full Name"
@@ -90,7 +94,11 @@ export default function ProfileForm() {
           field={register('name')}
           error={errors.name?.message}
         />
-        <ReadOnlyRow icon={<Mail className="h-4 w-4 text-gray-400" />} label="Email" value={user?.email ?? ''} />
+        <ReadOnlyRow
+          icon={<Mail className="h-4 w-4 text-gray-400" />}
+          label="Email"
+          value={user?.email ?? ''}
+        />
         <EditableField
           id="profession"
           label="Profession"
@@ -130,7 +138,10 @@ export default function ProfileForm() {
         />
       </div>
 
-      <Collapsible open={passwordSection.isOpen} onOpenChange={passwordSection.setIsOpen}>
+      <Collapsible
+        open={passwordSection.isOpen}
+        onOpenChange={passwordSection.setIsOpen}
+      >
         <CollapsibleTrigger asChild>
           <Button type="button" variant="outline" className="w-full">
             <Lock className="mr-2 h-4 w-4" />
@@ -153,13 +164,22 @@ export default function ProfileForm() {
             />
           </div>
           {errors.newPassword?.message && (
-            <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.newPassword.message}</span>
+            <span
+              role="alert"
+              className="mt-1 block text-xs font-medium text-red-500"
+            >
+              {errors.newPassword.message}
+            </span>
           )}
         </CollapsibleContent>
       </Collapsible>
 
       <div className="button-container flex w-full items-end justify-end">
-        <Button type="submit" disabled={isPending} className="mt-2 w-36 bg-green-600">
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="mt-2 w-36 bg-green-600"
+        >
           {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -186,7 +206,14 @@ type EditableFieldProps = {
   type?: string;
 };
 
-function EditableField({ id, label, icon, field, error, type = 'text' }: EditableFieldProps) {
+function EditableField({
+  id,
+  label,
+  icon,
+  field,
+  error,
+  type = 'text',
+}: EditableFieldProps) {
   return (
     <div className="w-full space-y-2">
       <Label htmlFor={id}>{label}</Label>
@@ -194,12 +221,27 @@ function EditableField({ id, label, icon, field, error, type = 'text' }: Editabl
         <span className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</span>
         <Input id={id} type={type} className="w-full pl-10" {...field} />
       </div>
-      {error && <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{error}</span>}
+      {error && (
+        <span
+          role="alert"
+          className="mt-1 block text-xs font-medium text-red-500"
+        >
+          {error}
+        </span>
+      )}
     </div>
   );
 }
 
-function ReadOnlyRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function ReadOnlyRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
     <div className="w-full space-y-2">
       <Label>{label}</Label>

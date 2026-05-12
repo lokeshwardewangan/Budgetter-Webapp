@@ -13,7 +13,18 @@ type FormFieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
 // an inline error slot. Designed to wrap any registered react-hook-form input
 // without enforcing a specific RHF API on the consumer.
 export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
-  ({ label, error, icon, endAdornment, className, inputClassName, ...inputProps }, ref) => {
+  (
+    {
+      label,
+      error,
+      icon,
+      endAdornment,
+      className,
+      inputClassName,
+      ...inputProps
+    },
+    ref
+  ) => {
     return (
       <div className={cn('relative mb-3', className)}>
         {label && (
@@ -25,7 +36,11 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
           </label>
         )}
         <div className="relative">
-          {icon && <span className="absolute left-3 top-[7px] text-gray-500">{icon}</span>}
+          {icon && (
+            <span className="absolute left-3 top-[7px] text-gray-500">
+              {icon}
+            </span>
+          )}
           <input
             ref={ref}
             {...inputProps}
@@ -33,11 +48,13 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
               'mt-1 block w-full rounded-md border border-gray-300 py-2 font-medium text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm',
               icon ? 'pl-9' : 'px-3',
               endAdornment ? 'pr-12' : '',
-              inputClassName,
+              inputClassName
             )}
           />
           {endAdornment && (
-            <div className="absolute right-0 top-1.5 flex items-center pr-3">{endAdornment}</div>
+            <div className="absolute right-0 top-1.5 flex items-center pr-3">
+              {endAdornment}
+            </div>
           )}
         </div>
         {error && (
@@ -50,6 +67,6 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
         )}
       </div>
     );
-  },
+  }
 );
 FormField.displayName = 'FormField';

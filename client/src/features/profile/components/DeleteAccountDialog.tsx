@@ -57,8 +57,8 @@ export default function DeleteAccountDialog() {
             Delete Account
           </DialogTitle>
           <DialogDescription className="pt-2 text-slate-700">
-            This action cannot be undone. This will permanently delete your account
-            and remove all your data from our servers.
+            This action cannot be undone. This will permanently delete your
+            account and remove all your data from our servers.
           </DialogDescription>
         </DialogHeader>
 

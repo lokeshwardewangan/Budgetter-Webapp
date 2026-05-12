@@ -46,8 +46,8 @@ export default function MarkReceivedDialog({ lentMoneyId, personName }: Props) {
             Confirm Money Received
           </DialogTitle>
           <DialogDescription className="pt-2 text-center text-slate-700">
-            Are you sure you've received the money from {personName}? This will mark
-            the entry as received and update your balance.
+            Are you sure you've received the money from {personName}? This will
+            mark the entry as received and update your balance.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex gap-3 sm:gap-0 sm:space-x-4">

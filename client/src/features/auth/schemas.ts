@@ -6,11 +6,16 @@ const usernameRule = z
   .string()
   .min(4, 'Username must be at least 4 characters')
   .max(20, 'Username must be less than 20 characters')
-  .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores');
+  .regex(
+    /^[a-zA-Z0-9_]+$/,
+    'Username can only contain letters, numbers, and underscores'
+  );
 
 const emailRule = z.string().email('Invalid email address').toLowerCase();
 
-const passwordRule = z.string().min(6, 'Password must be at least 6 characters');
+const passwordRule = z
+  .string()
+  .min(6, 'Password must be at least 6 characters');
 
 const nameRule = z
   .string()
@@ -25,8 +30,10 @@ export const loginSchema = z.object({
     .string()
     .min(1, 'This field is required')
     .refine(
-      (value) => emailRule.safeParse(value).success || usernameRule.safeParse(value).success,
-      { message: 'Must be a valid email or username' },
+      (value) =>
+        emailRule.safeParse(value).success ||
+        usernameRule.safeParse(value).success,
+      { message: 'Must be a valid email or username' }
     ),
   password: passwordRule,
 });

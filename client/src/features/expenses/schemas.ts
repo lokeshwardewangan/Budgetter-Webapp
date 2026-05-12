@@ -4,16 +4,14 @@ import { expensesCategories } from '@/utils/ui/utility';
 const dateRegex = /^([0-2][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
 
 // `price` accepts string or number, emits a positive number.
-const positiveAmount = z
-  .union([z.string(), z.number()])
-  .transform((v, ctx) => {
-    const n = typeof v === 'number' ? v : parseFloat(v);
-    if (Number.isNaN(n) || n <= 0) {
-      ctx.addIssue({ code: 'custom', message: 'Price must be greater than 0' });
-      return z.NEVER;
-    }
-    return n;
-  });
+const positiveAmount = z.union([z.string(), z.number()]).transform((v, ctx) => {
+  const n = typeof v === 'number' ? v : parseFloat(v);
+  if (Number.isNaN(n) || n <= 0) {
+    ctx.addIssue({ code: 'custom', message: 'Price must be greater than 0' });
+    return z.NEVER;
+  }
+  return n;
+});
 
 const categoryEnum = z.enum(expensesCategories as [string, ...string[]]);
 

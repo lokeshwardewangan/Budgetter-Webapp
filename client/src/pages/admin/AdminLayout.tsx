@@ -25,7 +25,9 @@ export default function AdminLayout() {
   }, [navigate]);
 
   return (
-    <div className={`h-full w-full ${isAdminAuthenticated ? 'block' : 'hidden'}`}>
+    <div
+      className={`h-full w-full ${isAdminAuthenticated ? 'block' : 'hidden'}`}
+    >
       <SideNavbar userSidenavbarList={adminSidenavbarList} />
       <div
         className={`dashboard_layout_container absolute right-0 top-0 flex flex-col ${isSideNavbarOpen && !isMobile && 'dashboard_layout_container_large_screen_open'} ${!isSideNavbarOpen && !isMobile && 'dashboard_layout_container_large_screen_close'} ${isMobile && 'dashboard_layout_container_small_screen_close'} `}

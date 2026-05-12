@@ -17,7 +17,10 @@ export function useTodayExpenses() {
   });
 }
 
-export function useExpensesByDate(date: string, options?: { enabled?: boolean }) {
+export function useExpensesByDate(
+  date: string,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: qk.expenses.byDate(date),
     queryFn: () => getExpensesByDate(date),
