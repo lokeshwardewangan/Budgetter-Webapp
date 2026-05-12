@@ -50,7 +50,15 @@ export async function registerLocal({ username, name, email, password }, req) {
 }
 
 export async function loginLocal({ username, email, password }, req) {
-  const existing = await UserModel.findOne({ $or: [{ email }, { username }] }).select('+password');
+  // Only include populated fields in the $or — Mongoose strips undefined
+  // values, which would turn `{ email: undefined }` into `{}` and match
+  // every document via $or. Build the filter explicitly to avoid that.
+  const filters = [];
+  if (email) filters.push({ email });
+  if (username) filters.push({ username });
+  if (filters.length === 0) throw new ApiError(400, 'username or email is required');
+
+  const existing = await UserModel.findOne({ $or: filters }).select('+password');
   if (!existing) throw new ApiError(404, 'User does not exist');
 
   const ok = await existing.isPasswordMatch(password);

@@ -50,6 +50,7 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
     formState: { errors },
   } = useForm<EditExpenseFormInput>({
     resolver: zodResolver(editExpenseFormSchema),
+    mode: 'onTouched',
     defaultValues: {
       expenseDate: actualDate,
       expenseName: product.name,
@@ -119,7 +120,7 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
                   )}
                 />
                 {errors.expenseDate && (
-                  <span className="ml-1 text-sm text-red-500">
+                  <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
                     {errors.expenseDate.message}
                   </span>
                 )}
@@ -133,7 +134,7 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
                   placeholder="Enter Expense"
                 />
                 {errors.expenseName && (
-                  <span className="ml-1 text-sm text-red-500">
+                  <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
                     {errors.expenseName.message}
                   </span>
                 )}
@@ -165,7 +166,7 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
                   placeholder="Enter Price"
                 />
                 {errors.expensePrice && (
-                  <span className="ml-1 text-sm text-red-500">
+                  <span role="alert" className="mt-1 block text-xs font-medium text-red-500">
                     {errors.expensePrice.message}
                   </span>
                 )}

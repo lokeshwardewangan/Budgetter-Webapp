@@ -40,7 +40,14 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
             <div className="absolute right-0 top-1.5 flex items-center pr-3">{endAdornment}</div>
           )}
         </div>
-        {error && <span className="ml-1 text-sm text-red-500">{error}</span>}
+        {error && (
+          <span
+            role="alert"
+            className="mt-1 block text-xs font-medium text-red-500"
+          >
+            {error}
+          </span>
+        )}
       </div>
     );
   },

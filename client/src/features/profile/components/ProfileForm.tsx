@@ -39,6 +39,7 @@ export default function ProfileForm() {
     formState: { errors },
   } = useForm<UpdateProfileForm>({
     resolver: zodResolver(updateProfileSchema),
+    mode: 'onTouched',
     defaultValues: {
       name: '',
       dob: '',
@@ -152,7 +153,7 @@ export default function ProfileForm() {
             />
           </div>
           {errors.newPassword?.message && (
-            <span className="text-xs text-red-500">{errors.newPassword.message}</span>
+            <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{errors.newPassword.message}</span>
           )}
         </CollapsibleContent>
       </Collapsible>
@@ -193,7 +194,7 @@ function EditableField({ id, label, icon, field, error, type = 'text' }: Editabl
         <span className="absolute left-3 top-1/2 -translate-y-1/2">{icon}</span>
         <Input id={id} type={type} className="w-full pl-10" {...field} />
       </div>
-      {error && <span className="text-xs text-red-500">{error}</span>}
+      {error && <span role="alert" className="mt-1 block text-xs font-medium text-red-500">{error}</span>}
     </div>
   );
 }

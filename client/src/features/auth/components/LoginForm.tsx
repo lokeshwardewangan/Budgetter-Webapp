@@ -22,20 +22,19 @@ export default function LoginForm() {
   });
 
   const onSubmit = handleSubmit((values) => {
-    // Server's loginSchema accepts either `email` or `username`. Send both
-    // populated so the server's `$or` query finds whichever matched.
-    return toast.promise(
-      login({
-        username: values.emailOrUsername,
-        email: values.emailOrUsername,
-        password: values.password,
-      }),
-      {
-        loading: 'Logging in...',
-        success: 'Successfully logged in!',
-        error: 'Invalid credentials, please try again.',
-      },
-    );
+    // The server's loginSchema runs `.email()` on the email field as soon
+    // as it's populated. Sending the same string in both keys would mean
+    // username logins fail with "Invalid email format". Route the input
+    // to whichever field actually matches.
+    const looksLikeEmail = values.emailOrUsername.includes('@');
+    const credentials = looksLikeEmail
+      ? { email: values.emailOrUsername, password: values.password }
+      : { username: values.emailOrUsername, password: values.password };
+    return toast.promise(login(credentials), {
+      loading: 'Logging in...',
+      success: 'Successfully logged in!',
+      error: 'Invalid credentials, please try again.',
+    });
   });
 
   return (
