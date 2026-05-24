@@ -1,20 +1,18 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env' });
-const PORT = process.env.PORT;
 import { app } from './app.js';
+import { env } from './config/env.js';
 import connectToDb from './db/conn.js';
 
 connectToDb()
   .then(() => {
-    app.on('error', () => {
-      console.log('Error on Express App', error);
-      throw error;
+    app.on('error', (err) => {
+      console.error('Express app error:', err);
+      throw err;
     });
-    app.listen(PORT, () => {
-      console.log(`Server Listen at PORT ${PORT}`);
+    app.listen(env.PORT, () => {
+      console.log(`Server listening on PORT ${env.PORT}`);
     });
   })
   .catch((err) => {
-    console.log('Connection Failed!!', err);
-    throw err;
+    console.error('Connection failed:', err);
+    process.exit(1);
   });

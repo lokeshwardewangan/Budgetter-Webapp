@@ -1,16 +1,20 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: '.env' });
+// Must come first — validates env before any module reads process.env.
+import { env, isProd } from './config/env.js';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
 import apiRouter from './routes/index.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
+import { globalLimiter } from './middleware/rateLimit.middleware.js';
 
 const app = express();
 
-app.set('trust proxy', true);
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.set('trust proxy', env.TRUST_PROXY_HOPS);
+app.use(morgan(isProd ? 'combined' : 'dev'));
+app.use(helmet());
 
 app.use(
   cors({
@@ -26,15 +30,17 @@ app.use(
 );
 
 app.use(express.json({ limit: '16kb' }));
+app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+app.use(mongoSanitize());
 app.use(express.static('public'));
 app.use(cookieParser());
+app.use(globalLimiter);
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json({ message: 'Welcome to Budgetter API' });
 });
 
-// Liveness probe for container HEALTHCHECK — must stay cheap and unauthenticated.
-app.get('/healthz', (req, res) => {
+app.get('/healthz', (_req, res) => {
   res.status(200).json({ status: 'ok', uptime: process.uptime() });
 });
 
