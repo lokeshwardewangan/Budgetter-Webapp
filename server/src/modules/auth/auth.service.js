@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import { StatusCodes } from 'http-status-codes';
 import UserModel from '../user/user.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { sha256 } from '../../shared/lib/hash.js';
@@ -44,7 +45,8 @@ async function buildUserAndSession({ name, email, password, googleId, picture },
 
 export async function registerLocal({ username, name, email, password }, req) {
   const existing = await UserModel.findOne({ $or: [{ username }, { email }] });
-  if (existing) throw new ApiError(409, 'User with this username or email already exists');
+  if (existing)
+    throw new ApiError(StatusCodes.CONFLICT, 'User with this username or email already exists');
 
   const { user, token } = await buildUserAndSession({ name, email, password }, req);
   sendVerificationEmail(user).catch((err) => logger.error({ err }, 'verify email failed'));
@@ -58,13 +60,14 @@ export async function loginLocal({ username, email, password }, req) {
   const filters = [];
   if (email) filters.push({ email });
   if (username) filters.push({ username });
-  if (filters.length === 0) throw new ApiError(400, 'username or email is required');
+  if (filters.length === 0)
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'username or email is required');
 
   const existing = await UserModel.findOne({ $or: filters }).select('+password');
-  if (!existing) throw new ApiError(404, 'User does not exist');
+  if (!existing) throw new ApiError(StatusCodes.NOT_FOUND, 'User does not exist');
 
   const ok = await existing.isPasswordMatch(password);
-  if (!ok) throw new ApiError(401, 'Invalid credentials');
+  if (!ok) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid credentials');
 
   const token = await createSession(existing, req);
   const user = await UserModel.findById(existing._id).select('-password');
@@ -94,10 +97,10 @@ export async function verifyAccountToken(token) {
   try {
     decoded = jwt.verify(token, process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET);
   } catch {
-    throw new ApiError(400, 'Invalid or expired verification token');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid or expired verification token');
   }
   const user = await UserModel.findById(decoded._id);
-  if (!user) throw new ApiError(404, 'User not found');
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
 
   if (user.isVerified) return { alreadyVerified: true };
   user.isVerified = true;
@@ -107,7 +110,7 @@ export async function verifyAccountToken(token) {
 
 export async function requestPasswordReset(email) {
   const user = await UserModel.findOne({ email });
-  if (!user) throw new ApiError(404, 'User not found');
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
 
   const token = jwt.sign({ _id: user._id }, process.env.RESET_PASSWORD_TOKEN_SECRET, {
     expiresIn: process.env.RESET_PASSWORD_TOKEN_SECRET_EXPIRY,
@@ -124,7 +127,7 @@ export async function requestPasswordReset(email) {
     'Budgetter Password Reset',
     token,
   );
-  if (!ok) throw new ApiError(500, 'Failed to send password reset email');
+  if (!ok) throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send password reset email');
 }
 
 export async function validatePasswordResetToken(token) {
@@ -132,19 +135,22 @@ export async function validatePasswordResetToken(token) {
   try {
     decoded = jwt.verify(token, process.env.RESET_PASSWORD_TOKEN_SECRET);
   } catch {
-    throw new ApiError(400, 'Invalid or expired reset token');
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid or expired reset token');
   }
   const user = await UserModel.findById(decoded._id).select('_id');
-  if (!user) throw new ApiError(404, 'User not found');
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   return user._id;
 }
 
 export async function resetPassword(userId, newPassword) {
   // Require a pending reset request — blocks blind userId-only attacks.
   const pending = await UserModel.findById(userId).select('+passwordResetTokenHash').lean();
-  if (!pending) throw new ApiError(404, 'User not found');
+  if (!pending) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   if (!pending.passwordResetTokenHash) {
-    throw new ApiError(400, 'No active password-reset request. Request a new link.');
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      'No active password-reset request. Request a new link.',
+    );
   }
 
   const hash = await bcrypt.hash(newPassword, 10);

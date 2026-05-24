@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes';
 import { ApiError } from '../lib/ApiError.js';
 
 /**
@@ -21,7 +22,7 @@ export const validate =
         message: issue.message,
         code: issue.code,
       }));
-      return next(new ApiError(400, 'Validation failed', errors));
+      return next(new ApiError(StatusCodes.BAD_REQUEST, 'Validation failed', errors));
     }
     req[source] = result.data;
     next();

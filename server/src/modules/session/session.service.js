@@ -1,4 +1,5 @@
 import { UAParser } from 'ua-parser-js';
+import { StatusCodes } from 'http-status-codes';
 import ActiveSessionModel from './session.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { sha256 } from '../../shared/lib/hash.js';
@@ -45,7 +46,7 @@ export async function listSessions(userId) {
 
 export async function deleteSession(userId, sessionId) {
   const result = await ActiveSessionModel.deleteOne({ _id: sessionId, user: userId });
-  if (result.deletedCount === 0) throw new ApiError(404, 'Session not found');
+  if (result.deletedCount === 0) throw new ApiError(StatusCodes.NOT_FOUND, 'Session not found');
 }
 
 export async function deleteAllOtherSessions(userId, currentToken) {

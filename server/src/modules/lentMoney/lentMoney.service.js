@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes';
 import LentMoneyModel from './lentMoney.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { adjustBalance } from '../user/user.service.js';
@@ -21,8 +22,9 @@ export async function listEntries(userId) {
 
 export async function markReceived(userId, lentMoneyId) {
   const entry = await LentMoneyModel.findOne({ _id: lentMoneyId, user: userId });
-  if (!entry) throw new ApiError(404, 'Lent money record not found');
-  if (entry.isReceived) throw new ApiError(409, 'This lent money has already been received');
+  if (!entry) throw new ApiError(StatusCodes.NOT_FOUND, 'Lent money record not found');
+  if (entry.isReceived)
+    throw new ApiError(StatusCodes.CONFLICT, 'This lent money has already been received');
 
   entry.isReceived = true;
   entry.receivedAt = new Date();

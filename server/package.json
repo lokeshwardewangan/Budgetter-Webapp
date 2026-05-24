@@ -27,6 +27,7 @@
     "express-rate-limit": "^8.5.2",
     "google-auth-library": "^9.15.1",
     "helmet": "^8.2.0",
+    "http-status-codes": "^2.3.0",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.3",

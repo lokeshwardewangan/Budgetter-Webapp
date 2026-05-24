@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { StatusCodes } from 'http-status-codes';
 import { ApiError } from '../lib/ApiError.js';
 import { sha256 } from '../lib/hash.js';
 import ActiveSessionModel from '../../modules/session/session.model.js';
@@ -9,20 +10,20 @@ const verifyJwtToken = async (req, _res, next) => {
   try {
     const authHeader = req.header('Authorization') || '';
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    if (!token) throw new ApiError(401, 'Unauthorized: missing access token');
+    if (!token) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized: missing access token');
 
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
     } catch {
-      throw new ApiError(401, 'Unauthorized: invalid or expired token');
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized: invalid or expired token');
     }
 
     const tokenHash = sha256(token);
     const session = await ActiveSessionModel.findOne({ tokenHash, user: decoded._id })
       .select('_id')
       .lean();
-    if (!session) throw new ApiError(401, 'Unauthorized: session not found');
+    if (!session) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized: session not found');
 
     ActiveSessionModel.updateOne(
       { _id: session._id },

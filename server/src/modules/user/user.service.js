@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-codes';
 import UserModel from './user.model.js';
 import PocketMoneyModel from '../pocketMoney/pocketMoney.model.js';
 import LentMoneyModel from '../lentMoney/lentMoney.model.js';
@@ -54,7 +55,7 @@ export async function getMe(userId, currentToken) {
       .lean(),
   ]);
 
-  if (!user) throw new ApiError(404, 'User not found');
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   return toMeDto(user, currentSession);
 }
 
@@ -71,9 +72,10 @@ export async function updateProfile(userId, body) {
 
   if (newPassword) {
     const user = await UserModel.findById(userId).select('+password');
-    if (!user?.password) throw new ApiError(500, 'User password not set.');
+    if (!user?.password)
+      throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'User password not set.');
     const ok = await bcrypt.compare(currentPassword, user.password);
-    if (!ok) throw new ApiError(401, 'Current password is incorrect.');
+    if (!ok) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Current password is incorrect.');
     updates.password = await bcrypt.hash(newPassword, 10);
   }
 
@@ -82,31 +84,32 @@ export async function updateProfile(userId, body) {
     { $set: updates },
     { new: true },
   ).select('-password');
-  if (!updated) throw new ApiError(404, 'User not found');
+  if (!updated) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   return updated;
 }
 
 export async function updateAvatar(userId, localFilePath) {
-  if (!localFilePath) throw new ApiError(400, 'Avatar file is required');
+  if (!localFilePath) throw new ApiError(StatusCodes.BAD_REQUEST, 'Avatar file is required');
 
   const uploaded = await uploadOnCloudinary(localFilePath);
-  if (!uploaded?.secure_url) throw new ApiError(500, 'Failed to upload avatar');
+  if (!uploaded?.secure_url)
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to upload avatar');
 
   const updated = await UserModel.findByIdAndUpdate(
     userId,
     { $set: { avatar: uploaded.secure_url } },
     { new: true },
   ).select('avatar');
-  if (!updated) throw new ApiError(500, 'Avatar not updated');
+  if (!updated) throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Avatar not updated');
   return updated;
 }
 
 export async function deleteAccount(userId, providedPassword) {
   const user = await UserModel.findById(userId).select('+password');
-  if (!user) throw new ApiError(404, 'User not found');
+  if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
 
   const ok = await user.isPasswordMatch(providedPassword);
-  if (!ok) throw new ApiError(401, 'Invalid password');
+  if (!ok) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid password');
 
   const { name, username, email, avatar, currentPocketMoney } = user;
 
@@ -142,6 +145,6 @@ export async function adjustBalance(userId, delta) {
     { $inc: { currentPocketMoney: Number(delta) } },
     { new: true, projection: { currentPocketMoney: 1 } },
   );
-  if (!updated) throw new ApiError(404, 'User not found');
+  if (!updated) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
   return updated.currentPocketMoney;
 }

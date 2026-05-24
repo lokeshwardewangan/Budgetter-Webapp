@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes';
 import { ApiError } from '../lib/ApiError.js';
 import UserModel from '../../modules/user/user.model.js';
 
@@ -7,10 +8,10 @@ export const requireRole =
   (...allowed) =>
   async (req, _res, next) => {
     try {
-      if (!req.userId) throw new ApiError(401, 'Unauthorized');
+      if (!req.userId) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized');
       const user = await UserModel.findById(req.userId).select('role').lean();
-      if (!user) throw new ApiError(401, 'Unauthorized');
-      if (!allowed.includes(user.role)) throw new ApiError(403, 'Forbidden');
+      if (!user) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized');
+      if (!allowed.includes(user.role)) throw new ApiError(StatusCodes.FORBIDDEN, 'Forbidden');
       next();
     } catch (err) {
       next(err);

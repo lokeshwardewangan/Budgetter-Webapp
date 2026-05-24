@@ -1,10 +1,13 @@
+import { StatusCodes } from 'http-status-codes';
 import asyncHandler from '../../shared/lib/asyncHandler.js';
 import { ApiResponse } from '../../shared/lib/ApiResponse.js';
 import * as expenseService from './expense.service.js';
 
 export const addToday = asyncHandler(async (req, res) => {
   const data = await expenseService.addTodayExpenses(req.userId, req.body?.productsArray);
-  res.status(201).json(new ApiResponse(201, data, 'Expenses created successfully'));
+  res
+    .status(StatusCodes.CREATED)
+    .json(new ApiResponse(StatusCodes.CREATED, data, 'Expenses created successfully'));
 });
 
 export const addBulk = asyncHandler(async (req, res) => {
@@ -13,17 +16,23 @@ export const addBulk = asyncHandler(async (req, res) => {
     req.body?.pastDaysExpensesArray,
   );
   res
-    .status(201)
-    .json(new ApiResponse(201, data, `${data.daysProcessed} day(s) of expenses created`));
+    .status(StatusCodes.CREATED)
+    .json(
+      new ApiResponse(
+        StatusCodes.CREATED,
+        data,
+        `${data.daysProcessed} day(s) of expenses created`,
+      ),
+    );
 });
 
 export const getToday = asyncHandler(async (req, res) => {
   const expenses = await expenseService.getTodayExpenses(req.userId);
   res
-    .status(200)
+    .status(StatusCodes.OK)
     .json(
       new ApiResponse(
-        200,
+        StatusCodes.OK,
         expenses,
         expenses.length ? "Today's expenses found" : 'No expenses for today',
       ),
@@ -33,15 +42,21 @@ export const getToday = asyncHandler(async (req, res) => {
 export const getByDate = asyncHandler(async (req, res) => {
   const expenses = await expenseService.getExpensesByDate(req.userId, req.query.date);
   res
-    .status(200)
+    .status(StatusCodes.OK)
     .json(
-      new ApiResponse(200, expenses, expenses.length ? 'Expenses found' : 'No expenses found'),
+      new ApiResponse(
+        StatusCodes.OK,
+        expenses,
+        expenses.length ? 'Expenses found' : 'No expenses found',
+      ),
     );
 });
 
 export const getAll = asyncHandler(async (req, res) => {
   const expenses = await expenseService.getAllExpenses(req.userId);
-  res.status(200).json(new ApiResponse(200, expenses, 'All expenses retrieved'));
+  res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, expenses, 'All expenses retrieved'));
 });
 
 export const feed = asyncHandler(async (req, res) => {
@@ -53,7 +68,9 @@ export const feed = asyncHandler(async (req, res) => {
     search: req.query.search || undefined,
     category: req.query.category || undefined,
   });
-  res.status(200).json(new ApiResponse(200, data, 'Expenses feed retrieved'));
+  res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, data, 'Expenses feed retrieved'));
 });
 
 export const update = asyncHandler(async (req, res) => {
@@ -64,12 +81,16 @@ export const update = asyncHandler(async (req, res) => {
     expenseCategory: req.body.expenseCategory,
     expenseDate: req.body.expenseDate,
   });
-  res.status(200).json(new ApiResponse(200, data, 'Expense updated successfully'));
+  res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, data, 'Expense updated successfully'));
 });
 
 export const remove = asyncHandler(async (req, res) => {
   const data = await expenseService.deleteExpense(req.userId, req.params.productId, {
     isAddPriceToPocketMoney: req.body.isAddPriceToPocketMoney ?? false,
   });
-  res.status(200).json(new ApiResponse(200, data, 'Expense deleted successfully'));
+  res
+    .status(StatusCodes.OK)
+    .json(new ApiResponse(StatusCodes.OK, data, 'Expense deleted successfully'));
 });

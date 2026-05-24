@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes';
 import ExpenseModel from './expense.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { dayRange, monthRange, startOfToday } from '../../shared/lib/date.js';
@@ -80,7 +81,7 @@ export async function updateExpense(userId, expenseId, body) {
   const { expenseName, expensePrice, expenseCategory, expenseDate, selectedLabel } = body;
 
   const existing = await ExpenseModel.findOne({ _id: expenseId, user: userId });
-  if (!existing) throw new ApiError(404, 'Expense not found');
+  if (!existing) throw new ApiError(StatusCodes.NOT_FOUND, 'Expense not found');
 
   const previousPrice = existing.price;
   existing.name = expenseName;
@@ -97,7 +98,7 @@ export async function updateExpense(userId, expenseId, body) {
 
 export async function deleteExpense(userId, expenseId, { isAddPriceToPocketMoney }) {
   const existing = await ExpenseModel.findOneAndDelete({ _id: expenseId, user: userId });
-  if (!existing) throw new ApiError(404, 'Expense not found');
+  if (!existing) throw new ApiError(StatusCodes.NOT_FOUND, 'Expense not found');
 
   let currentPocketMoney;
   if (isAddPriceToPocketMoney) {

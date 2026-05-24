@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
+import { StatusCodes } from 'http-status-codes';
 import apiRouter from './routes.js';
 import { errorHandler, notFoundHandler } from './shared/middleware/error.middleware.js';
 import { globalLimiter } from './shared/middleware/rateLimit.middleware.js';
@@ -51,7 +52,7 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/healthz', (_req, res) => {
-  res.status(200).json({ status: 'ok', uptime: process.uptime() });
+  res.status(StatusCodes.OK).json({ status: 'ok', uptime: process.uptime() });
 });
 
 app.use('/api', apiRouter);

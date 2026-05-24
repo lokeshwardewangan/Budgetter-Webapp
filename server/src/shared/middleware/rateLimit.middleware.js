@@ -1,8 +1,9 @@
 import rateLimit from 'express-rate-limit';
+import { StatusCodes } from 'http-status-codes';
 import { ApiError } from '../lib/ApiError.js';
 
 const handler = (_req, _res, next) => {
-  next(new ApiError(429, 'Too many requests, please try again later'));
+  next(new ApiError(StatusCodes.TOO_MANY_REQUESTS, 'Too many requests, please try again later'));
 };
 
 export const globalLimiter = rateLimit({
