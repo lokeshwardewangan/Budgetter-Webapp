@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { logger } from '../lib/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,7 @@ const sendMessageToUser = async (userName, type, userEmail, subject, token, html
   } else if (type === 'NEWSLETTER') {
     customizedHTML = html;
   } else {
-    console.log('invalid email type:', type);
+    logger.warn({ type }, 'invalid email type');
     return false;
   }
 
@@ -50,10 +51,10 @@ const sendMessageToUser = async (userName, type, userEmail, subject, token, html
     };
 
     await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully! to -', userEmail);
+    logger.info({ to: userEmail, type }, 'email sent');
     return true;
-  } catch (error) {
-    console.error(`Error sending email to - ${userEmail}`, error);
+  } catch (err) {
+    logger.error({ err, to: userEmail, type }, 'email send failed');
     return false;
   }
 };

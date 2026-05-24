@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
+import { logger } from './logger.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -14,8 +15,8 @@ const uploadOnCloudinary = async (localFilePath) => {
       resource_type: 'auto',
     });
     return response;
-  } catch (error) {
-    console.error('Cloudinary upload failed:', error);
+  } catch (err) {
+    logger.error({ err }, 'Cloudinary upload failed');
     return null;
   } finally {
     if (fs.existsSync(localFilePath)) {

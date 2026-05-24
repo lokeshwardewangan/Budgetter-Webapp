@@ -8,8 +8,6 @@ export const notFoundHandler = (req, res) => {
     .json(new ApiResponse(404, null, `Route not found: ${req.method} ${req.originalUrl}`));
 };
 
-// Centralized error handler. Every controller wrapped in asyncHandler funnels
-// rejections here via next(err), so controllers can simply `throw new ApiError(...)`.
 export const errorHandler = (err, req, res, _next) => {
   let statusCode = 500;
   let message = 'Internal server error';
@@ -34,9 +32,11 @@ export const errorHandler = (err, req, res, _next) => {
     message = err.message;
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.error(`[${req.method} ${req.originalUrl}]`, err);
-  }
+  // Log 5xx as errors, 4xx as warnings; req.log is the pino child logger
+  // injected per-request by pino-http and already carries the requestId.
+  const log = req.log || console;
+  if (statusCode >= 500) log.error({ err, statusCode }, message);
+  else log.warn({ err: { name: err?.name, message: err?.message }, statusCode }, message);
 
   res.status(statusCode).json({
     statusCode,

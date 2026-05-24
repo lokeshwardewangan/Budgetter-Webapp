@@ -1,7 +1,7 @@
 // Must come first — validates env before any module reads process.env.
 import { env, isProd } from './shared/config/env.js';
 import express from 'express';
-import morgan from 'morgan';
+import pinoHttp from 'pino-http';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -9,11 +9,21 @@ import cookieParser from 'cookie-parser';
 import apiRouter from './routes.js';
 import { errorHandler, notFoundHandler } from './shared/middleware/error.middleware.js';
 import { globalLimiter } from './shared/middleware/rateLimit.middleware.js';
+import { requestId } from './shared/middleware/requestId.middleware.js';
+import { logger } from './shared/lib/logger.js';
 
 const app = express();
 
 app.set('trust proxy', env.TRUST_PROXY_HOPS);
-app.use(morgan(isProd ? 'combined' : 'dev'));
+
+app.use(requestId);
+app.use(
+  pinoHttp({
+    logger,
+    customProps: (req) => ({ requestId: req.id }),
+    autoLogging: { ignore: (req) => req.url === '/healthz' },
+  }),
+);
 app.use(helmet());
 
 app.use(
@@ -49,4 +59,4 @@ app.use('/api', apiRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-export { app };
+export { app, isProd };

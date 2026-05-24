@@ -6,8 +6,35 @@ import ActiveSessionModel from '../session/session.model.js';
 import ExpenseModel from '../expense/expense.model.js';
 import DeletedUserModel from './deletedUser.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
+import { sha256 } from '../../shared/lib/hash.js';
 import { uploadOnCloudinary } from '../../shared/lib/cloudinary.js';
 import { sendMessageToUser } from '../../shared/email/email.service.js';
+import { logger } from '../../shared/lib/logger.js';
+
+// Whitelist of fields the SPA needs. Adding a User field doesn't leak it
+// to /me until you opt-in here.
+const ME_FIELDS = [
+  '_id',
+  'username',
+  'name',
+  'email',
+  'avatar',
+  'isVerified',
+  'currentPocketMoney',
+  'profession',
+  'dob',
+  'instagramLink',
+  'facebookLink',
+  'createdAt',
+  'lastLogin',
+];
+
+function toMeDto(user, currentSession) {
+  const dto = {};
+  for (const k of ME_FIELDS) dto[k] = user[k];
+  dto.currentSession = currentSession ? [currentSession] : [];
+  return dto;
+}
 
 export async function generateUniqueUsername(name) {
   const base = name.toLowerCase().replace(/\s+/g, '');
@@ -19,31 +46,16 @@ export async function generateUniqueUsername(name) {
   return username;
 }
 
-// Returns user identity + current session; histories load via their own endpoints.
 export async function getMe(userId, currentToken) {
   const [user, currentSession] = await Promise.all([
-    UserModel.findById(userId).select('-password'),
-    ActiveSessionModel.findOne({ user: userId, token: currentToken }).lean(),
+    UserModel.findById(userId).select('-password').lean(),
+    ActiveSessionModel.findOne({ user: userId, tokenHash: sha256(currentToken) })
+      .select('-tokenHash')
+      .lean(),
   ]);
 
   if (!user) throw new ApiError(404, 'User not found');
-
-  return {
-    _id: user._id,
-    username: user.username,
-    name: user.name,
-    email: user.email,
-    avatar: user.avatar,
-    isVerified: user.isVerified,
-    currentPocketMoney: user.currentPocketMoney,
-    profession: user.profession,
-    dob: user.dob,
-    instagramLink: user.instagramLink,
-    facebookLink: user.facebookLink,
-    createdAt: user.createdAt,
-    lastLogin: user.lastLogin,
-    currentSession: currentSession ? [currentSession] : [],
-  };
+  return toMeDto(user, currentSession);
 }
 
 export async function updateProfile(userId, body) {
@@ -51,7 +63,6 @@ export async function updateProfile(userId, body) {
 
   const updates = {};
   if (name) updates.name = name;
-  // Empty string clears the dob; a Date value sets it.
   if (dob === '') updates.dob = null;
   else if (dob instanceof Date) updates.dob = dob;
   if (instagramLink !== undefined) updates.instagramLink = instagramLink;
@@ -110,14 +121,13 @@ export async function deleteAccount(userId, providedPassword) {
 
   await DeletedUserModel.create({ name, username, email, avatar, currentPocketMoney });
 
-  // Best-effort email; don't block deletion on email failure.
   sendMessageToUser(
     username,
     'DELETE_ACCOUNT',
     email,
     'Budgetter - Account Deletion Confirmation',
     '',
-  ).catch((err) => console.error('delete-account email failed:', err));
+  ).catch((err) => logger.error({ err, email }, 'delete-account email failed'));
 }
 
 export async function isVerified(userId) {

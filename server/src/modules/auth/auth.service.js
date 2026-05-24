@@ -5,6 +5,7 @@ import UserModel from '../user/user.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { sha256 } from '../../shared/lib/hash.js';
 import { sendMessageToUser } from '../../shared/email/email.service.js';
+import { logger } from '../../shared/lib/logger.js';
 import { generateUniqueUsername } from '../user/user.service.js';
 import { createSession } from '../session/session.service.js';
 
@@ -21,7 +22,7 @@ async function sendVerificationEmail(user) {
     'Budgetter Account Verification',
     token,
   );
-  if (!ok) console.error(`Verification email failed for ${user.email}`);
+  if (!ok) logger.error({ email: user.email }, 'verification email failed');
 }
 
 async function buildUserAndSession({ name, email, password, googleId, picture }, req) {
@@ -46,7 +47,7 @@ export async function registerLocal({ username, name, email, password }, req) {
   if (existing) throw new ApiError(409, 'User with this username or email already exists');
 
   const { user, token } = await buildUserAndSession({ name, email, password }, req);
-  sendVerificationEmail(user).catch((err) => console.error('verify email failed:', err));
+  sendVerificationEmail(user).catch((err) => logger.error({ err }, 'verify email failed'));
   return { user, token };
 }
 
