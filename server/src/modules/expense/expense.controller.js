@@ -3,13 +3,13 @@ import { ApiResponse } from '../../shared/lib/ApiResponse.js';
 import * as expenseService from './expense.service.js';
 
 export const addToday = asyncHandler(async (req, res) => {
-  const data = await expenseService.addTodayExpenses(req.user._id, req.body?.productsArray);
+  const data = await expenseService.addTodayExpenses(req.userId, req.body?.productsArray);
   res.status(201).json(new ApiResponse(201, data, 'Expenses created successfully'));
 });
 
 export const addBulk = asyncHandler(async (req, res) => {
   const data = await expenseService.addPastDateExpensesBulk(
-    req.user._id,
+    req.userId,
     req.body?.pastDaysExpensesArray,
   );
   res
@@ -18,7 +18,7 @@ export const addBulk = asyncHandler(async (req, res) => {
 });
 
 export const getToday = asyncHandler(async (req, res) => {
-  const expenses = await expenseService.getTodayExpenses(req.user._id);
+  const expenses = await expenseService.getTodayExpenses(req.userId);
   res
     .status(200)
     .json(
@@ -31,7 +31,7 @@ export const getToday = asyncHandler(async (req, res) => {
 });
 
 export const getByDate = asyncHandler(async (req, res) => {
-  const expenses = await expenseService.getExpensesByDate(req.user._id, req.query.date);
+  const expenses = await expenseService.getExpensesByDate(req.userId, req.query.date);
   res
     .status(200)
     .json(
@@ -40,12 +40,12 @@ export const getByDate = asyncHandler(async (req, res) => {
 });
 
 export const getAll = asyncHandler(async (req, res) => {
-  const expenses = await expenseService.getAllExpenses(req.user._id);
+  const expenses = await expenseService.getAllExpenses(req.userId);
   res.status(200).json(new ApiResponse(200, expenses, 'All expenses retrieved'));
 });
 
 export const feed = asyncHandler(async (req, res) => {
-  const data = await expenseService.getExpensesFeed(req.user._id, {
+  const data = await expenseService.getExpensesFeed(req.userId, {
     page: Number(req.query.page) || 0,
     limit: Math.min(Number(req.query.limit) || 10, 100),
     month: req.query.month || undefined,
@@ -57,7 +57,7 @@ export const feed = asyncHandler(async (req, res) => {
 });
 
 export const update = asyncHandler(async (req, res) => {
-  const data = await expenseService.updateExpense(req.user._id, req.params.productId, {
+  const data = await expenseService.updateExpense(req.userId, req.params.productId, {
     expenseName: req.body.expenseName,
     selectedLabel: req.body.selectedLabel,
     expensePrice: req.body.expensePrice,
@@ -68,7 +68,7 @@ export const update = asyncHandler(async (req, res) => {
 });
 
 export const remove = asyncHandler(async (req, res) => {
-  const data = await expenseService.deleteExpense(req.user._id, req.params.productId, {
+  const data = await expenseService.deleteExpense(req.userId, req.params.productId, {
     isAddPriceToPocketMoney: req.body.isAddPriceToPocketMoney ?? false,
   });
   res.status(200).json(new ApiResponse(200, data, 'Expense deleted successfully'));

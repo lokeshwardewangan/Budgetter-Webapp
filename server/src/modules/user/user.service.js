@@ -120,6 +120,11 @@ export async function deleteAccount(userId, providedPassword) {
   ).catch((err) => console.error('delete-account email failed:', err));
 }
 
+export async function isVerified(userId) {
+  const u = await UserModel.findById(userId).select('isVerified').lean();
+  return !!u?.isVerified;
+}
+
 // Atomic $inc — race-free under concurrent expense/pocket-money writes.
 export async function adjustBalance(userId, delta) {
   const updated = await UserModel.findByIdAndUpdate(

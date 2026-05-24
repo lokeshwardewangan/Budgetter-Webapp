@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import UserModel from '../user/user.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
+import { sha256 } from '../../shared/lib/hash.js';
 import { sendMessageToUser } from '../../shared/email/email.service.js';
 import { generateUniqueUsername } from '../user/user.service.js';
 import { createSession } from '../session/session.service.js';
@@ -111,6 +112,10 @@ export async function requestPasswordReset(email) {
     expiresIn: process.env.RESET_PASSWORD_TOKEN_SECRET_EXPIRY,
   });
 
+  await UserModel.findByIdAndUpdate(user._id, {
+    $set: { passwordResetTokenHash: sha256(token) },
+  });
+
   const ok = await sendMessageToUser(
     user.name,
     'RESET_PASSWORD',
@@ -134,11 +139,16 @@ export async function validatePasswordResetToken(token) {
 }
 
 export async function resetPassword(userId, newPassword) {
+  // Require a pending reset request — blocks blind userId-only attacks.
+  const pending = await UserModel.findById(userId).select('+passwordResetTokenHash').lean();
+  if (!pending) throw new ApiError(404, 'User not found');
+  if (!pending.passwordResetTokenHash) {
+    throw new ApiError(400, 'No active password-reset request. Request a new link.');
+  }
+
   const hash = await bcrypt.hash(newPassword, 10);
-  const updated = await UserModel.findByIdAndUpdate(
-    userId,
-    { $set: { password: hash } },
-    { new: true },
-  );
-  if (!updated) throw new ApiError(404, 'User not found');
+  await UserModel.findByIdAndUpdate(userId, {
+    $set: { password: hash },
+    $unset: { passwordResetTokenHash: '' },
+  });
 }

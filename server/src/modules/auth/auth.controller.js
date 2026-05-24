@@ -2,6 +2,7 @@ import asyncHandler from '../../shared/lib/asyncHandler.js';
 import { ApiResponse } from '../../shared/lib/ApiResponse.js';
 import * as authService from './auth.service.js';
 import * as sessionService from '../session/session.service.js';
+import * as userService from '../user/user.service.js';
 
 export const register = asyncHandler(async (req, res) => {
   const { user, token } = await authService.registerLocal(req.body, req);
@@ -21,12 +22,13 @@ export const googleLogin = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
-  await sessionService.deleteByToken(req.user._id, req.token);
+  await sessionService.deleteByToken(req.userId, req.token);
   res.status(200).json(new ApiResponse(200, null, 'Successfully logged out'));
 });
 
 export const checkVerified = asyncHandler(async (req, res) => {
-  res.status(200).json(new ApiResponse(200, req.user.isVerified, 'Verified status retrieved'));
+  const verified = await userService.isVerified(req.userId);
+  res.status(200).json(new ApiResponse(200, verified, 'Verified status retrieved'));
 });
 
 export const verifyAccount = asyncHandler(async (req, res) => {

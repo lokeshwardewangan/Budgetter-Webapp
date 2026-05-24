@@ -8,7 +8,8 @@ const ActiveSessionSchema = new Schema(
       required: true,
       index: true,
     },
-    token: {
+    // sha256(JWT) — never store the raw JWT (DB leak = full impersonation).
+    tokenHash: {
       type: String,
       required: true,
       index: true,

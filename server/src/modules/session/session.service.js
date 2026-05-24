@@ -1,7 +1,7 @@
 import { UAParser } from 'ua-parser-js';
 import ActiveSessionModel from './session.model.js';
-import UserModel from '../user/user.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
+import { sha256 } from '../../shared/lib/hash.js';
 
 export function getClientInfo(req) {
   const ip =
@@ -24,7 +24,7 @@ export async function createSession(user, req) {
 
   await ActiveSessionModel.create({
     user: user._id,
-    token,
+    tokenHash: sha256(token),
     ip: info.ip,
     userAgent: `${info.browser} on ${info.os} (${info.deviceType})`,
   });
@@ -37,7 +37,10 @@ export async function createSession(user, req) {
 }
 
 export async function listSessions(userId) {
-  return ActiveSessionModel.find({ user: userId }).select('-token').sort({ lastUsedAt: -1 }).lean();
+  return ActiveSessionModel.find({ user: userId })
+    .select('-tokenHash')
+    .sort({ lastUsedAt: -1 })
+    .lean();
 }
 
 export async function deleteSession(userId, sessionId) {
@@ -46,9 +49,12 @@ export async function deleteSession(userId, sessionId) {
 }
 
 export async function deleteAllOtherSessions(userId, currentToken) {
-  await ActiveSessionModel.deleteMany({ user: userId, token: { $ne: currentToken } });
+  await ActiveSessionModel.deleteMany({
+    user: userId,
+    tokenHash: { $ne: sha256(currentToken) },
+  });
 }
 
 export async function deleteByToken(userId, token) {
-  await ActiveSessionModel.deleteOne({ user: userId, token });
+  await ActiveSessionModel.deleteOne({ user: userId, tokenHash: sha256(token) });
 }

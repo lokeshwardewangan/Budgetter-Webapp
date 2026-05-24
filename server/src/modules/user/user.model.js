@@ -66,6 +66,18 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
+    // sha256 of the most recently issued reset JWT — non-null only while
+    // a reset is pending. Cleared on successful password reset.
+    passwordResetTokenHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
     lastLogin: {
       type: Date,
       default: null,
