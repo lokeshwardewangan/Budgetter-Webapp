@@ -1,10 +1,16 @@
 import ExpenseModel from './expense.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
-import { getTodayDate } from '../../shared/lib/date.js';
+import { dayRange, monthRange, startOfToday } from '../../shared/lib/date.js';
 import { adjustBalance } from '../user/user.service.js';
 
+// Finds the user's expense doc for the calendar day of `date`. `date` is a Date.
+async function findExpenseDocForDay(userId, date) {
+  const { gte, lt } = dayRange(date);
+  return ExpenseModel.findOne({ user: userId, date: { $gte: gte, $lt: lt } });
+}
+
 async function upsertProductsForDate(userId, date, productsArray) {
-  const existing = await ExpenseModel.findOne({ user: userId, date });
+  const existing = await findExpenseDocForDay(userId, date);
   if (!existing) {
     return ExpenseModel.create({ user: userId, date, products: productsArray });
   }
@@ -14,9 +20,8 @@ async function upsertProductsForDate(userId, date, productsArray) {
 }
 
 export async function addTodayExpenses(userId, productsArray) {
-  const date = getTodayDate();
   const total = productsArray.reduce((sum, p) => sum + p.price, 0);
-  const expense = await upsertProductsForDate(userId, date, productsArray);
+  const expense = await upsertProductsForDate(userId, startOfToday(), productsArray);
   const currentPocketMoney = await adjustBalance(userId, -total);
   return { expense, currentPocketMoney, totalDeducted: total };
 }
@@ -37,30 +42,34 @@ export async function addPastDateExpensesBulk(userId, daysArray) {
 }
 
 export async function getTodayExpenses(userId) {
-  const today = getTodayDate();
-  const doc = await ExpenseModel.findOne({ user: userId, date: today }).lean();
+  const doc = await findExpenseDocForDay(userId, startOfToday());
   return doc?.products || [];
 }
 
 export async function getExpensesByDate(userId, date) {
-  return ExpenseModel.findOne({ user: userId, date }).lean();
+  const { gte, lt } = dayRange(date);
+  return ExpenseModel.findOne({ user: userId, date: { $gte: gte, $lt: lt } }).lean();
 }
 
 export async function getAllExpenses(userId) {
   return ExpenseModel.find({ user: userId }).sort({ date: -1 }).lean();
 }
 
-// Paginated flat feed of product-level expense rows. Filters month/year/search/
-// category server-side via an aggregation pipeline so the client only ever
-// loads `limit` rows (default 10) at a time.
+// Paginated product-level feed with month/year/search/category filters.
 export async function getExpensesFeed(
   userId,
   { page = 0, limit = 10, month, year, search, category },
 ) {
   const match = { user: userId };
-  if (month && year) match.date = { $regex: `^\\d{2}-${month}-${year}` };
-  else if (month) match.date = { $regex: `^\\d{2}-${month}-\\d{4}` };
-  else if (year) match.date = { $regex: `^\\d{2}-\\d{2}-${year}` };
+  if (month && year) {
+    const { gte, lt } = monthRange(month, year);
+    match.date = { $gte: gte, $lt: lt };
+  } else if (year) {
+    const y = Number(year);
+    match.date = { $gte: new Date(Date.UTC(y, 0, 1)), $lt: new Date(Date.UTC(y + 1, 0, 1)) };
+  } else if (month) {
+    match.$expr = { $eq: [{ $month: '$date' }, Number(month)] };
+  }
 
   const productMatch = {};
   if (category) productMatch['product.category'] = category;
@@ -86,13 +95,7 @@ export async function getExpensesFeed(
   const [result] = await ExpenseModel.aggregate(pipeline);
   const items = result?.items || [];
   const total = result?.total?.[0]?.count || 0;
-  return {
-    items,
-    total,
-    page,
-    limit,
-    hasMore: (page + 1) * limit < total,
-  };
+  return { items, total, page, limit, hasMore: (page + 1) * limit < total };
 }
 
 export async function updateExpenseProduct(userId, body) {
@@ -106,15 +109,16 @@ export async function updateExpenseProduct(userId, body) {
     expenseDate,
   } = body;
 
-  const existing = await ExpenseModel.findOne({ user: userId, date: actualDate });
+  const existing = await findExpenseDocForDay(userId, actualDate);
   if (!existing) throw new ApiError(404, 'Expense document not found for actualDate');
 
   const product = existing.products.find((p) => p._id.toString() === expenseId);
   if (!product) throw new ApiError(404, 'Expense product not found');
 
   const previousPrice = product.price;
+  const sameDay = dayRange(actualDate).gte.getTime() === dayRange(expenseDate).gte.getTime();
 
-  if (actualDate === expenseDate) {
+  if (sameDay) {
     product.name = expenseName;
     product.price = expensePrice;
     product.category = expenseCategory;
@@ -128,16 +132,10 @@ export async function updateExpenseProduct(userId, body) {
       await existing.save();
     }
     await upsertProductsForDate(userId, expenseDate, [
-      {
-        name: expenseName,
-        price: expensePrice,
-        category: expenseCategory,
-        label: selectedLabel,
-      },
+      { name: expenseName, price: expensePrice, category: expenseCategory, label: selectedLabel },
     ]);
   }
 
-  // Refund the old price, charge the new one (net effect: refund delta).
   const delta = previousPrice - expensePrice;
   const currentPocketMoney = await adjustBalance(userId, delta);
   return { currentPocketMoney };
@@ -145,9 +143,10 @@ export async function updateExpenseProduct(userId, body) {
 
 export async function deleteExpenseProduct(userId, body) {
   const { expenseId, expenseDate, isAddPriceToPocketMoney } = body;
+  const { gte, lt } = dayRange(expenseDate);
 
   const doc = await ExpenseModel.findOne(
-    { user: userId, date: expenseDate, 'products._id': expenseId },
+    { user: userId, date: { $gte: gte, $lt: lt }, 'products._id': expenseId },
     { 'products.$': 1 },
   );
   const product = doc?.products?.[0];
@@ -156,7 +155,7 @@ export async function deleteExpenseProduct(userId, body) {
   const price = product.price;
 
   const updated = await ExpenseModel.findOneAndUpdate(
-    { user: userId, date: expenseDate },
+    { user: userId, date: { $gte: gte, $lt: lt } },
     { $pull: { products: { _id: expenseId } } },
     { new: true },
   );
@@ -167,7 +166,7 @@ export async function deleteExpenseProduct(userId, body) {
 
   let currentPocketMoney;
   if (isAddPriceToPocketMoney) {
-    currentPocketMoney = await adjustBalance(userId, Number(price) || 0);
+    currentPocketMoney = await adjustBalance(userId, price || 0);
   }
   return { currentPocketMoney, refunded: !!isAddPriceToPocketMoney };
 }

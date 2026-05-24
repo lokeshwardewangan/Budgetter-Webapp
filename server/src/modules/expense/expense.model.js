@@ -21,6 +21,7 @@ const ProductSchema = new Schema(
     price: {
       type: Number,
       required: true,
+      min: 0,
     },
     category: {
       type: String,
@@ -44,32 +45,21 @@ const ExpensesSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
     },
     date: {
-      type: String,
+      type: Date,
       required: true,
-      default: () => {
-        const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const year = String(now.getFullYear()).slice(-2);
-        return `${day}-${month}-${year}`;
-      },
+      default: Date.now,
     },
     products: {
       type: [ProductSchema],
-      validate: [arrayLimit, 'Must have at least 1 product'],
+      validate: [(arr) => arr.length > 0, 'Must have at least 1 product'],
     },
   },
   {
     timestamps: true,
   },
 );
-
-function arrayLimit(val) {
-  return val.length > 0;
-}
 
 ExpensesSchema.index({ user: 1, date: 1 });
 

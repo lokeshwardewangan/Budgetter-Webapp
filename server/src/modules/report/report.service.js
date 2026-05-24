@@ -1,6 +1,7 @@
 import ExpenseModel, { EXPENSE_CATEGORIES } from '../expense/expense.model.js';
 import PocketMoneyModel from '../pocketMoney/pocketMoney.model.js';
 import LentMoneyModel from '../lentMoney/lentMoney.model.js';
+import { monthRange } from '../../shared/lib/date.js';
 
 const CATEGORY_KEY_MAP = {
   Groceries: 'GroceriesExpenses',
@@ -21,22 +22,19 @@ function emptyCategoryBreakdown() {
 }
 
 export async function monthlyReport(userId, { month, year }) {
-  const dateRegex = `^\\d{2}-${month}-${year}`;
+  const { gte, lt } = monthRange(month, year);
+  const range = { $gte: gte, $lt: lt };
 
   const [monthExpenses, lastExpenseDoc, pocketAgg, lentAgg] = await Promise.all([
-    ExpenseModel.find({ user: userId, date: { $regex: dateRegex } }).lean(),
+    ExpenseModel.find({ user: userId, date: range }).lean(),
     ExpenseModel.findOne({ user: userId }).sort({ _id: -1 }).lean(),
     PocketMoneyModel.aggregate([
-      { $match: { user: userId } },
-      { $addFields: { parts: { $split: ['$date', '-'] } } },
-      { $match: { 'parts.1': month } },
-      { $group: { _id: null, total: { $sum: { $toDouble: '$amount' } } } },
+      { $match: { user: userId, date: range } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
     ]),
     LentMoneyModel.aggregate([
-      { $match: { user: userId } },
-      { $addFields: { parts: { $split: ['$date', '-'] } } },
-      { $match: { 'parts.1': month } },
-      { $group: { _id: null, total: { $sum: { $toDouble: '$price' } } } },
+      { $match: { user: userId, date: range } },
+      { $group: { _id: null, total: { $sum: '$price' } } },
     ]),
   ]);
 
@@ -51,7 +49,7 @@ export async function monthlyReport(userId, { month, year }) {
   }
 
   const lastTotalExpenses =
-    lastExpenseDoc?.products?.reduce((acc, p) => acc + (Number(p.price) || 0), 0) || 0;
+    lastExpenseDoc?.products?.reduce((acc, p) => acc + (p.price || 0), 0) || 0;
 
   return {
     totalExpenses,

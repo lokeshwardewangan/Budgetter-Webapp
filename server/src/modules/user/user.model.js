@@ -9,7 +9,6 @@ const UserSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      index: true,
     },
     name: {
       type: String,
@@ -26,32 +25,26 @@ const UserSchema = new Schema(
       type: String,
       default: 'https://i.postimg.cc/cCWKmfzs/satoro-1.jpg',
     },
-    dateOfBirth: {
-      type: String,
-      default: '',
-      required: false,
+    dob: {
+      type: Date,
+      default: null,
     },
     profession: {
       type: String,
       default: '',
-      required: false,
     },
     instagramLink: {
       type: String,
       default: '',
-      required: false,
     },
     facebookLink: {
       type: String,
       default: '',
-      required: false,
     },
-    // Denormalized running balance. Source of truth is the deltas applied by
-    // pocket-money / expense / lent-money flows. Reconcile from those
-    // collections if it ever drifts.
+    // Denormalized running balance; reconcile from PocketMoney + LentMoney + Expense if it drifts.
     currentPocketMoney: {
-      type: String,
-      default: '0',
+      type: Number,
+      default: 0,
     },
     password: {
       type: String,
@@ -86,6 +79,9 @@ const UserSchema = new Schema(
     timestamps: true,
   },
 );
+
+// Sparse so non-Google users (googleId: null) don't all collide on the index.
+UserSchema.index({ googleId: 1 }, { sparse: true });
 
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {

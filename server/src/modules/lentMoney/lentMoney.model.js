@@ -6,7 +6,6 @@ const LentMoneySchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true,
     },
     personName: {
       type: String,
@@ -14,17 +13,18 @@ const LentMoneySchema = new Schema(
       trim: true,
     },
     price: {
-      type: String,
+      type: Number,
       required: true,
+      min: 0,
     },
     date: {
-      type: String,
+      type: Date,
       required: true,
+      default: Date.now,
     },
     isReceived: {
       type: Boolean,
       default: false,
-      index: true,
     },
     receivedAt: {
       type: Date,
@@ -33,6 +33,8 @@ const LentMoneySchema = new Schema(
   },
   { timestamps: true },
 );
+
+LentMoneySchema.index({ user: 1, isReceived: 1 });
 
 const LentMoney = mongoose.model('LentMoney', LentMoneySchema);
 export default LentMoney;

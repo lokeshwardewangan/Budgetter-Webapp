@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "format": "npx prettier --write ."
+    "format": "npx prettier --write .",
+    "migrate:v2-types": "node scripts/migrate-v2-types.js"
   },
   "author": "",
   "license": "ISC",

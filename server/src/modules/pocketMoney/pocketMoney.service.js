@@ -2,13 +2,7 @@ import PocketMoneyModel from './pocketMoney.model.js';
 import { adjustBalance } from '../user/user.service.js';
 
 export async function addEntry(userId, { date, amount, source }) {
-  // `amount` arrives as a positive Number from the validator's coercion.
-  const entry = await PocketMoneyModel.create({
-    user: userId,
-    date,
-    amount: amount.toString(),
-    source,
-  });
+  const entry = await PocketMoneyModel.create({ user: userId, date, amount, source });
   const currentPocketMoney = await adjustBalance(userId, amount);
   return { entry, currentPocketMoney };
 }

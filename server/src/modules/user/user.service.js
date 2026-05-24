@@ -3,7 +3,6 @@ import UserModel from './user.model.js';
 import PocketMoneyModel from '../pocketMoney/pocketMoney.model.js';
 import LentMoneyModel from '../lentMoney/lentMoney.model.js';
 import ActiveSessionModel from '../session/session.model.js';
-// PocketMoney + LentMoney imports kept because deleteAccount still cascades into them.
 import ExpenseModel from '../expense/expense.model.js';
 import DeletedUserModel from './deletedUser.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
@@ -20,10 +19,7 @@ export async function generateUniqueUsername(name) {
   return username;
 }
 
-// /me now returns user identity + current session only. Pocket-money and
-// lent-money histories are fetched separately via their dedicated endpoints,
-// which gives smaller payloads on first paint, granular query invalidation,
-// and lets each feature own its cache.
+// Returns user identity + current session; histories load via their own endpoints.
 export async function getMe(userId, currentToken) {
   const [user, currentSession] = await Promise.all([
     UserModel.findById(userId).select('-password'),
@@ -41,7 +37,7 @@ export async function getMe(userId, currentToken) {
     isVerified: user.isVerified,
     currentPocketMoney: user.currentPocketMoney,
     profession: user.profession,
-    dob: user.dateOfBirth,
+    dob: user.dob,
     instagramLink: user.instagramLink,
     facebookLink: user.facebookLink,
     createdAt: user.createdAt,
@@ -55,7 +51,9 @@ export async function updateProfile(userId, body) {
 
   const updates = {};
   if (name) updates.name = name;
-  if (dob) updates.dateOfBirth = dob;
+  // Empty string clears the dob; a Date value sets it.
+  if (dob === '') updates.dob = null;
+  else if (dob instanceof Date) updates.dob = dob;
   if (instagramLink !== undefined) updates.instagramLink = instagramLink;
   if (facebookLink !== undefined) updates.facebookLink = facebookLink;
   if (profession !== undefined) updates.profession = profession;
@@ -112,7 +110,7 @@ export async function deleteAccount(userId, providedPassword) {
 
   await DeletedUserModel.create({ name, username, email, avatar, currentPocketMoney });
 
-  // Best-effort acknowledgment email; don't block the deletion on email failure.
+  // Best-effort email; don't block deletion on email failure.
   sendMessageToUser(
     username,
     'DELETE_ACCOUNT',
@@ -122,13 +120,13 @@ export async function deleteAccount(userId, providedPassword) {
   ).catch((err) => console.error('delete-account email failed:', err));
 }
 
-// Atomically adjust the cached running balance on User. Returns the new balance.
+// Atomic $inc — race-free under concurrent expense/pocket-money writes.
 export async function adjustBalance(userId, delta) {
-  const user = await UserModel.findById(userId);
-  if (!user) throw new ApiError(404, 'User not found');
-  const next = parseFloat(user.currentPocketMoney || '0') + Number(delta);
-  if (Number.isNaN(next)) throw new ApiError(500, 'Balance calculation failed');
-  user.currentPocketMoney = next.toString();
-  await user.save({ validateBeforeSave: false });
-  return user.currentPocketMoney;
+  const updated = await UserModel.findByIdAndUpdate(
+    userId,
+    { $inc: { currentPocketMoney: Number(delta) } },
+    { new: true, projection: { currentPocketMoney: 1 } },
+  );
+  if (!updated) throw new ApiError(404, 'User not found');
+  return updated.currentPocketMoney;
 }

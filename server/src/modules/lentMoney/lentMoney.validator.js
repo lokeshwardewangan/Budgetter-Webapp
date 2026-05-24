@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { objectIdSchema, dateString, moneyAmount } from '../../shared/lib/validators.js';
+import { objectIdSchema, dateInput, moneyAmount } from '../../shared/lib/validators.js';
 
 export const addLentMoneySchema = z.object({
   personName: z.string().trim().min(1, 'personName is required'),
   price: moneyAmount,
-  date: dateString,
+  date: dateInput,
 });
 
 export const lentMoneyIdParamSchema = z.object({

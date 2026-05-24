@@ -3,19 +3,12 @@ import { ApiError } from '../../shared/lib/ApiError.js';
 import { adjustBalance } from '../user/user.service.js';
 
 export async function addEntry(userId, { personName, price, date }) {
-  // `price` arrives as a positive Number from the validator's coercion.
-  const entry = await LentMoneyModel.create({
-    user: userId,
-    personName,
-    price: price.toString(),
-    date,
-  });
-
+  const entry = await LentMoneyModel.create({ user: userId, personName, price, date });
   const currentPocketMoney = await adjustBalance(userId, -price);
 
   const totals = await LentMoneyModel.aggregate([
     { $match: { user: entry.user, isReceived: false } },
-    { $group: { _id: null, total: { $sum: { $toDouble: '$price' } } } },
+    { $group: { _id: null, total: { $sum: '$price' } } },
   ]);
   const totalLentMoney = totals[0]?.total || 0;
 
@@ -35,7 +28,6 @@ export async function markReceived(userId, lentMoneyId) {
   entry.receivedAt = new Date();
   await entry.save();
 
-  const numeric = parseFloat(entry.price) || 0;
-  const currentPocketMoney = await adjustBalance(userId, numeric);
+  const currentPocketMoney = await adjustBalance(userId, entry.price);
   return { entry, currentPocketMoney };
 }

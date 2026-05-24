@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { objectIdSchema, dateString, productSchema } from '../../shared/lib/validators.js';
+import { objectIdSchema, dateInput, productSchema } from '../../shared/lib/validators.js';
 import { EXPENSE_CATEGORIES } from './expense.model.js';
 
 export const addTodaySchema = z.object({
@@ -10,7 +10,7 @@ export const addBulkSchema = z.object({
   pastDaysExpensesArray: z
     .array(
       z.object({
-        date: dateString,
+        date: dateInput,
         productsArray: z.array(productSchema).min(1),
       }),
     )
@@ -18,7 +18,7 @@ export const addBulkSchema = z.object({
 });
 
 export const dateQuerySchema = z.object({
-  date: dateString,
+  date: dateInput,
 });
 
 // Coerce `page` and `limit` from query strings; the controller clamps `limit`
@@ -43,15 +43,15 @@ export const productIdParamSchema = z.object({
 });
 
 export const updateExpenseBodySchema = z.object({
-  actualDate: dateString,
+  actualDate: dateInput,
   expenseName: z.string().trim().min(1, 'expenseName is required'),
   selectedLabel: z.any().optional().nullable(),
   expensePrice: z.number().positive('expensePrice must be greater than 0'),
   expenseCategory: z.enum(EXPENSE_CATEGORIES),
-  expenseDate: dateString,
+  expenseDate: dateInput,
 });
 
 export const deleteExpenseBodySchema = z.object({
-  expenseDate: dateString,
+  expenseDate: dateInput,
   isAddPriceToPocketMoney: z.boolean().optional().default(false),
 });

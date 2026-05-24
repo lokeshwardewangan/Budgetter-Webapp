@@ -20,8 +20,8 @@ const deletedUserSchema = new Schema(
       required: true,
     },
     currentPocketMoney: {
-      type: String,
-      default: '0',
+      type: Number,
+      default: 0,
     },
   },
   {
