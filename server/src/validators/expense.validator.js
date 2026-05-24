@@ -26,8 +26,14 @@ export const dateQuerySchema = z.object({
 export const feedQuerySchema = z.object({
   page: z.coerce.number().int().nonnegative().optional(),
   limit: z.coerce.number().int().positive().max(100).optional(),
-  month: z.string().regex(/^(0[1-9]|1[0-2])$/).optional(),
-  year: z.string().regex(/^\d{4}$/).optional(),
+  month: z
+    .string()
+    .regex(/^(0[1-9]|1[0-2])$/)
+    .optional(),
+  year: z
+    .string()
+    .regex(/^\d{4}$/)
+    .optional(),
   search: z.string().max(80).optional(),
   category: z.enum(EXPENSE_CATEGORIES).optional(),
 });

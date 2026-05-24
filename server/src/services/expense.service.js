@@ -53,7 +53,10 @@ export async function getAllExpenses(userId) {
 // Paginated flat feed of product-level expense rows. Filters month/year/search/
 // category server-side via an aggregation pipeline so the client only ever
 // loads `limit` rows (default 10) at a time.
-export async function getExpensesFeed(userId, { page = 0, limit = 10, month, year, search, category }) {
+export async function getExpensesFeed(
+  userId,
+  { page = 0, limit = 10, month, year, search, category },
+) {
   const match = { user: userId };
   if (month && year) match.date = { $regex: `^\\d{2}-${month}-${year}` };
   else if (month) match.date = { $regex: `^\\d{2}-${month}-\\d{4}` };
