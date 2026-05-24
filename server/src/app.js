@@ -1,14 +1,14 @@
 // Must come first — validates env before any module reads process.env.
-import { env, isProd } from './config/env.js';
+import { env, isProd } from './shared/config/env.js';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
-import apiRouter from './routes/index.js';
-import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
-import { globalLimiter } from './middleware/rateLimit.middleware.js';
+import apiRouter from './routes.js';
+import { errorHandler, notFoundHandler } from './shared/middleware/error.middleware.js';
+import { globalLimiter } from './shared/middleware/rateLimit.middleware.js';
 
 const app = express();
 

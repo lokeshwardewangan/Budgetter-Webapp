@@ -1,6 +1,6 @@
 import { app } from './app.js';
-import { env } from './config/env.js';
-import connectToDb from './db/conn.js';
+import { env } from './shared/config/env.js';
+import connectToDb from './shared/db/conn.js';
 
 connectToDb()
   .then(() => {
