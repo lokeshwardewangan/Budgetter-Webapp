@@ -26,9 +26,11 @@ async function sendVerificationEmail(user) {
   if (!ok) logger.error({ email: user.email }, 'verification email failed');
 }
 
-async function buildUserAndSession({ name, email, password, googleId, picture }, req) {
-  const username = await generateUniqueUsername(name);
-  const data = { username, name, email };
+async function buildUserAndSession({ username, name, email, password, googleId, picture }, req) {
+  // Local register passes a user-chosen username; Google login passes none
+  // (synthesize from name).
+  const finalUsername = username || (await generateUniqueUsername(name));
+  const data = { username: finalUsername, name, email };
   if (password) data.password = password;
   if (googleId) {
     data.googleId = googleId;
@@ -48,7 +50,7 @@ export async function registerLocal({ username, name, email, password }, req) {
   if (existing)
     throw new ApiError(StatusCodes.CONFLICT, 'User with this username or email already exists');
 
-  const { user, token } = await buildUserAndSession({ name, email, password }, req);
+  const { user, token } = await buildUserAndSession({ username, name, email, password }, req);
   sendVerificationEmail(user).catch((err) => logger.error({ err }, 'verify email failed'));
   return { user, token };
 }
