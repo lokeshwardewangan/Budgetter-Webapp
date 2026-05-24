@@ -1,13 +1,17 @@
 // Must come first — validates env before any module reads process.env.
 import { env, isProd } from './shared/config/env.js';
+// Extends Zod with .openapi(); must run before any schema is defined.
+import './shared/openapi/init.js';
 import express from 'express';
 import pinoHttp from 'pino-http';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
 import { StatusCodes } from 'http-status-codes';
 import apiRouter from './routes.js';
+import { buildOpenApiDocument } from './shared/openapi/build.js';
 import { errorHandler, notFoundHandler } from './shared/middleware/error.middleware.js';
 import { globalLimiter } from './shared/middleware/rateLimit.middleware.js';
 import { requestId } from './shared/middleware/requestId.middleware.js';
@@ -56,6 +60,10 @@ app.get('/healthz', (_req, res) => {
 });
 
 app.use('/api', apiRouter);
+
+const openApiDocument = buildOpenApiDocument();
+app.get('/openapi.json', (_req, res) => res.json(openApiDocument));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 app.use(notFoundHandler);
 app.use(errorHandler);
