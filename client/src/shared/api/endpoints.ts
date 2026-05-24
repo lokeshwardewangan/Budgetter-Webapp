@@ -41,8 +41,4 @@ export const endpoints = {
   reports: {
     monthly: '/reports/monthly',
   },
-  admin: {
-    users: '/admin/users',
-    newsletter: '/admin/newsletter',
-  },
 } as const;

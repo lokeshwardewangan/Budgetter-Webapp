@@ -45,8 +45,4 @@ export const qk = {
     monthly: (month: string, year: string) =>
       ['reports', 'monthly', month, year] as const,
   },
-
-  admin: {
-    users: ['admin', 'users'] as const,
-  },
 } as const;

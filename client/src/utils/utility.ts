@@ -27,10 +27,6 @@ export const getActiveRouteLink = () => {
       return 'user/add-lent-money';
     case '/user/add-money':
       return 'user/add-money';
-    case '/admin/newsletter':
-      return 'admin/newsletter';
-    case '/admin/users':
-      return 'admin/users';
     default:
       return '/';
   }
@@ -45,7 +41,6 @@ export const getPageTitle = (): string => {
     '/user/show-expenses': 'Show Expenses',
     '/user/reports': 'Reports',
     '/user/add-money': 'Add Money',
-    '/admin/users': 'Admin Page',
   };
 
   const pageTitle = routes[path] || 'Home';
