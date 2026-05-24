@@ -67,7 +67,6 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
     await toast.promise(
       edit({
         expenseId: product._id,
-        actualDate,
         expenseName: v.expenseName,
         expensePrice: v.expensePrice,
         expenseCategory: v.expenseCategory,

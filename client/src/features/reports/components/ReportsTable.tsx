@@ -21,11 +21,14 @@ const columns = [
     header: '#',
     cell: (info) => info.row.index + 1,
   }),
-  columnHelper.accessor('date', { header: 'Date' }),
-  columnHelper.accessor('product.name', {
+  columnHelper.accessor('date', {
+    header: 'Date',
+    cell: (info) => new Date(info.getValue<string>()).toLocaleDateString(),
+  }),
+  columnHelper.accessor('name', {
     header: 'Product Name',
     cell: (info) => {
-      const row = info.row.original.product;
+      const row = info.row.original;
       if (!row.label) return row.name;
       const style = getLabelColorStyle(row.label);
       return (
@@ -45,12 +48,11 @@ const columns = [
       );
     },
   }),
-  columnHelper.accessor('product.price', { header: 'Price ₹' }),
-  columnHelper.accessor('product.category', { header: 'Category' }),
-  columnHelper.accessor('product.createdAt', {
+  columnHelper.accessor('price', { header: 'Price ₹' }),
+  columnHelper.accessor('category', { header: 'Category' }),
+  columnHelper.accessor('createdAt', {
     header: 'Time',
-    cell: (info) =>
-      new Date(info.getValue<string>()).toLocaleString().split(',')[1],
+    cell: (info) => new Date(info.getValue<string>()).toLocaleString().split(',')[1],
   }),
 ];
 

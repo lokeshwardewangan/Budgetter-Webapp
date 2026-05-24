@@ -11,8 +11,18 @@ export const EXPENSE_CATEGORIES = [
   'Miscellaneous',
 ];
 
-const ProductSchema = new Schema(
+const ExpenseSchema = new Schema(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
     name: {
       type: String,
       required: true,
@@ -33,35 +43,15 @@ const ProductSchema = new Schema(
     },
     label: {
       type: String,
-      required: false,
+      default: null,
     },
   },
   { timestamps: true },
 );
 
-const ExpensesSchema = new Schema(
-  {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    date: {
-      type: Date,
-      required: true,
-      default: Date.now,
-    },
-    products: {
-      type: [ProductSchema],
-      validate: [(arr) => arr.length > 0, 'Must have at least 1 product'],
-    },
-  },
-  {
-    timestamps: true,
-  },
-);
+ExpenseSchema.index({ user: 1, date: -1 });
+ExpenseSchema.index({ user: 1, category: 1, date: -1 });
+ExpenseSchema.index({ user: 1, createdAt: -1 });
 
-ExpensesSchema.index({ user: 1, date: 1 });
-
-const Expense = mongoose.model('Expense', ExpensesSchema);
+const Expense = mongoose.model('Expense', ExpenseSchema);
 export default Expense;

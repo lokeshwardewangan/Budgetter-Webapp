@@ -27,7 +27,7 @@ export default function ExpensesByDatePanel() {
     }
   };
 
-  const products = data?.products ?? [];
+  const products = data ?? [];
 
   return (
     <>

@@ -46,7 +46,7 @@ export default function ReportsPanel() {
   const pdfRows = useMemo(
     () =>
       rows.map((r, i) => ({
-        ...r.product,
+        ...r,
         sno: i + 1,
       })),
     [rows]

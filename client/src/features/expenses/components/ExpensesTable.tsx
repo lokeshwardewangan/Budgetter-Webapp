@@ -69,10 +69,7 @@ export default function ExpensesTable({
             actualDate={actualDate}
             product={info.row.original}
           />
-          <DeleteExpenseDialog
-            actualDate={actualDate}
-            product={info.row.original}
-          />
+          <DeleteExpenseDialog product={info.row.original} />
         </div>
       ),
     }),

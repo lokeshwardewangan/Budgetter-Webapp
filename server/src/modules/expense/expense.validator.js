@@ -21,8 +21,6 @@ export const dateQuerySchema = z.object({
   date: dateInput,
 });
 
-// Coerce `page` and `limit` from query strings; the controller clamps `limit`
-// to [1, 100] separately.
 export const feedQuerySchema = z.object({
   page: z.coerce.number().int().nonnegative().optional(),
   limit: z.coerce.number().int().positive().max(100).optional(),
@@ -43,15 +41,13 @@ export const productIdParamSchema = z.object({
 });
 
 export const updateExpenseBodySchema = z.object({
-  actualDate: dateInput,
   expenseName: z.string().trim().min(1, 'expenseName is required'),
   selectedLabel: z.any().optional().nullable(),
   expensePrice: z.number().positive('expensePrice must be greater than 0'),
   expenseCategory: z.enum(EXPENSE_CATEGORIES),
-  expenseDate: dateInput,
+  expenseDate: dateInput.optional(),
 });
 
 export const deleteExpenseBodySchema = z.object({
-  expenseDate: dateInput,
   isAddPriceToPocketMoney: z.boolean().optional().default(false),
 });

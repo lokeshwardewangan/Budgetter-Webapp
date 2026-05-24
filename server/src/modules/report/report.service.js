@@ -25,9 +25,28 @@ export async function monthlyReport(userId, { month, year }) {
   const { gte, lt } = monthRange(month, year);
   const range = { $gte: gte, $lt: lt };
 
-  const [monthExpenses, lastExpenseDoc, pocketAgg, lentAgg] = await Promise.all([
-    ExpenseModel.find({ user: userId, date: range }).lean(),
-    ExpenseModel.findOne({ user: userId }).sort({ _id: -1 }).lean(),
+  // Last month with any expense activity, used as the "previous period" total.
+  const lastEntry = await ExpenseModel.findOne({ user: userId }).sort({ date: -1 }).lean();
+  let lastTotalExpenses = 0;
+  if (lastEntry) {
+    const prev = monthRange(lastEntry.date.getUTCMonth() + 1, lastEntry.date.getUTCFullYear());
+    const lastAgg = await ExpenseModel.aggregate([
+      { $match: { user: userId, date: { $gte: prev.gte, $lt: prev.lt } } },
+      { $group: { _id: null, total: { $sum: '$price' } } },
+    ]);
+    lastTotalExpenses = lastAgg[0]?.total || 0;
+  }
+
+  const [expensesAgg, pocketAgg, lentAgg] = await Promise.all([
+    ExpenseModel.aggregate([
+      { $match: { user: userId, date: range } },
+      {
+        $group: {
+          _id: '$category',
+          total: { $sum: '$price' },
+        },
+      },
+    ]),
     PocketMoneyModel.aggregate([
       { $match: { user: userId, date: range } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
@@ -40,16 +59,11 @@ export async function monthlyReport(userId, { month, year }) {
 
   const categoryWiseExpensesData = emptyCategoryBreakdown();
   let totalExpenses = 0;
-  for (const doc of monthExpenses) {
-    for (const product of doc.products || []) {
-      const key = CATEGORY_KEY_MAP[product.category];
-      if (key) categoryWiseExpensesData[key] += product.price;
-      totalExpenses += product.price;
-    }
+  for (const row of expensesAgg) {
+    const key = CATEGORY_KEY_MAP[row._id];
+    if (key) categoryWiseExpensesData[key] = row.total;
+    totalExpenses += row.total;
   }
-
-  const lastTotalExpenses =
-    lastExpenseDoc?.products?.reduce((acc, p) => acc + (p.price || 0), 0) || 0;
 
   return {
     totalExpenses,

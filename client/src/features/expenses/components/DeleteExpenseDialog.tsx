@@ -18,11 +18,10 @@ import type { ExpenseProduct } from '@/types/api/expenses/expenses';
 import { useDeleteExpense } from '../hooks';
 
 type Props = {
-  actualDate: string;
   product: ExpenseProduct;
 };
 
-export default function DeleteExpenseDialog({ actualDate, product }: Props) {
+export default function DeleteExpenseDialog({ product }: Props) {
   const { isOpen, setIsOpen, close } = useDialogState(false);
   const [refund, setRefund] = useState(true);
   const { mutateAsync: doDelete, isPending } = useDeleteExpense();
@@ -31,7 +30,6 @@ export default function DeleteExpenseDialog({ actualDate, product }: Props) {
     await toast.promise(
       doDelete({
         expenseId: product._id,
-        expenseDate: actualDate,
         isAddPriceToPocketMoney: refund,
       }),
       {

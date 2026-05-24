@@ -6,19 +6,26 @@ import { useTheme } from '@/shared/contexts/ThemeContext';
 import ChartFilterOptions from '@/shared/components/charts/ChartFilterOptions';
 import { getDayName, getLast7Dates } from '@/utils/date/date';
 import { useAllExpenses } from '@/features/expenses/hooks';
-import type { ExpenseEntry } from '@/types/api/expenses/expenses';
+import type { Expense } from '@/types/api/expenses/expenses';
 import LineChartLoader from './loaders/LineChartLoader';
 
 type ChartFilter = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type Point = { day: string; value: number };
+
+// ISO date string → dd-mm-yyyy for grouping/comparison against legacy helpers.
+function toDdMmYyyy(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const yyyy = d.getUTCFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+}
 
 export default function ExpensesTimelineChart() {
   const chartRef = useRef<HTMLDivElement>(null);
   const { isDarkMode } = useTheme();
   const [filter, setFilter] = useState<ChartFilter>('daily');
 
-  // Sourced from the shared all-expenses query — same data the insights table
-  // reads, so there's only one network call between them.
   const { data: allExpenses = [], isLoading } = useAllExpenses();
 
   const chartData = useMemo(
@@ -122,7 +129,6 @@ export default function ExpensesTimelineChart() {
     };
   }, [isDarkMode, chartData]);
 
-  // Force re-render on filter change so amCharts picks up new data.
   useEffect(() => {}, [filter]);
 
   return (
@@ -151,21 +157,13 @@ export default function ExpensesTimelineChart() {
   );
 }
 
-// Build the X-axis series for the chosen filter from the full expense list.
-function computeSeries(
-  allExpenses: ExpenseEntry[],
-  filter: ChartFilter
-): Point[] {
-  const sumOf = (entries: ExpenseEntry[]) =>
-    entries.reduce(
-      (acc, e) => acc + e.products.reduce((s, p) => s + (p.price ?? 0), 0),
-      0
-    );
-
+function computeSeries(allExpenses: Expense[], filter: ChartFilter): Point[] {
   if (filter === 'daily') {
     return getLast7Dates.map((day) => ({
       day: getDayName(day),
-      value: sumOf(allExpenses.filter((e) => e.date === day)),
+      value: allExpenses
+        .filter((e) => toDdMmYyyy(e.date) === day)
+        .reduce((sum, e) => sum + (e.price ?? 0), 0),
     }));
   }
 
@@ -180,10 +178,10 @@ function computeSeries(
       { day: 'Week-4', value: 0 },
     ];
     for (const e of allExpenses) {
-      const [d, m, y] = e.date.split('-');
+      const [d, m, y] = toDdMmYyyy(e.date).split('-');
       if (m !== currentMonth || y !== currentYear) continue;
       const idx = Math.min(Math.floor((parseInt(d) - 1) / 7), 3);
-      weeks[idx].value += e.products.reduce((s, p) => s + (p.price ?? 0), 0);
+      weeks[idx].value += e.price ?? 0;
     }
     return weeks;
   }
@@ -191,13 +189,9 @@ function computeSeries(
   if (filter === 'monthly') {
     const byMonth = new Map<string, number>();
     for (const e of allExpenses) {
-      const [, m, y] = e.date.split('-');
+      const [, m, y] = toDdMmYyyy(e.date).split('-');
       const key = `${m}-${y}`;
-      byMonth.set(
-        key,
-        (byMonth.get(key) ?? 0) +
-          e.products.reduce((s, p) => s + (p.price ?? 0), 0)
-      );
+      byMonth.set(key, (byMonth.get(key) ?? 0) + (e.price ?? 0));
     }
     return Array.from(byMonth, ([day, value]) => ({ day, value }));
   }
@@ -205,11 +199,8 @@ function computeSeries(
   // yearly
   const byYear = new Map<string, number>();
   for (const e of allExpenses) {
-    const [, , y] = e.date.split('-');
-    byYear.set(
-      y,
-      (byYear.get(y) ?? 0) + e.products.reduce((s, p) => s + (p.price ?? 0), 0)
-    );
+    const [, , y] = toDdMmYyyy(e.date).split('-');
+    byYear.set(y, (byYear.get(y) ?? 0) + (e.price ?? 0));
   }
   return Array.from(byYear, ([day, value]) => ({ day, value }));
 }

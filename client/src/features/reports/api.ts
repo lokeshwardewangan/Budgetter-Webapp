@@ -1,13 +1,9 @@
 import { apiURL } from '@/lib/http';
 import { endpoints } from '@/shared/api/endpoints';
 import type { ApiResponse } from '@/shared/api/types';
-import type { ExpenseProduct } from '@/types/api/expenses/expenses';
+import type { Expense } from '@/types/api/expenses/expenses';
 
-export type ExpenseFeedRow = {
-  date: string;
-  parentId: string;
-  product: ExpenseProduct;
-};
+export type ExpenseFeedRow = Expense;
 
 export type ExpenseFeedPage = {
   items: ExpenseFeedRow[];
@@ -27,13 +23,10 @@ export type ExpenseFeedFilters = {
 };
 
 export async function getExpensesFeed(
-  filters: ExpenseFeedFilters
+  filters: ExpenseFeedFilters,
 ): Promise<ApiResponse<ExpenseFeedPage>> {
-  const { data } = await apiURL.get<ApiResponse<ExpenseFeedPage>>(
-    endpoints.expenses.feed,
-    {
-      params: filters,
-    }
-  );
+  const { data } = await apiURL.get<ApiResponse<ExpenseFeedPage>>(endpoints.expenses.feed, {
+    params: filters,
+  });
   return data;
 }

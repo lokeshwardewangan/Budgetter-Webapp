@@ -8,19 +8,10 @@ import {
 } from '@/components/ui/dialog';
 import { DataTable } from '@/shared/components/table/DataTable';
 import { useDialogState } from '@/shared/hooks/useDialogState';
-import { getMonthName } from '@/utils/date/date';
 import { getLabelColorStyle } from '@/utils/ui/utility';
+import type { Expense } from '@/types/api/expenses/expenses';
 
-type ExpensesRow = {
-  _id: string;
-  name: string;
-  price: number;
-  label: string;
-  date: string;
-  category: string;
-  createdAt: string;
-  updatedAt: string;
-};
+type ExpensesRow = Expense;
 
 type Props = {
   category: string;
@@ -62,8 +53,8 @@ const columns = [
   columnHelper.accessor('date', {
     header: 'Date',
     cell: (info) => {
-      const [day, month] = info.getValue<string>().split('-');
-      return `${parseInt(day, 10)} ${getMonthName(month)}`;
+      const d = new Date(info.getValue<string>());
+      return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
     },
   }),
 ];
