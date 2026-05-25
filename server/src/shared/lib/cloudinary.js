@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
 import { logger } from './logger.js';
 
 cloudinary.config({
@@ -8,25 +7,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
-  if (!localFilePath) return null;
-  try {
-    const response = await cloudinary.uploader.upload(localFilePath, {
-      resource_type: 'auto',
-    });
-    return response;
-  } catch (err) {
-    logger.error({ err }, 'Cloudinary upload failed');
-    return null;
-  } finally {
-    if (fs.existsSync(localFilePath)) {
-      try {
-        fs.unlinkSync(localFilePath);
-      } catch {
-        // best-effort cleanup
-      }
-    }
-  }
-};
+// Streams an in-memory buffer straight to Cloudinary — no disk roundtrip.
+const uploadBufferToCloudinary = (buffer, options = {}) =>
+  new Promise((resolve) => {
+    if (!buffer) return resolve(null);
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: 'auto', ...options },
+      (err, result) => {
+        if (err) {
+          logger.error({ err }, 'Cloudinary upload failed');
+          return resolve(null);
+        }
+        resolve(result);
+      },
+    );
+    stream.end(buffer);
+  });
 
-export { uploadOnCloudinary };
+export { uploadBufferToCloudinary };

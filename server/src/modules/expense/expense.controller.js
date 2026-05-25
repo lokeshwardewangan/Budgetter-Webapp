@@ -68,9 +68,7 @@ export const feed = asyncHandler(async (req, res) => {
     search: req.query.search || undefined,
     category: req.query.category || undefined,
   });
-  res
-    .status(StatusCodes.OK)
-    .json(new ApiResponse(StatusCodes.OK, data, 'Expenses feed retrieved'));
+  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, data, 'Expenses feed retrieved'));
 });
 
 export const update = asyncHandler(async (req, res) => {

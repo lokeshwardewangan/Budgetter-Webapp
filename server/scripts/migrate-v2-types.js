@@ -36,7 +36,8 @@ async function migrateUsers(db) {
     const set = {};
     const unset = {};
 
-    if (typeof doc.currentPocketMoney === 'string') set.currentPocketMoney = toNumber(doc.currentPocketMoney);
+    if (typeof doc.currentPocketMoney === 'string')
+      set.currentPocketMoney = toNumber(doc.currentPocketMoney);
     if (doc.dateOfBirth !== undefined) {
       set.dob = parseDdMmYyyy(doc.dateOfBirth);
       unset.dateOfBirth = '';

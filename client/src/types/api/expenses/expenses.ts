@@ -26,7 +26,11 @@ export type AllExpensesResType = ExpensesResType;
 
 export interface AddExpensesResType {
   statusCode: number;
-  data: { expenses: Expense[]; currentPocketMoney: number; totalDeducted: number } | null;
+  data: {
+    expenses: Expense[];
+    currentPocketMoney: number;
+    totalDeducted: number;
+  } | null;
   message: string;
   success: boolean;
 }

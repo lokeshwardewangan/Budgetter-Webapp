@@ -16,7 +16,7 @@ export const updateMe = asyncHandler(async (req, res) => {
 });
 
 export const updateAvatar = asyncHandler(async (req, res) => {
-  const updated = await userService.updateAvatar(req.userId, req.file?.path);
+  const updated = await userService.updateAvatar(req.userId, req.file?.buffer);
   res
     .status(StatusCodes.OK)
     .json(new ApiResponse(StatusCodes.OK, updated, 'Avatar updated successfully'));

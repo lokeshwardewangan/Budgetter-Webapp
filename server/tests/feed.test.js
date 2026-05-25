@@ -16,17 +16,13 @@ describe('expense feed pagination', () => {
     const token = await registerAndGetToken();
     await seed(token, 25);
 
-    const p0 = await api()
-      .get('/api/expenses/feed?page=0&limit=10')
-      .set(authHeader(token));
+    const p0 = await api().get('/api/expenses/feed?page=0&limit=10').set(authHeader(token));
     expect(p0.status).toBe(200);
     expect(p0.body.data.items).toHaveLength(10);
     expect(p0.body.data.total).toBe(25);
     expect(p0.body.data.hasMore).toBe(true);
 
-    const p2 = await api()
-      .get('/api/expenses/feed?page=2&limit=10')
-      .set(authHeader(token));
+    const p2 = await api().get('/api/expenses/feed?page=2&limit=10').set(authHeader(token));
     expect(p2.body.data.items).toHaveLength(5);
     expect(p2.body.data.hasMore).toBe(false);
   });

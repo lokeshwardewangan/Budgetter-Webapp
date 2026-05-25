@@ -34,43 +34,61 @@ export type DeleteExpenseInput = {
 // --- Queries ---------------------------------------------------------------
 
 export async function getTodayExpenses(): Promise<ApiResponse<Expense[]>> {
-  const { data } = await apiURL.get<ApiResponse<Expense[]>>(endpoints.expenses.today);
+  const { data } = await apiURL.get<ApiResponse<Expense[]>>(
+    endpoints.expenses.today
+  );
   return data;
 }
 
-export async function getExpensesByDate(date: string): Promise<ApiResponse<Expense[]>> {
-  const { data } = await apiURL.get<ApiResponse<Expense[]>>(endpoints.expenses.byDate, {
-    params: { date },
-  });
+export async function getExpensesByDate(
+  date: string
+): Promise<ApiResponse<Expense[]>> {
+  const { data } = await apiURL.get<ApiResponse<Expense[]>>(
+    endpoints.expenses.byDate,
+    {
+      params: { date },
+    }
+  );
   return data;
 }
 
 export async function getAllExpenses(): Promise<ApiResponse<Expense[]>> {
-  const { data } = await apiURL.get<ApiResponse<Expense[]>>(endpoints.expenses.list);
+  const { data } = await apiURL.get<ApiResponse<Expense[]>>(
+    endpoints.expenses.list
+  );
   return data;
 }
 
 // --- Mutations -------------------------------------------------------------
 
-export async function addExpensesBulk(input: BulkAddInput): Promise<ApiResponse<unknown>> {
-  const { data } = await apiURL.post<ApiResponse<unknown>>(endpoints.expenses.bulk, input);
-  return data;
-}
-
-export async function editExpense(input: EditExpenseInput): Promise<ApiResponse<unknown>> {
-  const { expenseId, ...body } = input;
-  const { data } = await apiURL.patch<ApiResponse<unknown>>(
-    endpoints.expenses.product(expenseId),
-    body,
+export async function addExpensesBulk(
+  input: BulkAddInput
+): Promise<ApiResponse<unknown>> {
+  const { data } = await apiURL.post<ApiResponse<unknown>>(
+    endpoints.expenses.bulk,
+    input
   );
   return data;
 }
 
-export async function deleteExpense(input: DeleteExpenseInput): Promise<ApiResponse<unknown>> {
+export async function editExpense(
+  input: EditExpenseInput
+): Promise<ApiResponse<unknown>> {
+  const { expenseId, ...body } = input;
+  const { data } = await apiURL.patch<ApiResponse<unknown>>(
+    endpoints.expenses.product(expenseId),
+    body
+  );
+  return data;
+}
+
+export async function deleteExpense(
+  input: DeleteExpenseInput
+): Promise<ApiResponse<unknown>> {
   const { expenseId, ...body } = input;
   const { data } = await apiURL.delete<ApiResponse<unknown>>(
     endpoints.expenses.product(expenseId),
-    { data: body },
+    { data: body }
   );
   return data;
 }

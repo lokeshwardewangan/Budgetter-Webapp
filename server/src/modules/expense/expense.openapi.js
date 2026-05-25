@@ -28,7 +28,7 @@ registry.registerPath({
   method: 'post',
   path: '/expenses',
   tags: [tag],
-  summary: "Add one or more expenses for today",
+  summary: 'Add one or more expenses for today',
   security: [{ [bearerAuth.name]: [] }],
   request: { body: { content: { 'application/json': { schema: addTodaySchema } } } },
   responses: {

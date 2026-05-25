@@ -5,9 +5,7 @@ import * as adminService from './admin.service.js';
 
 export const listUsers = asyncHandler(async (req, res) => {
   const users = await adminService.listAllUsers();
-  res
-    .status(StatusCodes.OK)
-    .json(new ApiResponse(StatusCodes.OK, users, 'All users retrieved'));
+  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, users, 'All users retrieved'));
 });
 
 export const newsletter = asyncHandler(async (req, res) => {

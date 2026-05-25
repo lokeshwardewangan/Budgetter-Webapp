@@ -5,7 +5,10 @@ const products = (...prices) =>
   prices.map((p, i) => ({ name: `Item ${i + 1}`, price: p, category: 'Food', label: null }));
 
 async function addToday(token, prices) {
-  return api().post('/api/expenses').set(authHeader(token)).send({ productsArray: products(...prices) });
+  return api()
+    .post('/api/expenses')
+    .set(authHeader(token))
+    .send({ productsArray: products(...prices) });
 }
 
 async function balance(token) {
@@ -36,7 +39,12 @@ describe('expense CRUD + balance', () => {
     const edit = await api()
       .patch(`/api/expenses/products/${id}`)
       .set(authHeader(token))
-      .send({ expenseName: 'Item 1', expensePrice: 30, expenseCategory: 'Food', selectedLabel: null });
+      .send({
+        expenseName: 'Item 1',
+        expensePrice: 30,
+        expenseCategory: 'Food',
+        selectedLabel: null,
+      });
     expect(edit.status).toBe(200);
 
     const after2 = await balance(token);
@@ -52,7 +60,12 @@ describe('expense CRUD + balance', () => {
     await api()
       .patch(`/api/expenses/products/${id}`)
       .set(authHeader(token))
-      .send({ expenseName: 'Item 1', expensePrice: 80, expenseCategory: 'Food', selectedLabel: null });
+      .send({
+        expenseName: 'Item 1',
+        expensePrice: 80,
+        expenseCategory: 'Food',
+        selectedLabel: null,
+      });
 
     const after2 = await balance(token);
     expect(after2).toBe(after1 - 30); // refunded 50, charged 80

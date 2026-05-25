@@ -34,9 +34,7 @@ export const googleLogin = asyncHandler(async (req, res) => {
 
 export const logout = asyncHandler(async (req, res) => {
   await sessionService.deleteByToken(req.userId, req.token);
-  res
-    .status(StatusCodes.OK)
-    .json(new ApiResponse(StatusCodes.OK, null, 'Successfully logged out'));
+  res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, null, 'Successfully logged out'));
 });
 
 export const checkVerified = asyncHandler(async (req, res) => {

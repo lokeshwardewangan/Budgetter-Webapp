@@ -129,7 +129,8 @@ export async function requestPasswordReset(email) {
     'Budgetter Password Reset',
     token,
   );
-  if (!ok) throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send password reset email');
+  if (!ok)
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send password reset email');
 }
 
 export async function validatePasswordResetToken(token) {

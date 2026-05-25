@@ -11,7 +11,9 @@ export const sample = {
 };
 
 export async function register(overrides = {}) {
-  return api().post('/api/auth/register').send({ ...sample, ...overrides });
+  return api()
+    .post('/api/auth/register')
+    .send({ ...sample, ...overrides });
 }
 
 export async function loginAndGetToken(overrides = {}) {

@@ -66,7 +66,10 @@ registry.registerPath({
   summary: 'Log in or register via Google ID token',
   request: { body: { content: { 'application/json': { schema: googleLoginSchema } } } },
   responses: {
-    200: { description: 'Login successful', content: { 'application/json': { schema: apiResponse(authData) } } },
+    200: {
+      description: 'Login successful',
+      content: { 'application/json': { schema: apiResponse(authData) } },
+    },
     201: { description: 'New account created' },
     429: { description: 'Too many requests' },
   },
@@ -79,7 +82,10 @@ registry.registerPath({
   summary: 'Invalidate the current session',
   security: [{ [bearerAuth.name]: [] }],
   responses: {
-    200: { description: 'Logged out', content: { 'application/json': { schema: apiResponse(emptyData) } } },
+    200: {
+      description: 'Logged out',
+      content: { 'application/json': { schema: apiResponse(emptyData) } },
+    },
     401: { description: 'Unauthorized' },
   },
 });
@@ -91,7 +97,10 @@ registry.registerPath({
   summary: 'Check whether the current account has been email-verified',
   security: [{ [bearerAuth.name]: [] }],
   responses: {
-    200: { description: 'Verified status', content: { 'application/json': { schema: apiResponse(z.boolean()) } } },
+    200: {
+      description: 'Verified status',
+      content: { 'application/json': { schema: apiResponse(z.boolean()) } },
+    },
     401: { description: 'Unauthorized' },
   },
 });
@@ -115,7 +124,10 @@ registry.registerPath({
   summary: 'Email a password-reset link to the account',
   request: { body: { content: { 'application/json': { schema: passwordResetRequestSchema } } } },
   responses: {
-    200: { description: 'Reset link sent', content: { 'application/json': { schema: apiResponse(emptyData) } } },
+    200: {
+      description: 'Reset link sent',
+      content: { 'application/json': { schema: apiResponse(emptyData) } },
+    },
     404: { description: 'No account with that email' },
     429: { description: 'Too many requests' },
   },
@@ -140,7 +152,10 @@ registry.registerPath({
   summary: 'Set a new password (requires a pending reset request)',
   request: { body: { content: { 'application/json': { schema: passwordResetSchema } } } },
   responses: {
-    200: { description: 'Password updated', content: { 'application/json': { schema: apiResponse(emptyData) } } },
+    200: {
+      description: 'Password updated',
+      content: { 'application/json': { schema: apiResponse(emptyData) } },
+    },
     400: { description: 'No active reset request' },
     404: { description: 'User not found' },
     429: { description: 'Too many requests' },

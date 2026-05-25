@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import { env } from '../config/env.js';
 import { logger } from '../lib/logger.js';
 
+mongoose.set('strictQuery', true);
+
 const connectToDb = async () => {
   try {
     const instance = await mongoose.connect(env.MONGO_URL);

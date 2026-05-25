@@ -25,10 +25,9 @@ const verifyJwtToken = async (req, _res, next) => {
       .lean();
     if (!session) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Unauthorized: session not found');
 
-    ActiveSessionModel.updateOne(
-      { _id: session._id },
-      { $set: { lastUsedAt: new Date() } },
-    ).catch(() => {});
+    ActiveSessionModel.updateOne({ _id: session._id }, { $set: { lastUsedAt: new Date() } }).catch(
+      () => {},
+    );
 
     req.userId = decoded._id;
     req.token = token;

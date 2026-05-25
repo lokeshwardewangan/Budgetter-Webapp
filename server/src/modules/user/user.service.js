@@ -8,7 +8,7 @@ import ExpenseModel from '../expense/expense.model.js';
 import DeletedUserModel from './deletedUser.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { sha256 } from '../../shared/lib/hash.js';
-import { uploadOnCloudinary } from '../../shared/lib/cloudinary.js';
+import { uploadBufferToCloudinary } from '../../shared/lib/cloudinary.js';
 import { sendMessageToUser } from '../../shared/email/email.service.js';
 import { logger } from '../../shared/lib/logger.js';
 
@@ -88,10 +88,10 @@ export async function updateProfile(userId, body) {
   return updated;
 }
 
-export async function updateAvatar(userId, localFilePath) {
-  if (!localFilePath) throw new ApiError(StatusCodes.BAD_REQUEST, 'Avatar file is required');
+export async function updateAvatar(userId, fileBuffer) {
+  if (!fileBuffer) throw new ApiError(StatusCodes.BAD_REQUEST, 'Avatar file is required');
 
-  const uploaded = await uploadOnCloudinary(localFilePath);
+  const uploaded = await uploadBufferToCloudinary(fileBuffer, { folder: 'budgetter/avatars' });
   if (!uploaded?.secure_url)
     throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to upload avatar');
 

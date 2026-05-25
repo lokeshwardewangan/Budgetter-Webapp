@@ -54,7 +54,10 @@ const columns = [
     header: 'Date',
     cell: (info) => {
       const d = new Date(info.getValue<string>());
-      return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+      return d.toLocaleDateString(undefined, {
+        day: 'numeric',
+        month: 'short',
+      });
     },
   }),
 ];

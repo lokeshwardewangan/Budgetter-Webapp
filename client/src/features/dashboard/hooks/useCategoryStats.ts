@@ -30,7 +30,9 @@ export function useCategoryStats(
     if (!filterMonthValue || !filterYearValue) return [];
     const monthNum = getMonthInNumber(filterMonthValue);
 
-    const inRange = allExpenses.filter((e) => inMonthYear(e, monthNum, filterYearValue));
+    const inRange = allExpenses.filter((e) =>
+      inMonthYear(e, monthNum, filterYearValue)
+    );
     if (inRange.length === 0) return [];
 
     const byCategory = new Map<string, number[]>();
@@ -48,7 +50,9 @@ export function useCategoryStats(
       return {
         category,
         totalSpent,
-        expensePercent: parseFloat(((totalSpent / totalSpentAll) * 100).toFixed(2)),
+        expensePercent: parseFloat(
+          ((totalSpent / totalSpentAll) * 100).toFixed(2)
+        ),
         transactionCount,
         avgExpense: totalSpent / transactionCount,
         maxExpense: Math.max(...prices),
