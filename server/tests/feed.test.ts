@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { api, authHeader, registerAndGetToken } from './helpers.js';
 
-async function seed(token, n) {
+interface FeedItem {
+  category: string;
+  name: string;
+}
+
+async function seed(token: string | undefined, n: number): Promise<void> {
   const productsArray = Array.from({ length: n }, (_, i) => ({
     name: `Item ${i}`,
     price: 1 + i,
@@ -35,7 +40,7 @@ describe('expense feed pagination', () => {
       .get('/api/expenses/feed?page=0&limit=10&category=Food')
       .set(authHeader(token));
     expect(res.body.data.total).toBe(5);
-    expect(res.body.data.items.every((i) => i.category === 'Food')).toBe(true);
+    expect(res.body.data.items.every((i: FeedItem) => i.category === 'Food')).toBe(true);
   });
 
   it('filters by search (case-insensitive)', async () => {

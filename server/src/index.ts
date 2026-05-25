@@ -6,13 +6,13 @@ import { logger } from './shared/lib/logger.js';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 
-async function start() {
+async function start(): Promise<void> {
   await connectToDb();
   const server = app.listen(env.PORT, () => {
     logger.info(`Server listening on PORT ${env.PORT}`);
   });
 
-  const shutdown = (signal) => {
+  const shutdown = (signal: string): void => {
     logger.info({ signal }, 'Shutting down');
     const forceExit = setTimeout(() => {
       logger.error('Shutdown timed out — forcing exit');

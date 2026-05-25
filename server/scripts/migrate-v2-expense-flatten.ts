@@ -10,18 +10,32 @@
 // Run AFTER migrate-v2-types.js (which converts date String → Date).
 
 import mongoose from 'mongoose';
+import type { ObjectId } from 'mongodb';
 import { env } from '../src/shared/config/env.js';
 
-async function run() {
+interface FlatExpense {
+  _id: ObjectId;
+  user: ObjectId;
+  date: Date;
+  name: string;
+  price: number;
+  category: string;
+  label: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+async function run(): Promise<void> {
   await mongoose.connect(env.MONGO_URL);
   const db = mongoose.connection.db;
+  if (!db) throw new Error('No DB connection');
   const coll = db.collection('expenses');
   console.log(`Connected to ${db.databaseName}\n`);
 
   const cursor = coll.find({ products: { $type: 'array' } });
   let dayDocsScanned = 0;
-  let flatDocsToInsert = [];
-  let dayDocIdsToDelete = [];
+  const flatDocsToInsert: FlatExpense[] = [];
+  const dayDocIdsToDelete: ObjectId[] = [];
 
   for await (const doc of cursor) {
     dayDocsScanned++;

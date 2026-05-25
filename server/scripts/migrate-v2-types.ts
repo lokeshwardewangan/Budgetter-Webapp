@@ -1,14 +1,15 @@
 // One-shot migration: convert legacy String money + String dd-mm-yyyy (or dd-mm-yy)
-// date fields to Number + Date. Run with `node scripts/migrate-v2-types.js`.
+// date fields to Number + Date. Run with `npm run migrate:v2-types`.
 //
 // Idempotent: skips docs already in the new shape. Reads via raw collection
 // driver to bypass the Mongoose schema (which now expects Number/Date and
 // would reject reads of the old String values).
 
 import mongoose from 'mongoose';
+import type { Db, AnyBulkWriteOperation } from 'mongodb';
 import { env } from '../src/shared/config/env.js';
 
-const parseDdMmYyyy = (s) => {
+const parseDdMmYyyy = (s: unknown): Date | null => {
   if (s == null || s === '') return null;
   if (s instanceof Date) return s;
   const m = /^([0-2][0-9]|3[01])-(0[1-9]|1[0-2])-(\d{2}|\d{4})$/.exec(String(s));
@@ -18,23 +19,28 @@ const parseDdMmYyyy = (s) => {
   return new Date(Date.UTC(yyyy, Number(mm) - 1, Number(dd)));
 };
 
-const toNumber = (v) => {
+const toNumber = (v: unknown): number => {
   if (typeof v === 'number') return v;
-  const n = parseFloat(v);
+  const n = parseFloat(String(v));
   return Number.isFinite(n) ? n : 0;
 };
 
-async function migrateUsers(db) {
+interface MigrationResult {
+  scanned: number;
+  updated: number;
+}
+
+async function migrateUsers(db: Db): Promise<MigrationResult> {
   const coll = db.collection('users');
   const cursor = coll.find({});
   let scanned = 0;
   let updated = 0;
-  const ops = [];
+  const ops: AnyBulkWriteOperation[] = [];
 
   for await (const doc of cursor) {
     scanned++;
-    const set = {};
-    const unset = {};
+    const set: Record<string, unknown> = {};
+    const unset: Record<string, unknown> = {};
 
     if (typeof doc.currentPocketMoney === 'string')
       set.currentPocketMoney = toNumber(doc.currentPocketMoney);
@@ -44,7 +50,7 @@ async function migrateUsers(db) {
     }
 
     if (Object.keys(set).length || Object.keys(unset).length) {
-      const update = {};
+      const update: Record<string, unknown> = {};
       if (Object.keys(set).length) update.$set = set;
       if (Object.keys(unset).length) update.$unset = unset;
       ops.push({ updateOne: { filter: { _id: doc._id }, update } });
@@ -55,16 +61,20 @@ async function migrateUsers(db) {
   return { scanned, updated };
 }
 
-async function migrateMoneyDateCollection(db, name, moneyField) {
+async function migrateMoneyDateCollection(
+  db: Db,
+  name: string,
+  moneyField: string,
+): Promise<MigrationResult> {
   const coll = db.collection(name);
   const cursor = coll.find({});
   let scanned = 0;
   let updated = 0;
-  const ops = [];
+  const ops: AnyBulkWriteOperation[] = [];
 
   for await (const doc of cursor) {
     scanned++;
-    const set = {};
+    const set: Record<string, unknown> = {};
     if (typeof doc[moneyField] === 'string') set[moneyField] = toNumber(doc[moneyField]);
     if (typeof doc.date === 'string') {
       const parsed = parseDdMmYyyy(doc.date);
@@ -79,12 +89,12 @@ async function migrateMoneyDateCollection(db, name, moneyField) {
   return { scanned, updated };
 }
 
-async function migrateExpenses(db) {
+async function migrateExpenses(db: Db): Promise<MigrationResult> {
   const coll = db.collection('expenses');
   const cursor = coll.find({});
   let scanned = 0;
   let updated = 0;
-  const ops = [];
+  const ops: AnyBulkWriteOperation[] = [];
 
   for await (const doc of cursor) {
     scanned++;
@@ -100,12 +110,12 @@ async function migrateExpenses(db) {
   return { scanned, updated };
 }
 
-async function migrateDeletedUsers(db) {
+async function migrateDeletedUsers(db: Db): Promise<MigrationResult> {
   const coll = db.collection('deletedusers');
   const cursor = coll.find({ currentPocketMoney: { $type: 'string' } });
   let scanned = 0;
   let updated = 0;
-  const ops = [];
+  const ops: AnyBulkWriteOperation[] = [];
 
   for await (const doc of cursor) {
     scanned++;
@@ -121,9 +131,9 @@ async function migrateDeletedUsers(db) {
   return { scanned, updated };
 }
 
-async function main() {
+async function main(): Promise<void> {
   await mongoose.connect(env.MONGO_URL);
-  const db = mongoose.connection.db;
+  const db = mongoose.connection.db as Db;
   console.log(`Connected to ${db.databaseName}\n`);
 
   const users = await migrateUsers(db);

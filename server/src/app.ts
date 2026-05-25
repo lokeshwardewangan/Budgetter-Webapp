@@ -3,7 +3,7 @@ import { env, isProd } from './shared/config/env.js';
 // Extends Zod with .openapi(); must run before any schema is defined.
 import './shared/openapi/init.js';
 import express from 'express';
-import pinoHttp from 'pino-http';
+import { pinoHttp } from 'pino-http';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -25,7 +25,7 @@ app.use(requestId);
 app.use(
   pinoHttp({
     logger,
-    customProps: (req) => ({ requestId: req.id }),
+    customProps: (req) => ({ requestId: (req as unknown as { id?: string }).id }),
     autoLogging: { ignore: (req) => req.url === '/healthz' },
   }),
 );

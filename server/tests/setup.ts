@@ -19,7 +19,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 
-let mongod;
+let mongod: MongoMemoryServer | undefined;
 
 beforeAll(async () => {
   mongod = await MongoMemoryServer.create();
@@ -28,7 +28,7 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  if (mongoose.connection.readyState === 1) {
+  if (mongoose.connection.readyState === 1 && mongoose.connection.db) {
     const collections = await mongoose.connection.db.collections();
     for (const c of collections) await c.deleteMany({});
   }

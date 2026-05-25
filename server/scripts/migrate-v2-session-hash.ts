@@ -3,19 +3,21 @@
 
 import mongoose from 'mongoose';
 import crypto from 'crypto';
+import type { AnyBulkWriteOperation } from 'mongodb';
 import { env } from '../src/shared/config/env.js';
 
-const sha256 = (s) => crypto.createHash('sha256').update(s).digest('hex');
+const sha256 = (s: string): string => crypto.createHash('sha256').update(s).digest('hex');
 
-async function run() {
+async function run(): Promise<void> {
   await mongoose.connect(env.MONGO_URL);
   const db = mongoose.connection.db;
+  if (!db) throw new Error('No DB connection');
   const coll = db.collection('activesessions');
   console.log(`Connected to ${db.databaseName}\n`);
 
   const cursor = coll.find({ token: { $exists: true } });
   let scanned = 0;
-  const ops = [];
+  const ops: AnyBulkWriteOperation[] = [];
 
   for await (const doc of cursor) {
     scanned++;

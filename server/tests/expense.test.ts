@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { api, authHeader, registerAndGetToken } from './helpers.js';
 
-const products = (...prices) =>
+const products = (...prices: number[]) =>
   prices.map((p, i) => ({ name: `Item ${i + 1}`, price: p, category: 'Food', label: null }));
 
-async function addToday(token, prices) {
+async function addToday(token: string | undefined, prices: number[]) {
   return api()
     .post('/api/expenses')
     .set(authHeader(token))
     .send({ productsArray: products(...prices) });
 }
 
-async function balance(token) {
+async function balance(token: string | undefined): Promise<number> {
   const me = await api().get('/api/users/me').set(authHeader(token));
   return me.body.data.currentPocketMoney;
 }
