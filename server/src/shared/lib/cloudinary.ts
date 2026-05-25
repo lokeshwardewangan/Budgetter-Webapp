@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, type UploadApiOptions, type UploadApiResponse } from 'cloudinary';
 import { logger } from './logger.js';
 
 cloudinary.config({
@@ -8,7 +8,10 @@ cloudinary.config({
 });
 
 // Streams an in-memory buffer straight to Cloudinary — no disk roundtrip.
-const uploadBufferToCloudinary = (buffer, options = {}) =>
+const uploadBufferToCloudinary = (
+  buffer: Buffer | undefined | null,
+  options: UploadApiOptions = {},
+): Promise<UploadApiResponse | null> =>
   new Promise((resolve) => {
     if (!buffer) return resolve(null);
     const stream = cloudinary.uploader.upload_stream(
@@ -18,7 +21,7 @@ const uploadBufferToCloudinary = (buffer, options = {}) =>
           logger.error({ err }, 'Cloudinary upload failed');
           return resolve(null);
         }
-        resolve(result);
+        resolve(result ?? null);
       },
     );
     stream.end(buffer);

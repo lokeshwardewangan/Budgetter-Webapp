@@ -9,12 +9,22 @@ const __dirname = path.dirname(__filename);
 
 const TEMPLATE_DIR = path.join(__dirname, '../../../public/email-template');
 
-const readTemplate = (filename) => fs.readFileSync(path.join(TEMPLATE_DIR, filename), 'utf-8');
+const readTemplate = (filename: string): string =>
+  fs.readFileSync(path.join(TEMPLATE_DIR, filename), 'utf-8');
 
-const sendMessageToUser = async (userName, type, userEmail, subject, token, html = null) => {
+export type EmailType = 'RESET_PASSWORD' | 'VERIFY_ACCOUNT' | 'DELETE_ACCOUNT' | 'NEWSLETTER';
+
+const sendMessageToUser = async (
+  userName: string,
+  type: EmailType,
+  userEmail: string | string[],
+  subject: string,
+  token: string,
+  html: string | null = null,
+): Promise<boolean> => {
   const serverURL = process.env.SERVER_URL;
 
-  let customizedHTML;
+  let customizedHTML: string;
   if (type === 'RESET_PASSWORD') {
     const tpl = readTemplate('reset-password-template.html');
     const link = `${serverURL}/api/auth/password-reset/validate?token=${token}`;
@@ -27,7 +37,7 @@ const sendMessageToUser = async (userName, type, userEmail, subject, token, html
     const tpl = readTemplate('account-delete.html');
     customizedHTML = tpl.replace('{userName}', userName);
   } else if (type === 'NEWSLETTER') {
-    customizedHTML = html;
+    customizedHTML = html ?? '';
   } else {
     logger.warn({ type }, 'invalid email type');
     return false;

@@ -4,7 +4,7 @@ import { logger } from '../lib/logger.js';
 
 mongoose.set('strictQuery', true);
 
-const connectToDb = async () => {
+const connectToDb = async (): Promise<void> => {
   try {
     const instance = await mongoose.connect(env.MONGO_URL);
     logger.info({ host: instance.connection.host }, 'MongoDB connected');

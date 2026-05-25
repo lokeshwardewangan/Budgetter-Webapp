@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z, type ZodTypeAny } from 'zod';
 import { extendZodWithOpenApi, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 
 extendZodWithOpenApi(z);
@@ -13,7 +13,7 @@ export const bearerAuth = registry.registerComponent('securitySchemes', 'bearerA
 });
 
 // Wraps a payload schema in the ApiResponse envelope used by every endpoint.
-export const apiResponse = (dataSchema, statusCode = 200) =>
+export const apiResponse = (dataSchema: ZodTypeAny, statusCode = 200) =>
   z.object({
     statusCode: z.number().openapi({ example: statusCode }),
     success: z.boolean().openapi({ example: true }),

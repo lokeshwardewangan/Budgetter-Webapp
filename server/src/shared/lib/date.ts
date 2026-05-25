@@ -1,17 +1,20 @@
 // UTC midnight to avoid TZ drift on day boundaries.
-export const startOfToday = () => {
+export const startOfToday = (): Date => {
   const now = new Date();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
 };
 
-export const startOfTomorrow = () => {
+export const startOfTomorrow = (): Date => {
   const t = startOfToday();
   t.setUTCDate(t.getUTCDate() + 1);
   return t;
 };
 
 // Returns [gte, lt) for the given month/year (1-12, 4-digit year).
-export const monthRange = (month, year) => {
+export const monthRange = (
+  month: number | string,
+  year: number | string,
+): { gte: Date; lt: Date } => {
   const m = Number(month);
   const y = Number(year);
   return {
@@ -21,7 +24,7 @@ export const monthRange = (month, year) => {
 };
 
 // Returns [gte, lt) for the calendar day of the given Date (UTC).
-export const dayRange = (d) => {
+export const dayRange = (d: Date): { gte: Date; lt: Date } => {
   const gte = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
   const lt = new Date(gte);
   lt.setUTCDate(lt.getUTCDate() + 1);
@@ -29,7 +32,7 @@ export const dayRange = (d) => {
 };
 
 // Legacy: dd-mm-yyyy string for any client/UI still expecting it.
-export const getTodayDate = () => {
+export const getTodayDate = (): string => {
   const now = new Date();
   const date = String(now.getDate()).padStart(2, '0');
   const month = String(now.getMonth() + 1).padStart(2, '0');

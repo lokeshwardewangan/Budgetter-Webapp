@@ -1,12 +1,12 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { type RateLimitRequestHandler, type Options } from 'express-rate-limit';
 import { StatusCodes } from 'http-status-codes';
 import { ApiError } from '../lib/ApiError.js';
 
-const handler = (_req, _res, next) => {
+const handler: Options['handler'] = (_req, _res, next) => {
   next(new ApiError(StatusCodes.TOO_MANY_REQUESTS, 'Too many requests, please try again later'));
 };
 
-export const globalLimiter = rateLimit({
+export const globalLimiter: RateLimitRequestHandler = rateLimit({
   windowMs: 60 * 1000,
   max: 120,
   standardHeaders: true,
@@ -15,7 +15,7 @@ export const globalLimiter = rateLimit({
 });
 
 // Failures only — successful logins don't count against the cap.
-export const authLimiter = rateLimit({
+export const authLimiter: RateLimitRequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,

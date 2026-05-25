@@ -1,9 +1,10 @@
+import type { ErrorRequestHandler, RequestHandler } from 'express';
 import mongoose from 'mongoose';
 import { StatusCodes } from 'http-status-codes';
-import { ApiError } from '../lib/ApiError.js';
+import { ApiError, type ApiErrorIssue } from '../lib/ApiError.js';
 import { ApiResponse } from '../lib/ApiResponse.js';
 
-export const notFoundHandler = (req, res) => {
+export const notFoundHandler: RequestHandler = (req, res) => {
   res
     .status(StatusCodes.NOT_FOUND)
     .json(
@@ -15,10 +16,10 @@ export const notFoundHandler = (req, res) => {
     );
 };
 
-export const errorHandler = (err, req, res, _next) => {
-  let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
+  let statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR;
   let message = 'Internal server error';
-  let errors = [];
+  let errors: ApiErrorIssue[] = [];
 
   if (err instanceof ApiError) {
     statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
@@ -39,9 +40,8 @@ export const errorHandler = (err, req, res, _next) => {
     message = err.message;
   }
 
-  // Log 5xx as errors, 4xx as warnings; req.log is the pino child logger
-  // injected per-request by pino-http and already carries the requestId.
-  const log = req.log || console;
+  // 5xx → error, 4xx → warn. req.log is the per-request pino child (carries requestId).
+  const log = (req as unknown as { log?: typeof console }).log || console;
   if (statusCode >= 500) log.error({ err, statusCode }, message);
   else log.warn({ err: { name: err?.name, message: err?.message }, statusCode }, message);
 
