@@ -26,3 +26,6 @@ export const updateProfileSchema = z
 export const deleteAccountSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;

@@ -1,15 +1,22 @@
+import type { Request } from 'express';
 import { UAParser } from 'ua-parser-js';
 import { StatusCodes } from 'http-status-codes';
 import ActiveSessionModel from './session.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { sha256 } from '../../shared/lib/hash.js';
+import type { UserDocument } from '../user/user.model.js';
 
-export function getClientInfo(req) {
-  const ip =
-    req.headers['x-forwarded-for']?.split(',').shift().trim() ||
-    req.ip ||
-    req.socket?.remoteAddress ||
-    'Unknown';
+interface ClientInfo {
+  ip: string;
+  browser: string;
+  os: string;
+  deviceType: string;
+}
+
+export function getClientInfo(req: Request): ClientInfo {
+  const fwd = req.headers['x-forwarded-for'];
+  const fwdFirst = Array.isArray(fwd) ? fwd[0] : fwd?.split(',').shift()?.trim();
+  const ip = fwdFirst || req.ip || req.socket?.remoteAddress || 'Unknown';
   const ua = new UAParser(req.headers['user-agent']).getResult();
   return {
     ip,
@@ -19,7 +26,7 @@ export function getClientInfo(req) {
   };
 }
 
-export async function createSession(user, req) {
+export async function createSession(user: UserDocument, req: Request): Promise<string> {
   const token = await user.generateAccessToken();
   const info = getClientInfo(req);
 
@@ -37,25 +44,25 @@ export async function createSession(user, req) {
   return token;
 }
 
-export async function listSessions(userId) {
+export async function listSessions(userId: string) {
   return ActiveSessionModel.find({ user: userId })
     .select('-tokenHash')
     .sort({ lastUsedAt: -1 })
     .lean();
 }
 
-export async function deleteSession(userId, sessionId) {
+export async function deleteSession(userId: string, sessionId: string): Promise<void> {
   const result = await ActiveSessionModel.deleteOne({ _id: sessionId, user: userId });
   if (result.deletedCount === 0) throw new ApiError(StatusCodes.NOT_FOUND, 'Session not found');
 }
 
-export async function deleteAllOtherSessions(userId, currentToken) {
+export async function deleteAllOtherSessions(userId: string, currentToken: string): Promise<void> {
   await ActiveSessionModel.deleteMany({
     user: userId,
     tokenHash: { $ne: sha256(currentToken) },
   });
 }
 
-export async function deleteByToken(userId, token) {
+export async function deleteByToken(userId: string, token: string): Promise<void> {
   await ActiveSessionModel.deleteOne({ user: userId, tokenHash: sha256(token) });
 }

@@ -1,8 +1,9 @@
+import type { Request } from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { type JwtPayload, type SignOptions } from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { StatusCodes } from 'http-status-codes';
-import UserModel from '../user/user.model.js';
+import UserModel, { type UserDocument } from '../user/user.model.js';
 import { ApiError } from '../../shared/lib/ApiError.js';
 import { sha256 } from '../../shared/lib/hash.js';
 import { sendMessageToUser } from '../../shared/email/email.service.js';
@@ -12,10 +13,28 @@ import { createSession } from '../session/session.service.js';
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-async function sendVerificationEmail(user) {
-  const token = jwt.sign({ _id: user._id }, process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET, {
-    expiresIn: process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET_EXPIRY,
-  });
+interface BuildUserInput {
+  username?: string;
+  name: string;
+  email: string;
+  password?: string;
+  googleId?: string;
+  picture?: string;
+}
+
+interface AuthResult {
+  user: UserDocument | null;
+  token: string;
+}
+
+async function sendVerificationEmail(user: UserDocument): Promise<void> {
+  const token = jwt.sign(
+    { _id: user._id },
+    process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET as string,
+    {
+      expiresIn: process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET_EXPIRY as SignOptions['expiresIn'],
+    },
+  );
   const ok = await sendMessageToUser(
     user.name,
     'VERIFY_ACCOUNT',
@@ -26,11 +45,14 @@ async function sendVerificationEmail(user) {
   if (!ok) logger.error({ email: user.email }, 'verification email failed');
 }
 
-async function buildUserAndSession({ username, name, email, password, googleId, picture }, req) {
+async function buildUserAndSession(
+  { username, name, email, password, googleId, picture }: BuildUserInput,
+  req: Request,
+): Promise<AuthResult> {
   // Local register passes a user-chosen username; Google login passes none
   // (synthesize from name).
   const finalUsername = username || (await generateUniqueUsername(name));
-  const data = { username: finalUsername, name, email };
+  const data: Record<string, unknown> = { username: finalUsername, name, email };
   if (password) data.password = password;
   if (googleId) {
     data.googleId = googleId;
@@ -45,21 +67,39 @@ async function buildUserAndSession({ username, name, email, password, googleId, 
   return { user: safeUser, token };
 }
 
-export async function registerLocal({ username, name, email, password }, req) {
+interface RegisterArgs {
+  username: string;
+  name: string;
+  email: string;
+  password: string;
+}
+export async function registerLocal(
+  { username, name, email, password }: RegisterArgs,
+  req: Request,
+): Promise<AuthResult> {
   const existing = await UserModel.findOne({ $or: [{ username }, { email }] });
   if (existing)
     throw new ApiError(StatusCodes.CONFLICT, 'User with this username or email already exists');
 
   const { user, token } = await buildUserAndSession({ username, name, email, password }, req);
-  sendVerificationEmail(user).catch((err) => logger.error({ err }, 'verify email failed'));
+  if (user)
+    sendVerificationEmail(user).catch((err) => logger.error({ err }, 'verify email failed'));
   return { user, token };
 }
 
-export async function loginLocal({ username, email, password }, req) {
+interface LoginArgs {
+  username?: string;
+  email?: string;
+  password: string;
+}
+export async function loginLocal(
+  { username, email, password }: LoginArgs,
+  req: Request,
+): Promise<AuthResult> {
   // Only include populated fields in the $or — Mongoose strips undefined
   // values, which would turn `{ email: undefined }` into `{}` and match
   // every document via $or. Build the filter explicitly to avoid that.
-  const filters = [];
+  const filters: Array<{ email?: string; username?: string }> = [];
   if (email) filters.push({ email });
   if (username) filters.push({ username });
   if (filters.length === 0)
@@ -76,13 +116,19 @@ export async function loginLocal({ username, email, password }, req) {
   return { user, token };
 }
 
-export async function loginWithGoogle(idToken, req) {
+export async function loginWithGoogle(
+  idToken: string,
+  req: Request,
+): Promise<AuthResult & { isNewUser: boolean }> {
   const ticket = await googleClient.verifyIdToken({
     idToken,
     audience: process.env.GOOGLE_CLIENT_ID,
   });
   const payload = ticket.getPayload();
+  if (!payload) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid Google token');
   const { sub: googleId, email, name, picture } = payload;
+  if (!email || !name)
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Google token missing email or name');
 
   const existing = await UserModel.findOne({ $or: [{ googleId }, { email }] });
   if (existing) {
@@ -94,10 +140,13 @@ export async function loginWithGoogle(idToken, req) {
   return { user, token, isNewUser: true };
 }
 
-export async function verifyAccountToken(token) {
-  let decoded;
+export async function verifyAccountToken(token: string): Promise<{ alreadyVerified: boolean }> {
+  let decoded: JwtPayload & { _id: string };
   try {
-    decoded = jwt.verify(token, process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET);
+    decoded = jwt.verify(
+      token,
+      process.env.ACCOUNT_VERIFICATION_TOKEN_SECRET as string,
+    ) as JwtPayload & { _id: string };
   } catch {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid or expired verification token');
   }
@@ -110,12 +159,12 @@ export async function verifyAccountToken(token) {
   return { alreadyVerified: false };
 }
 
-export async function requestPasswordReset(email) {
+export async function requestPasswordReset(email: string): Promise<void> {
   const user = await UserModel.findOne({ email });
   if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
 
-  const token = jwt.sign({ _id: user._id }, process.env.RESET_PASSWORD_TOKEN_SECRET, {
-    expiresIn: process.env.RESET_PASSWORD_TOKEN_SECRET_EXPIRY,
+  const token = jwt.sign({ _id: user._id }, process.env.RESET_PASSWORD_TOKEN_SECRET as string, {
+    expiresIn: process.env.RESET_PASSWORD_TOKEN_SECRET_EXPIRY as SignOptions['expiresIn'],
   });
 
   await UserModel.findByIdAndUpdate(user._id, {
@@ -133,10 +182,12 @@ export async function requestPasswordReset(email) {
     throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send password reset email');
 }
 
-export async function validatePasswordResetToken(token) {
-  let decoded;
+export async function validatePasswordResetToken(token: string) {
+  let decoded: JwtPayload & { _id: string };
   try {
-    decoded = jwt.verify(token, process.env.RESET_PASSWORD_TOKEN_SECRET);
+    decoded = jwt.verify(token, process.env.RESET_PASSWORD_TOKEN_SECRET as string) as JwtPayload & {
+      _id: string;
+    };
   } catch {
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid or expired reset token');
   }
@@ -145,7 +196,7 @@ export async function validatePasswordResetToken(token) {
   return user._id;
 }
 
-export async function resetPassword(userId, newPassword) {
+export async function resetPassword(userId: string, newPassword: string): Promise<void> {
   // Require a pending reset request — blocks blind userId-only attacks.
   const pending = await UserModel.findById(userId).select('+passwordResetTokenHash').lean();
   if (!pending) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');

@@ -33,19 +33,19 @@ export const googleLogin = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
-  await sessionService.deleteByToken(req.userId, req.token);
+  await sessionService.deleteByToken(req.userId as string, req.token as string);
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, null, 'Successfully logged out'));
 });
 
 export const checkVerified = asyncHandler(async (req, res) => {
-  const verified = await userService.isVerified(req.userId);
+  const verified = await userService.isVerified(req.userId as string);
   res
     .status(StatusCodes.OK)
     .json(new ApiResponse(StatusCodes.OK, verified, 'Verified status retrieved'));
 });
 
 export const verifyAccount = asyncHandler(async (req, res) => {
-  const { alreadyVerified } = await authService.verifyAccountToken(req.query.token);
+  const { alreadyVerified } = await authService.verifyAccountToken(req.query.token as string);
   const frontendURL = process.env.FRONTEND_URL;
   res.redirect(
     `${frontendURL}/${alreadyVerified ? 'account-already-verified' : 'account-verified'}`,
@@ -60,7 +60,7 @@ export const requestPasswordReset = asyncHandler(async (req, res) => {
 });
 
 export const validatePasswordResetToken = asyncHandler(async (req, res) => {
-  const userId = await authService.validatePasswordResetToken(req.query.token);
+  const userId = await authService.validatePasswordResetToken(req.query.token as string);
   res.redirect(`${process.env.FRONTEND_URL}/reset-password/${userId}`);
 });
 
