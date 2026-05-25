@@ -36,15 +36,12 @@ describe('expense CRUD + balance', () => {
     const id = created.body.data.expenses[0]._id;
     const after1 = await balance(token);
 
-    const edit = await api()
-      .patch(`/api/expenses/products/${id}`)
-      .set(authHeader(token))
-      .send({
-        expenseName: 'Item 1',
-        expensePrice: 30,
-        expenseCategory: 'Food',
-        selectedLabel: null,
-      });
+    const edit = await api().patch(`/api/expenses/products/${id}`).set(authHeader(token)).send({
+      expenseName: 'Item 1',
+      expensePrice: 30,
+      expenseCategory: 'Food',
+      selectedLabel: null,
+    });
     expect(edit.status).toBe(200);
 
     const after2 = await balance(token);
@@ -57,15 +54,12 @@ describe('expense CRUD + balance', () => {
     const id = created.body.data.expenses[0]._id;
     const after1 = await balance(token);
 
-    await api()
-      .patch(`/api/expenses/products/${id}`)
-      .set(authHeader(token))
-      .send({
-        expenseName: 'Item 1',
-        expensePrice: 80,
-        expenseCategory: 'Food',
-        selectedLabel: null,
-      });
+    await api().patch(`/api/expenses/products/${id}`).set(authHeader(token)).send({
+      expenseName: 'Item 1',
+      expensePrice: 80,
+      expenseCategory: 'Food',
+      selectedLabel: null,
+    });
 
     const after2 = await balance(token);
     expect(after2).toBe(after1 - 30); // refunded 50, charged 80
