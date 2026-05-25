@@ -3,7 +3,7 @@ import asyncHandler from '../../shared/lib/asyncHandler.js';
 import { ApiResponse } from '../../shared/lib/ApiResponse.js';
 import * as adminService from './admin.service.js';
 
-export const listUsers = asyncHandler(async (req, res) => {
+export const listUsers = asyncHandler(async (_req, res) => {
   const users = await adminService.listAllUsers();
   res.status(StatusCodes.OK).json(new ApiResponse(StatusCodes.OK, users, 'All users retrieved'));
 });

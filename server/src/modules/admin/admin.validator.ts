@@ -20,3 +20,5 @@ export const newsletterSchema = z.object({
       { message: 'html must start with <!doctype html> or <html>' },
     ),
 });
+
+export type NewsletterInput = z.infer<typeof newsletterSchema>;

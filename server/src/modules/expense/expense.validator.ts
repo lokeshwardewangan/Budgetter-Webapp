@@ -51,3 +51,9 @@ export const updateExpenseBodySchema = z.object({
 export const deleteExpenseBodySchema = z.object({
   isAddPriceToPocketMoney: z.boolean().optional().default(false),
 });
+
+export type AddTodayInput = z.infer<typeof addTodaySchema>;
+export type AddBulkInput = z.infer<typeof addBulkSchema>;
+export type FeedQuery = z.infer<typeof feedQuerySchema>;
+export type UpdateExpenseInput = z.infer<typeof updateExpenseBodySchema>;
+export type DeleteExpenseInput = z.infer<typeof deleteExpenseBodySchema>;

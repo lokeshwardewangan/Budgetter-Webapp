@@ -1,9 +1,12 @@
-import ExpenseModel, { EXPENSE_CATEGORIES } from '../expense/expense.model.js';
+import ExpenseModel, {
+  EXPENSE_CATEGORIES,
+  type ExpenseCategory,
+} from '../expense/expense.model.js';
 import PocketMoneyModel from '../pocketMoney/pocketMoney.model.js';
 import LentMoneyModel from '../lentMoney/lentMoney.model.js';
 import { monthRange } from '../../shared/lib/date.js';
 
-const CATEGORY_KEY_MAP = {
+const CATEGORY_KEY_MAP: Record<ExpenseCategory, string> = {
   Groceries: 'GroceriesExpenses',
   'Housing & Utilities': 'Housing_UtilitiesExpenses',
   Medical: 'MedicalExpenses',
@@ -14,14 +17,19 @@ const CATEGORY_KEY_MAP = {
   Miscellaneous: 'MiscellaneousExpenses',
 };
 
-function emptyCategoryBreakdown() {
-  return EXPENSE_CATEGORIES.reduce((acc, cat) => {
+function emptyCategoryBreakdown(): Record<string, number> {
+  return EXPENSE_CATEGORIES.reduce<Record<string, number>>((acc, cat) => {
     acc[CATEGORY_KEY_MAP[cat]] = 0;
     return acc;
   }, {});
 }
 
-export async function monthlyReport(userId, { month, year }) {
+interface MonthlyReportArgs {
+  month: string | number;
+  year: string | number;
+}
+
+export async function monthlyReport(userId: string, { month, year }: MonthlyReportArgs) {
   const { gte, lt } = monthRange(month, year);
   const range = { $gte: gte, $lt: lt };
 
@@ -30,7 +38,7 @@ export async function monthlyReport(userId, { month, year }) {
   let lastTotalExpenses = 0;
   if (lastEntry) {
     const prev = monthRange(lastEntry.date.getUTCMonth() + 1, lastEntry.date.getUTCFullYear());
-    const lastAgg = await ExpenseModel.aggregate([
+    const lastAgg = await ExpenseModel.aggregate<{ _id: null; total: number }>([
       { $match: { user: userId, date: { $gte: prev.gte, $lt: prev.lt } } },
       { $group: { _id: null, total: { $sum: '$price' } } },
     ]);
@@ -38,20 +46,15 @@ export async function monthlyReport(userId, { month, year }) {
   }
 
   const [expensesAgg, pocketAgg, lentAgg] = await Promise.all([
-    ExpenseModel.aggregate([
+    ExpenseModel.aggregate<{ _id: ExpenseCategory; total: number }>([
       { $match: { user: userId, date: range } },
-      {
-        $group: {
-          _id: '$category',
-          total: { $sum: '$price' },
-        },
-      },
+      { $group: { _id: '$category', total: { $sum: '$price' } } },
     ]),
-    PocketMoneyModel.aggregate([
+    PocketMoneyModel.aggregate<{ _id: null; total: number }>([
       { $match: { user: userId, date: range } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
     ]),
-    LentMoneyModel.aggregate([
+    LentMoneyModel.aggregate<{ _id: null; total: number }>([
       { $match: { user: userId, date: range } },
       { $group: { _id: null, total: { $sum: '$price' } } },
     ]),

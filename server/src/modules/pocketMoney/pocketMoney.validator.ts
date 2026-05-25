@@ -6,3 +6,5 @@ export const addPocketMoneySchema = z.object({
   amount: moneyAmount,
   source: z.string().trim().min(1, 'source is required'),
 });
+
+export type AddPocketMoneyInput = z.infer<typeof addPocketMoneySchema>;

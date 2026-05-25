@@ -10,3 +10,5 @@ export const addLentMoneySchema = z.object({
 export const lentMoneyIdParamSchema = z.object({
   id: objectIdSchema,
 });
+
+export type AddLentMoneyInput = z.infer<typeof addLentMoneySchema>;
