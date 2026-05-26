@@ -12,9 +12,11 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "format": "npx prettier --write .",
-    "migrate:v2-types": "tsx scripts/migrate-v2-types.ts",
-    "migrate:v2-flatten": "tsx scripts/migrate-v2-expense-flatten.ts",
-    "migrate:v2-session-hash": "tsx scripts/migrate-v2-session-hash.ts"
+    "migrate:v2-preflight": "tsx scripts/migrate-v2-preflight.ts",
+    "migrate:v2-users": "tsx scripts/migrate-v2-users.ts",
+    "migrate:v2-expenses": "tsx scripts/migrate-v2-expenses.ts",
+    "migrate:v2-verify": "tsx scripts/migrate-v2-verify.ts",
+    "migrate:v2-all": "npm run migrate:v2-users && npm run migrate:v2-expenses && npm run migrate:v2-verify"
   },
   "author": "",
   "license": "ISC",
