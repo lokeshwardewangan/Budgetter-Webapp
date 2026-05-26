@@ -14,11 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { useDialogState } from '@/shared/hooks/useDialogState';
-import {
-  monthsNames,
-  prevYearsName,
-  getMonthInNumber,
-} from '@/utils/date/date';
+import { monthsNames, prevYearsName } from '@/utils/date/date';
 import { expenseCategoryNames } from '@/shared/lib/expenseCategories';
 
 type Props = {
@@ -123,10 +119,7 @@ export default function ReportsFilters({
 
         <Select
           value={month ?? ALL}
-          onValueChange={(v) => {
-            if (v === ALL) onMonthChange(undefined);
-            else onMonthChange(getMonthInNumber(v));
-          }}
+          onValueChange={(v) => onMonthChange(v === ALL ? undefined : v)}
         >
           <SelectTrigger className="mr-1 w-full">
             <SelectValue placeholder="All Months" />
@@ -134,11 +127,14 @@ export default function ReportsFilters({
           <SelectContent>
             <SelectItem value={ALL}>All Months</SelectItem>
             <SelectGroup>
-              {monthsNames.map((m) => (
-                <SelectItem key={m} value={m}>
-                  {m}
-                </SelectItem>
-              ))}
+              {monthsNames.map((m, i) => {
+                const mm = String(i + 1).padStart(2, '0');
+                return (
+                  <SelectItem key={mm} value={mm}>
+                    {m}
+                  </SelectItem>
+                );
+              })}
             </SelectGroup>
           </SelectContent>
         </Select>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { formatInTimeZone } from 'date-fns-tz';
 import PDFExportComponent from '@/components/user/PDFExportComponent';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 import { useExpensesFeed } from '../hooks';
@@ -6,11 +7,16 @@ import ReportsFilters from './ReportsFilters';
 import ReportsTable from './ReportsTable';
 
 const PAGE_SIZE = 10;
+// Default filters open on the current month/year in IST so users land on the
+// view they almost always want first.
+const NOW = new Date();
+const CURRENT_MONTH = formatInTimeZone(NOW, 'Asia/Kolkata', 'MM');
+const CURRENT_YEAR = formatInTimeZone(NOW, 'Asia/Kolkata', 'yyyy');
 
 export default function ReportsPanel() {
   const [search, setSearch] = useState('');
-  const [month, setMonth] = useState<string | undefined>();
-  const [year, setYear] = useState<string | undefined>();
+  const [month, setMonth] = useState<string | undefined>(CURRENT_MONTH);
+  const [year, setYear] = useState<string | undefined>(CURRENT_YEAR);
   const [category, setCategory] = useState<string | undefined>();
 
   // Debounce the search input so we don't fire a fetch on every keystroke.
