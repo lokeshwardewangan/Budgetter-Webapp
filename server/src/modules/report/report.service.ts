@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import ExpenseModel, {
   EXPENSE_CATEGORIES,
   type ExpenseCategory,
@@ -30,16 +31,19 @@ interface MonthlyReportArgs {
 }
 
 export async function monthlyReport(userId: string, { month, year }: MonthlyReportArgs) {
+  // aggregate() does NOT cast $match values — pass an ObjectId explicitly or
+  // every aggregation silently returns zero (String !== ObjectId in raw $match).
+  const userObj = new Types.ObjectId(userId);
   const { gte, lt } = monthRange(month, year);
   const range = { $gte: gte, $lt: lt };
 
   // Last month with any expense activity, used as the "previous period" total.
-  const lastEntry = await ExpenseModel.findOne({ user: userId }).sort({ date: -1 }).lean();
+  const lastEntry = await ExpenseModel.findOne({ user: userObj }).sort({ date: -1 }).lean();
   let lastTotalExpenses = 0;
   if (lastEntry) {
     const prev = monthRange(lastEntry.date.getUTCMonth() + 1, lastEntry.date.getUTCFullYear());
     const lastAgg = await ExpenseModel.aggregate<{ _id: null; total: number }>([
-      { $match: { user: userId, date: { $gte: prev.gte, $lt: prev.lt } } },
+      { $match: { user: userObj, date: { $gte: prev.gte, $lt: prev.lt } } },
       { $group: { _id: null, total: { $sum: '$price' } } },
     ]);
     lastTotalExpenses = lastAgg[0]?.total || 0;
@@ -47,15 +51,17 @@ export async function monthlyReport(userId: string, { month, year }: MonthlyRepo
 
   const [expensesAgg, pocketAgg, lentAgg] = await Promise.all([
     ExpenseModel.aggregate<{ _id: ExpenseCategory; total: number }>([
-      { $match: { user: userId, date: range } },
+      { $match: { user: userObj, date: range } },
       { $group: { _id: '$category', total: { $sum: '$price' } } },
     ]),
     PocketMoneyModel.aggregate<{ _id: null; total: number }>([
-      { $match: { user: userId, date: range } },
+      { $match: { user: userObj, date: range } },
       { $group: { _id: null, total: { $sum: '$amount' } } },
     ]),
+    // Lent money is outstanding debt — sum ALL unreceived regardless of when
+    // it was lent. The month filter doesn't fit "money still owed to you".
     LentMoneyModel.aggregate<{ _id: null; total: number }>([
-      { $match: { user: userId, date: range } },
+      { $match: { user: userObj, isReceived: false } },
       { $group: { _id: null, total: { $sum: '$price' } } },
     ]),
   ]);

@@ -31,9 +31,9 @@ export default function DashboardFilters({
         className="filters flex items-center justify-center gap-2 font-medium"
       >
         <p className="mr-1 whitespace-nowrap">Filter Report</p>
-        <Select onValueChange={onMonthChange}>
+        <Select value={monthLabel} onValueChange={onMonthChange}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={monthLabel} />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -45,9 +45,9 @@ export default function DashboardFilters({
             </SelectGroup>
           </SelectContent>
         </Select>
-        <Select onValueChange={onYearChange}>
+        <Select value={yearLabel} onValueChange={onYearChange}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder={yearLabel} />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
