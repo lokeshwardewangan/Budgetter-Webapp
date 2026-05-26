@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from '@/components/ui/sonner';
 import Cookies from 'universal-cookie';
 import { useSentryIntegration } from '@/hooks/useSentryIntegration';
 import { useMe } from '@/features/user/hooks';

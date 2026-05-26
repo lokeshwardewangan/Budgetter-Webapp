@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AlertTriangle, Loader2, Trash2 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,

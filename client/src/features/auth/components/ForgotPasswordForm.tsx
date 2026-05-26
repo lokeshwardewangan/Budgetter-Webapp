@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { FormField } from '@/shared/components/form/FormField';
 import { SubmitButton } from '@/shared/components/form/SubmitButton';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '../schemas';

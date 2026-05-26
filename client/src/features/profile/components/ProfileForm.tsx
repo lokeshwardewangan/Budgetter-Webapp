@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useForm, type UseFormRegisterReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useMe } from '@/features/user/hooks';
 import {
   Briefcase,

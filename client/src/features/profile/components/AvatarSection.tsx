@@ -3,7 +3,7 @@ import { Camera, Loader2, Calendar, Clock } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useUpdateAvatar } from '../hooks';
 
 type Props = {

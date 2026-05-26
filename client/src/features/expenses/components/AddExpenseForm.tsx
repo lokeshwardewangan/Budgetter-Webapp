@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CirclePlus, Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import CreatableSelect from 'react-select/creatable';
 import { useTheme } from '@/shared/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';

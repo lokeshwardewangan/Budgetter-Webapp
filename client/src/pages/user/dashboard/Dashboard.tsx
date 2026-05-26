@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { getCurrentMonth, getMonthInNumber } from '@/utils/date/date';
 import { useMonthlyReport } from '@/features/dashboard/hooks';
 import { useMe } from '@/features/user/hooks';
