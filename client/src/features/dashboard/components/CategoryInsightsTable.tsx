@@ -1,6 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { DataTable } from '@/shared/components/table/DataTable';
-import { categoryColorMap } from '@/utils/ui/utility';
+import { categoryColorMap } from '@/shared/lib/expenseCategories';
 import { useAllExpenses } from '@/features/expenses/hooks';
 import {
   type CategoryStats,

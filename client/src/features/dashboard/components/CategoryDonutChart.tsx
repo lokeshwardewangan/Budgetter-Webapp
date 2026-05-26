@@ -5,9 +5,9 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import { useTheme } from '@/shared/contexts/ThemeContext';
 import type { CategoryWiseExpensesData } from '@/types/api/reports/reports';
 import {
-  categoryColorList,
+  expenseCategories,
   categoryGradientStops,
-} from '../lib/categoryColors';
+} from '@/shared/lib/expenseCategories';
 import DonutChartLoader from './loaders/DonutChartLoader';
 
 type Props = {
@@ -54,7 +54,7 @@ export default function CategoryDonutChart({
     series.set(
       'colors',
       am5.ColorSet.new(root, {
-        colors: categoryColorList.map((c) => am5.color(c.hex)),
+        colors: expenseCategories.map((c) => am5.color(c.hex)),
       })
     );
 
@@ -115,9 +115,7 @@ export default function CategoryDonutChart({
         <div className="flex flex-wrap items-center justify-center gap-2 text-sm sm:flex-col sm:items-start sm:justify-start">
           {valuesByCategory.map(({ category, value }) => {
             if (value === 0) return null;
-            const palette = categoryColorList.find(
-              (c) => c.category === category
-            );
+            const palette = expenseCategories.find((c) => c.name === category);
             const pct = total > 0 ? (value / total) * 100 : 0;
             const display =
               pct.toFixed(0) === '0' ? pct.toFixed(1) : pct.toFixed(0);
@@ -152,8 +150,8 @@ function mapToCategoryValues(data?: CategoryWiseExpensesData) {
     Transportation: data?.TransportationExpenses ?? 0,
     Miscellaneous: data?.MiscellaneousExpenses ?? 0,
   };
-  return categoryColorList.map((c) => ({
-    category: c.category,
-    value: lookup[c.category],
+  return expenseCategories.map((c) => ({
+    category: c.name,
+    value: lookup[c.name],
   }));
 }

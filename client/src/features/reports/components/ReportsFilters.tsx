@@ -19,7 +19,7 @@ import {
   prevYearsName,
   getMonthInNumber,
 } from '@/utils/date/date';
-import { expensesCategories } from '@/utils/ui/utility';
+import { expenseCategoryNames } from '@/shared/lib/expenseCategories';
 
 type Props = {
   search: string;
@@ -109,7 +109,7 @@ export default function ReportsFilters({
                 <SelectContent>
                   <SelectItem value={ALL}>All Categories</SelectItem>
                   <SelectGroup>
-                    {expensesCategories.map((c) => (
+                    {expenseCategoryNames.map((c) => (
                       <SelectItem key={c} value={c}>
                         {c}
                       </SelectItem>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { expensesCategories } from '@/utils/ui/utility';
+import { expenseCategoryNames } from '@/shared/lib/expenseCategories';
 
 const dateRegex = /^([0-2][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
 
@@ -13,7 +13,9 @@ const positiveAmount = z.union([z.string(), z.number()]).transform((v, ctx) => {
   return n;
 });
 
-const categoryEnum = z.enum(expensesCategories as [string, ...string[]]);
+const categoryEnum = z.enum(
+  expenseCategoryNames as unknown as [string, ...string[]]
+);
 
 // react-select option (or null) for the optional label field.
 const labelOption = z

@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SelectField } from '@/shared/components/form/SelectField';
 import { useDialogState } from '@/shared/hooks/useDialogState';
-import { expensesCategories } from '@/utils/ui/utility';
+import { expenseCategoryNames } from '@/shared/lib/expenseCategories';
 import { LabelOptions, type OptionType } from '@/utils/utility';
 import { getCustomReactSelectStyles } from '@/styles/global';
 import type { ExpenseProduct } from '@/types/api/expenses/expenses';
@@ -155,7 +155,7 @@ export default function EditExpenseDialog({ actualDate, product }: Props) {
                     label="Expenses Category"
                     required
                     placeholder="Choose Category"
-                    options={expensesCategories}
+                    options={expenseCategoryNames}
                     value={field.value}
                     onChange={field.onChange}
                     error={errors.expenseCategory?.message}

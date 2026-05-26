@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { SelectField } from '@/shared/components/form/SelectField';
 import { formatDate } from '@/utils/date/date';
-import { expensesCategories } from '@/utils/ui/utility';
+import { expenseCategoryNames } from '@/shared/lib/expenseCategories';
 import { LabelOptions, type OptionType } from '@/utils/utility';
 import { getCustomReactSelectStyles } from '@/styles/global';
 import { addExpenseFormSchema, type AddExpenseFormInput } from '../schemas';
@@ -136,7 +136,7 @@ export default function AddExpenseForm() {
                 label="Expenses Category"
                 required
                 placeholder="Choose Category"
-                options={expensesCategories}
+                options={expenseCategoryNames}
                 value={field.value}
                 onChange={field.onChange}
                 error={errors.expenseCategory?.message}
