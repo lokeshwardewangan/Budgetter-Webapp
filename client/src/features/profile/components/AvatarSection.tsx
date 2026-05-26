@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { formatDateIST } from '@/shared/lib/dateFormat';
 import { useUpdateAvatar } from '../hooks';
 
 type Props = {
@@ -13,14 +14,7 @@ type Props = {
   lastLogin?: string | Date;
 };
 
-const formatDate = (d?: string | Date) =>
-  d
-    ? new Date(d).toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      })
-    : '—';
+const formatDate = (d?: string | Date) => formatDateIST(d) || '—';
 
 export default function AvatarSection({
   name,

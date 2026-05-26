@@ -1,6 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { DataTable } from '@/shared/components/table/DataTable';
 import { getLabelColorStyle } from '@/utils/ui/utility';
+import { formatTimeIST } from '@/shared/lib/dateFormat';
 import PDFExportComponent from '@/components/user/PDFExportComponent';
 import type { ExpenseProduct } from '@/types/api/expenses/expenses';
 import EditExpenseDialog from './EditExpenseDialog';
@@ -57,8 +58,7 @@ export default function ExpensesTable({
     columnHelper.accessor('category', { header: 'Category' }),
     columnHelper.accessor('createdAt', {
       header: 'Time',
-      cell: (info) =>
-        new Date(info.getValue<string>()).toLocaleString().split(',')[1],
+      cell: (info) => formatTimeIST(info.getValue<string>()),
     }),
     columnHelper.display({
       id: 'action',

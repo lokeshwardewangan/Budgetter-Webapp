@@ -3,6 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import { Loader2 } from 'lucide-react';
 import { DataTable } from '@/shared/components/table/DataTable';
 import { getLabelColorStyle } from '@/utils/ui/utility';
+import { formatDateIST, formatTimeIST } from '@/shared/lib/dateFormat';
 import type { ExpenseFeedRow } from '../api';
 
 type Props = {
@@ -23,7 +24,7 @@ const columns = [
   }),
   columnHelper.accessor('date', {
     header: 'Date',
-    cell: (info) => new Date(info.getValue<string>()).toLocaleDateString(),
+    cell: (info) => formatDateIST(info.getValue<string>()),
   }),
   columnHelper.accessor('name', {
     header: 'Product Name',
@@ -52,8 +53,7 @@ const columns = [
   columnHelper.accessor('category', { header: 'Category' }),
   columnHelper.accessor('createdAt', {
     header: 'Time',
-    cell: (info) =>
-      new Date(info.getValue<string>()).toLocaleString().split(',')[1],
+    cell: (info) => formatTimeIST(info.getValue<string>()),
   }),
 ];
 

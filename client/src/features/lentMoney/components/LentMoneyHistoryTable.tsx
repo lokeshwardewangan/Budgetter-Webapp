@@ -1,5 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { DataTable } from '@/shared/components/table/DataTable';
+import { formatDateIST } from '@/shared/lib/dateFormat';
 import type { LentMoneyEntry } from '@/types/api/auth/auth';
 import { useLentMoneyHistory } from '../hooks';
 import MarkReceivedDialog from './MarkReceivedDialog';
@@ -14,7 +15,10 @@ const columns = [
   }),
   columnHelper.accessor('personName', { header: 'Person Name' }),
   columnHelper.accessor('price', { header: 'Price' }),
-  columnHelper.accessor('date', { header: 'Date' }),
+  columnHelper.accessor('date', {
+    header: 'Date',
+    cell: (info) => formatDateIST(info.getValue<string>()),
+  }),
   columnHelper.accessor('isReceived', {
     header: 'Status',
     cell: (info) =>

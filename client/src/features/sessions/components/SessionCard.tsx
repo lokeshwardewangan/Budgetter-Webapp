@@ -1,5 +1,6 @@
 import { Loader2, Monitor, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatDateTimeIST } from '@/shared/lib/dateFormat';
 import { useLogout } from '@/features/auth/hooks';
 import type { SessionEntry } from '@/types/api/auth/auth';
 import { useDeleteSession } from '../hooks';
@@ -16,8 +17,7 @@ export default function SessionCard({ session, isActive }: Props) {
   const [browser, os] = (session.userAgent ?? '').split(' on ');
   const isMobile = /mobile|android|iphone|ipad/i.test(session.userAgent || '');
 
-  const formatTs = (ts?: string) =>
-    ts ? new Date(ts).toLocaleString() : 'N/A';
+  const formatTs = (ts?: string) => formatDateTimeIST(ts) || 'N/A';
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-y-2 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-bg_secondary_dark sm:justify-between">
