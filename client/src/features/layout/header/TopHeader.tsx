@@ -3,13 +3,13 @@ import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import { getTopHeaderName } from '@/components/hooks/HeaderName';
 import UserTourGuide from '@/components/layout/UserTourGuide';
-import { useSidebar } from '@/shared/contexts/SidebarContext';
+import { useSidebar } from '@/components/ui/sidebar';
 import { useMe } from '@/features/user/hooks';
 import HeaderActions from './HeaderActions';
 
 export default function TopHeader() {
   const location = useLocation();
-  const { toggle } = useSidebar();
+  const { toggleSidebar } = useSidebar();
   const { data: user } = useMe();
 
   const [currentHeaderName, setCurrentHeaderName] = useState('');
@@ -30,12 +30,16 @@ export default function TopHeader() {
 
   return (
     <>
-      <div className="topheader_container sticky top-0 z-10 flex h-full min-h-16 w-full items-center bg-bg_primary_light px-1 text-text_primary_light shadow-sm dark:border-l dark:bg-bg_primary_dark dark:text-text_primary_dark">
-        <i
+      <div className="topheader_container sticky top-0 z-10 flex h-16 w-full items-center bg-bg_primary_light px-1 text-text_primary_light shadow-sm dark:border-l dark:bg-bg_primary_dark dark:text-text_primary_dark">
+        <button
           id="menu_toggle_button_section"
-          onClick={toggle}
-          className="ri-menu-line mx-3 cursor-pointer text-xl font-bold text-text_primary_light dark:text-text_primary_dark sm:mx-4"
-        />
+          type="button"
+          aria-label="Toggle sidebar"
+          onClick={toggleSidebar}
+          className="mx-3 cursor-pointer border-0 bg-transparent p-0 sm:mx-4"
+        >
+          <i className="ri-menu-line text-xl font-bold text-text_primary_light dark:text-text_primary_dark" />
+        </button>
         <div className="name text-lg">
           <h2 className="font-bold">{currentHeaderName}</h2>
         </div>

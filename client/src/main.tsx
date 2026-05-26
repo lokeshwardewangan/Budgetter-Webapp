@@ -10,7 +10,6 @@ import App from './App.tsx';
 import './index.css';
 import '../src/styles/global.css';
 import { ThemeProvider } from '@/shared/contexts/ThemeContext';
-import { SidebarProvider } from '@/shared/contexts/SidebarContext';
 
 const GoogleClientID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const queryClient = new QueryClient();
@@ -21,10 +20,8 @@ createRoot(document.getElementById('root')!).render(
       <GoogleOAuthProvider clientId={GoogleClientID}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
-            <SidebarProvider>
-              <App />
-              <ReactQueryDevtools />
-            </SidebarProvider>
+            <App />
+            <ReactQueryDevtools />
           </ThemeProvider>
         </QueryClientProvider>
       </GoogleOAuthProvider>

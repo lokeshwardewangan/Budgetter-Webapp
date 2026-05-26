@@ -1,132 +1,102 @@
-import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Tooltip } from 'react-tooltip';
+import { Link, useLocation } from 'react-router-dom';
 import { Loader2, LogOut } from 'lucide-react';
 import LogoImage from '../../../../public/assets/logo/logo.png';
-import { getActiveRouteLink } from '@/utils/utility';
 import { useLogout } from '@/features/auth/hooks';
-import { useSidebar } from '@/shared/contexts/SidebarContext';
-import { useIsMobile } from '@/shared/hooks/useMediaQuery';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@/components/ui/sidebar';
 import type { userSidenavbarListType } from '@/data/UserSideNavbarList';
 
 type Props = {
   userSidenavbarList: userSidenavbarListType[];
 };
 
+// Match the previous chunkier sizing: h-11, text-base, size-5 icons, gap-3.
+// `group-data-[collapsible=icon]:!size-11` keeps the icon-only state large
+// enough to fill the 4.25rem column instead of shadcn's default 2rem.
+const itemSizing =
+  'h-11 px-3 py-2.5 gap-3 text-base font-medium [&>svg]:!size-5 group-data-[collapsible=icon]:!size-11 group-data-[collapsible=icon]:!p-2.5';
+
+const itemActiveAndHover =
+  'data-[active=true]:bg-gradient-to-r data-[active=true]:from-[#065f46]/80 data-[active=true]:via-[#047857]/80 data-[active=true]:to-[#059669]/80 data-[active=true]:text-white data-[active=true]:font-semibold hover:bg-[#059669]/30 dark:hover:bg-slate-700';
+
+const itemClasses = `${itemSizing} ${itemActiveAndHover}`;
+
 export default function SideNavbar({ userSidenavbarList }: Props) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const navbarRef = useRef<HTMLDivElement>(null);
-  const { isOpen: isSideNavbarOpen, showOverlay, close } = useSidebar();
-  const isMobile = useIsMobile();
+  const location = useLocation();
+  const { setOpenMobile, isMobile } = useSidebar();
   const { mutateAsync: logout, isPending } = useLogout();
 
-  // Outside-click-to-close on mobile.
-  useEffect(() => {
-    const handle = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (
-        overlayRef.current?.contains(target) &&
-        navbarRef.current &&
-        !navbarRef.current.contains(target) &&
-        window.innerWidth < 768
-      ) {
-        close();
-      }
-    };
-    document.addEventListener('click', handle);
-    return () => document.removeEventListener('click', handle);
-  }, [close]);
-
   return (
-    <>
-      {showOverlay && (
-        <div
-          ref={overlayRef}
-          className="overlay_effect fixed inset-0 z-[11] h-full w-full bg-black/30 backdrop-blur-sm md:static"
-        />
-      )}
-      <div
-        ref={navbarRef}
-        className={`sidenavbar_container fixed top-0 font-karla ${isSideNavbarOpen && !isMobile ? 'left-0 w-52' : ''} ${isSideNavbarOpen && isMobile ? 'left-0 w-52' : ''} ${!isSideNavbarOpen && !isMobile ? 'left-0 w-[68px]' : ''} ${!isSideNavbarOpen && isMobile ? 'left-[-210px] w-0' : ''} z-50 flex h-full flex-col gap-2 overflow-hidden bg-white px-3 py-5 text-text_sidebar shadow-lg dark:bg-bg_sidebar`}
-      >
+    <Sidebar collapsible="icon" className="font-karla">
+      <SidebarHeader className="py-5">
         <Link
           to="/"
-          className="sidenavbar_heading_container relative flex items-center py-5 pl-2.5"
+          onClick={() => isMobile && setOpenMobile(false)}
+          className="flex items-center gap-2 pl-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-0"
         >
-          {!isSideNavbarOpen && !isMobile && (
-            <img className="relative right-1 h-8" src={LogoImage} alt="logo" />
-          )}
-          {isSideNavbarOpen && (
-            <>
-              <img
-                className="relative right-1 h-8"
-                src={LogoImage}
-                alt="logo"
-              />
-              <h1 className="ml-2 bg-gradient-to-r from-[#2e7dff] to-[#00b87c] bg-clip-text text-2xl font-bold text-transparent dark:text-gray-200">
-                Budgetter
-              </h1>
-            </>
-          )}
+          <img className="h-8 shrink-0" src={LogoImage} alt="logo" />
+          <h1 className="overflow-hidden whitespace-nowrap bg-gradient-to-r from-[#2e7dff] to-[#00b87c] bg-clip-text text-2xl font-bold text-transparent transition-all duration-200 ease-linear group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 dark:text-gray-200">
+            Budgetter
+          </h1>
         </Link>
+      </SidebarHeader>
 
-        <div
-          id="sidebar_section"
-          className="sidenavbar_menu_container flex flex-col gap-2 sm:gap-3"
-        >
-          {userSidenavbarList.map(({ route, name, icon: Icon }) => (
-            <Link
-              data-tooltip-id="navbarTooltip"
-              data-tooltip-content={name}
-              data-tooltip-place="right"
-              key={route}
-              to={`/${route}`}
-              onClick={close}
-              className={`sidenavbar_menulink_container relative flex w-full justify-start gap-3 rounded-sm px-3 py-3 sm:py-2.5 ${getActiveRouteLink() === route ? 'bg-gradient-to-r from-[#065f46]/80 via-[#047857]/80 to-[#059669]/80 font-semibold text-white dark:bg-bg_active_sidebar_link' : 'font-semibold text-slate-700 dark:text-white sm:font-medium'} items-center hover:bg-[#059669]/40 dark:hover:bg-slate-700`}
+      <SidebarContent>
+        <SidebarGroup className="px-3">
+          <SidebarMenu className="gap-2 sm:gap-3">
+            {userSidenavbarList.map(({ route, name, icon: Icon }) => {
+              const isActive = location.pathname === `/${route}`;
+              return (
+                <SidebarMenuItem key={route}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    tooltip={name}
+                    className={itemClasses}
+                  >
+                    <Link
+                      to={`/${route}`}
+                      onClick={() => isMobile && setOpenMobile(false)}
+                    >
+                      <Icon className="h-5 w-5" />
+                      <span className="capitalize">{name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="px-3 pb-4">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip={isPending ? 'Signing out…' : 'Logout'}
+              className={`${itemSizing} bg-gradient-to-r from-[#065f46]/80 via-[#047857]/80 to-[#059669]/80 text-white hover:bg-gradient-to-tr hover:text-white`}
+              onClick={() => logout()}
+              disabled={isPending}
             >
-              <Icon className="h-5 w-5" />
-              <span
-                className={`font- absolute text-base ${!isSideNavbarOpen && !isMobile && 'left-16'} ${isSideNavbarOpen && !isMobile && 'left-11'} ${isSideNavbarOpen && isMobile && 'left-11'} whitespace-nowrap capitalize`}
-              >
-                {name}
-              </span>
-            </Link>
-          ))}
-        </div>
-
-        <div
-          id="logout_section"
-          className="menu_logout_container absolute bottom-5 left-3 right-3 flex flex-col gap-3"
-        >
-          <button
-            data-tooltip-id="navbarTooltip"
-            data-tooltip-content="Logout"
-            data-tooltip-place="right"
-            className="logout_container relative flex w-full items-center justify-start gap-3 rounded-sm bg-gradient-to-r from-[#065f46]/80 via-[#047857]/80 to-[#059669]/80 px-3 py-2.5 hover:bg-gradient-to-tr"
-            onClick={() => logout()}
-          >
-            {isPending ? (
-              <>
+              {isPending ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
-                <span className="absolute left-12">Signing out…</span>
-              </>
-            ) : (
-              <>
+              ) : (
                 <LogOut className="h-5 w-5" />
-                <span
-                  className={`absolute text-base ${!isSideNavbarOpen && !isMobile && 'left-16'} ${isSideNavbarOpen && !isMobile && 'left-11'} ${isSideNavbarOpen && isMobile && 'left-11'} whitespace-nowrap capitalize`}
-                >
-                  Logout
-                </span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-      <Tooltip
-        className="custom-react-tooltip dark:custom-react-tooltip"
-        id="navbarTooltip"
-      />
-    </>
+              )}
+              <span>{isPending ? 'Signing out…' : 'Logout'}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

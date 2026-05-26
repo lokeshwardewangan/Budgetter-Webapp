@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Outlet } from 'react-router-dom';
 import SideNavbar from '@/features/layout/sidebar/SideNavbar';
 import TopHeader from '@/features/layout/header/TopHeader';
@@ -5,25 +6,30 @@ import DashboardLoader from './Loader/DashboardLoader';
 import TopHeaderLoader from './Loader/TopHeaderLoader';
 import { userSidenavbarList } from '@/data/UserSideNavbarList';
 import { useMe } from '@/features/user/hooks';
-import { useSidebar } from '@/shared/contexts/SidebarContext';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/shared/hooks/useMediaQuery';
 
 export default function UserLayout() {
-  const { isOpen: isSideNavbarOpen } = useSidebar();
   const isMobile = useIsMobile();
   const { data: user } = useMe();
 
   return (
-    <>
+    <SidebarProvider
+      defaultOpen={!isMobile}
+      style={
+        {
+          '--sidebar-width': '13rem',
+          '--sidebar-width-icon': '4.25rem',
+        } as CSSProperties
+      }
+    >
       <SideNavbar userSidenavbarList={userSidenavbarList} />
-      <div
-        className={`dashboard_layout_container absolute right-0 top-0 flex flex-col ${isSideNavbarOpen && !isMobile && 'dashboard_layout_container_large_screen_open'} ${!isSideNavbarOpen && !isMobile && 'dashboard_layout_container_large_screen_close'} ${isMobile && 'dashboard_layout_container_small_screen_close'} `}
-      >
+      <SidebarInset className="flex flex-col bg-bg_secondary_light dark:bg-bg_secondary_dark">
         {user?._id ? <TopHeader /> : <TopHeaderLoader />}
         <div className="flex flex-col items-center justify-start gap-5 px-6 py-5">
           {user?._id ? <Outlet /> : <DashboardLoader />}
         </div>
-      </div>
-    </>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
