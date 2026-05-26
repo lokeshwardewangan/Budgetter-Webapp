@@ -20,6 +20,22 @@ if (!isLocal && process.env.CONFIRM_PROD !== 'yes') {
   process.exit(1);
 }
 
+// Legacy categories observed in old data → canonical new-enum values.
+// Anything not in this map AND not already in the new enum is left as-is
+// (and will be reported by migrate-v2-verify).
+const CATEGORY_REMAP: Record<string, string> = {
+  Utilities: 'Housing & Utilities',
+  Housing: 'Housing & Utilities',
+  Household: 'Miscellaneous',
+  Travel: 'Transportation',
+  'Personal Care': 'Personal',
+};
+
+const normalizeCategory = (c: unknown): string => {
+  if (typeof c !== 'string') return 'Miscellaneous';
+  return CATEGORY_REMAP[c] ?? c;
+};
+
 const parseDate = (v: unknown): Date => {
   if (v instanceof Date) return v;
   if (typeof v === 'string') {
@@ -72,7 +88,7 @@ async function run(): Promise<void> {
           date: parsedDate,
           name: p.name,
           price: typeof p.price === 'number' ? p.price : Number(p.price) || 0,
-          category: p.category,
+          category: normalizeCategory(p.category),
           label: p.label ?? null,
           createdAt: p.createdAt || doc.createdAt || new Date(),
           updatedAt: p.updatedAt || doc.updatedAt || new Date(),

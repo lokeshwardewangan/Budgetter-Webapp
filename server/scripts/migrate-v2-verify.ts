@@ -57,6 +57,23 @@ async function run(): Promise<void> {
     .countDocuments({ tokenHash: { $exists: false } });
   if (sessionsNoHash > 0) issues.push(`${sessionsNoHash} ActiveSession docs are missing tokenHash`);
 
+  // 5. Every Expense.category must be in the new enum (else editing it will 400).
+  const VALID_CATEGORIES = [
+    'Groceries',
+    'Housing & Utilities',
+    'Medical',
+    'Food',
+    'Personal',
+    'Educational',
+    'Transportation',
+    'Miscellaneous',
+  ];
+  const badCatExpenses = await db
+    .collection('expenses')
+    .countDocuments({ category: { $nin: VALID_CATEGORIES } });
+  if (badCatExpenses > 0)
+    issues.push(`${badCatExpenses} Expense docs have a category not in the new enum`);
+
   console.log('=== POST-MIGRATION COUNTS ===\n');
   console.log(`  users:           ${await db.collection('users').countDocuments()}`);
   console.log(`  pocketmoneys:    ${await db.collection('pocketmoneys').countDocuments()}`);
