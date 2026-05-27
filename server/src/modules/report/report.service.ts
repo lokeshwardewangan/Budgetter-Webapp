@@ -38,15 +38,20 @@ export async function monthlyReport(userId: string, { month, year }: MonthlyRepo
   const range = { $gte: gte, $lt: lt };
 
   // Last month with any expense activity, used as the "previous period" total.
+  // Coerce to Date defensively — a few legacy docs may still have `date` as
+  // a string if they were written between the v2 migration and the v2 deploy.
   const lastEntry = await ExpenseModel.findOne({ user: userObj }).sort({ date: -1 }).lean();
   let lastTotalExpenses = 0;
   if (lastEntry) {
-    const prev = monthRange(lastEntry.date.getUTCMonth() + 1, lastEntry.date.getUTCFullYear());
-    const lastAgg = await ExpenseModel.aggregate<{ _id: null; total: number }>([
-      { $match: { user: userObj, date: { $gte: prev.gte, $lt: prev.lt } } },
-      { $group: { _id: null, total: { $sum: '$price' } } },
-    ]);
-    lastTotalExpenses = lastAgg[0]?.total || 0;
+    const lastDate = lastEntry.date instanceof Date ? lastEntry.date : new Date(lastEntry.date);
+    if (!Number.isNaN(lastDate.getTime())) {
+      const prev = monthRange(lastDate.getUTCMonth() + 1, lastDate.getUTCFullYear());
+      const lastAgg = await ExpenseModel.aggregate<{ _id: null; total: number }>([
+        { $match: { user: userObj, date: { $gte: prev.gte, $lt: prev.lt } } },
+        { $group: { _id: null, total: { $sum: '$price' } } },
+      ]);
+      lastTotalExpenses = lastAgg[0]?.total || 0;
+    }
   }
 
   const [expensesAgg, pocketAgg, lentAgg] = await Promise.all([
