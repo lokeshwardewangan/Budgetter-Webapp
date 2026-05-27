@@ -1,0 +1,76 @@
+// Must come first — validates env before any module reads process.env.
+import { env, isProd } from './shared/config/env.js';
+// Extends Zod with .openapi(); must run before any schema is defined.
+import './shared/openapi/init.js';
+import express from 'express';
+import { pinoHttp } from 'pino-http';
+import cors from 'cors';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
+import { StatusCodes } from 'http-status-codes';
+import apiRouter from './routes.js';
+import { buildOpenApiDocument } from './shared/openapi/build.js';
+import { errorHandler, notFoundHandler } from './shared/middleware/error.middleware.js';
+import { globalLimiter } from './shared/middleware/rateLimit.middleware.js';
+import { requestId } from './shared/middleware/requestId.middleware.js';
+import { logger } from './shared/lib/logger.js';
+
+const app = express();
+
+app.set('trust proxy', env.TRUST_PROXY_HOPS);
+
+app.use(requestId);
+app.use(
+  pinoHttp({
+    logger,
+    customProps: (req) => ({ requestId: (req as unknown as { id?: string }).id }),
+    autoLogging: { ignore: (req) => req.url === '/healthz' },
+  }),
+);
+app.use(helmet());
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (
+        !origin ||
+        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) ||
+        /\.lokeshwardewangan\.in$/.test(origin) ||
+        /\.vercel\.app$/.test(origin)
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }),
+);
+
+app.use(express.json({ limit: '16kb' }));
+app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+app.use(mongoSanitize());
+app.use(express.static('public'));
+app.use(cookieParser());
+app.use(globalLimiter);
+
+app.get('/', (_req, res) => {
+  res.json({ message: 'Welcome to Budgetter API' });
+});
+
+app.get('/healthz', (_req, res) => {
+  res.status(StatusCodes.OK).json({ status: 'ok', uptime: process.uptime() });
+});
+
+app.use('/api', apiRouter);
+
+const openApiDocument = buildOpenApiDocument();
+app.get('/openapi.json', (_req, res) => res.json(openApiDocument));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+export { app, isProd };

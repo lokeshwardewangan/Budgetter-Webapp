@@ -29,3 +29,7 @@ temp/
 
 # Coverage directory used by testing tools like jest
 coverage/
+
+# TypeScript build output
+dist/
+*.tsbuildinfo

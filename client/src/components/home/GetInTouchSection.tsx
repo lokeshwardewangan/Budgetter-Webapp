@@ -10,7 +10,7 @@ const VIEWPORT_ONCE = { once: true, amount: 0.3 } as const;
 const VIEWPORT_FORM = { once: true, amount: 0.15 } as const;
 import React from 'react';
 import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useFormik } from 'formik';
 import { contactFormSchema } from '@/schemas/userAuth';
 import { useMutation } from '@tanstack/react-query';

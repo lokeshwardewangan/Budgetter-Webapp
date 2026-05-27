@@ -2,7 +2,7 @@
 import HeroSection from '@/components/home/HeroSection';
 import Footer from '@/components/layout/Footer';
 import Navbar from '@/components/navbar/Navbar';
-import React, { useEffect, Suspense, lazy } from 'react';
+import React, { Suspense, lazy } from 'react';
 import ScrollToTopButton from '@/components/home/ScrollTopTop';
 import { Tooltip } from 'react-tooltip';
 // HelmetProvider removed
@@ -34,10 +34,6 @@ const CallToAction = lazy(() =>
 import SEO from '@/components/seo/SEO';
 
 const HomePage: React.FC = () => {
-  useEffect(() => {
-    localStorage.removeItem('isDarkMode');
-  }, []);
-
   const seoData = {
     title: 'Budgetter - Smart Finance Tracker for Students',
     description:

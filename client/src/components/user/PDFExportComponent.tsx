@@ -3,7 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { karlaFont } from '../../utils/font';
 import { Button } from '../ui/button';
-import { useSelector } from 'react-redux';
+import { useMe } from '@/features/user/hooks';
 
 // Extend jsPDF type to include lastAutoTable
 declare module 'jspdf' {
@@ -31,13 +31,16 @@ const PDFExportComponent: React.FC<ExportTableProps> = ({
   expenses,
   createdAt,
 }) => {
-  const user = useSelector((state: any) => state.user?.user);
+  const { data: user } = useMe();
+  // jspdf-autotable's `CellInput` rejects `undefined`, so fall back to ''
+  // when the user query hasn't resolved yet (the button will still render
+  // a coherent PDF, just with blank user rows).
   const userDetails = {
-    name: user?.name,
-    username: user?.username,
-    email: user?.email,
-    currentPocketMoney: user?.currentPocketMoney,
-    DOB: user?.DOB,
+    name: user?.name ?? '',
+    username: user?.username ?? '',
+    email: user?.email ?? '',
+    currentPocketMoney: user?.currentPocketMoney ?? '',
+    dob: user?.dob ?? '',
   };
 
   const exportPDF = () => {

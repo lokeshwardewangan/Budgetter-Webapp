@@ -1,12 +1,9 @@
-import AllExpensesTable from '@/components/user/reports/table/AllExpensesTable';
-import React from 'react';
+import ReportsPanel from '@/features/reports/components/ReportsPanel';
 
-const Reports: React.FC = () => {
+export default function Reports() {
   return (
     <div className="dashboard_page_ flex w-full flex-col items-start justify-start gap-5">
-      <AllExpensesTable />
+      <ReportsPanel />
     </div>
   );
-};
-
-export default Reports;
+}

@@ -30,20 +30,6 @@ body.dark {
   padding: 2px;
 }
 
-/* dashboard layout container */
-.dashboard_layout_container_large_screen_open {
-  width: calc(100% - 208px);
-}
-.dashboard_layout_container_large_screen_close {
-  width: calc(100% - 65px);
-}
-.dashboard_layout_container_small_screen_open {
-  width: calc(100% - 208px);
-}
-.dashboard_layout_container_small_screen_close {
-  width: 100%;
-}
-
 /* Customize Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

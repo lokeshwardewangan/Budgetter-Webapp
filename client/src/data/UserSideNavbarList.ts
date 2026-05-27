@@ -1,10 +1,10 @@
 import {
   HandCoins,
   CirclePlus,
-  ListOrdered,
+  Receipt,
   ChartPie,
   LayoutDashboard,
-  Wallet,
+  PiggyBank,
 } from 'lucide-react';
 
 export type userSidenavbarListType = {
@@ -21,13 +21,13 @@ export const userSidenavbarList: userSidenavbarListType[] = [
   },
   {
     route: 'user/add-expenses',
-    name: 'Add Expenses',
+    name: 'Add Expense',
     icon: CirclePlus,
   },
   {
     route: 'user/show-expenses',
-    name: 'Show-expenses',
-    icon: ListOrdered,
+    name: 'All Expenses',
+    icon: Receipt,
   },
   {
     route: 'user/reports',
@@ -36,12 +36,12 @@ export const userSidenavbarList: userSidenavbarListType[] = [
   },
   {
     route: 'user/add-money',
-    name: 'Add Money',
-    icon: Wallet,
+    name: 'Add Pocket Money',
+    icon: PiggyBank,
   },
   {
     route: 'user/add-lent-money',
-    name: 'Add Lent Money',
+    name: 'Lent Money',
     icon: HandCoins,
   },
 ];

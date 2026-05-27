@@ -1,35 +1,30 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
+import { useMe } from '@/features/user/hooks';
 
 export const useSentryIntegration = () => {
-  const user = useSelector((state: any) => state.user?.user);
+  const { data: user } = useMe();
   const location = useLocation();
 
   // 1. User Identification
   useEffect(() => {
-    if (user && (user._id || user.id)) {
+    if (user?._id) {
       Sentry.setUser({
-        id: user._id || user.id,
+        id: user._id,
         email: user.email,
         username: user.username,
-        ip_address: '{{auto}}', // Let Sentry infer if needed, or omit
+        ip_address: '{{auto}}',
       });
-
-      // 3. Additional debugging context
       Sentry.setTag('user_role', user.profession || 'unknown');
       Sentry.setTag('account_verified', String(user.isVerified));
-
-      // Clear sensitive context if any was previously set
-      // (Sentry.setUser overrides, so we are good)
     } else {
       Sentry.setUser(null);
       Sentry.setTag('user_role', 'guest');
     }
   }, [user]);
 
-  // 4. Breadcrumbs for Navigation
+  // 2. Breadcrumbs for Navigation
   useEffect(() => {
     Sentry.addBreadcrumb({
       category: 'navigation',
@@ -43,7 +38,6 @@ export const useSentryIntegration = () => {
     });
   }, [location]);
 
-  // Environment context (can be set once, but safe here)
   useEffect(() => {
     Sentry.setContext('environment', {
       mode: import.meta.env.MODE,

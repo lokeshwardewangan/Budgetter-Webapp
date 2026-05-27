@@ -1,57 +1,50 @@
-export interface ExpenseProduct {
+// Flat expense row — one document per line item after the v2 flatten.
+export interface Expense {
+  _id: string;
+  user: string;
+  date: string; // ISO 8601 from server
   name: string;
   price: number;
   category: string;
-  label: string;
-  _id: string;
+  label: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface ExpenseEntry {
-  _id: string;
-  user: string;
-  date: string;
-  products: ExpenseProduct[];
-}
+// Alias for components that still type-name the product shape.
+export type ExpenseProduct = Expense;
 
 export interface ExpensesResType {
   statusCode: number;
-  data: ExpenseEntry;
+  data: Expense[];
   message: string;
   success: boolean;
 }
+
+export type TodayExpensesResType = ExpensesResType;
+export type AllExpensesResType = ExpensesResType;
 
 export interface AddExpensesResType {
   statusCode: number;
-  message: string;
-  data: null;
-  success: boolean;
-}
-
-export interface TodayExpensesResType {
-  statusCode: number;
-  data: ExpenseProduct[];
+  data: {
+    expenses: Expense[];
+    currentPocketMoney: number;
+    totalDeducted: number;
+  } | null;
   message: string;
   success: boolean;
 }
 
-export interface AllExpensesResType {
-  statusCode: number;
-  data: ExpenseEntry[];
-  message: string;
-  success: boolean;
-}
 export interface EditedExpenseResType {
   statusCode: number;
-  data: ExpenseProduct[];
+  data: { expense: Expense; currentPocketMoney: number };
   message: string;
   success: boolean;
 }
 
 export interface DeletedExpenseResType {
   statusCode: number;
-  data: ExpenseProduct[];
+  data: { currentPocketMoney?: number; refunded: boolean };
   message: string;
   success: boolean;
 }
@@ -63,10 +56,4 @@ export interface AllExpenseExpenseTableType {
   label: string | null;
   category: string;
   createdAt: string;
-}
-
-export interface FlattenedExpense {
-  user: string;
-  date: string;
-  product: ExpenseProduct;
 }

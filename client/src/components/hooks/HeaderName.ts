@@ -15,11 +15,6 @@ export const getTopHeaderName = (pathName: string): string => {
       return 'Lent Money';
     case '/user/profile':
       return 'Profile';
-    // for admin private routes
-    case '/admin/users':
-      return 'App Users';
-    case '/admin/newsletter':
-      return 'NewsLetter';
     default:
       return 'Oops! Wrong Page';
   }
