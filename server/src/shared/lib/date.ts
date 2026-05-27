@@ -1,7 +1,11 @@
-// UTC midnight to avoid TZ drift on day boundaries.
+// UTC midnight of "today in IST" — the project ships only to IST users, and
+// the client picks dates in IST. Without this shift, expenses added between
+// 00:00 and 05:30 IST land on the previous UTC day, so /expenses/today
+// silently misses them while /expenses/by-date?date=<IST-today> finds them.
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
 export const startOfToday = (): Date => {
-  const now = new Date();
-  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const istNow = new Date(Date.now() + IST_OFFSET_MS);
+  return new Date(Date.UTC(istNow.getUTCFullYear(), istNow.getUTCMonth(), istNow.getUTCDate()));
 };
 
 export const startOfTomorrow = (): Date => {
