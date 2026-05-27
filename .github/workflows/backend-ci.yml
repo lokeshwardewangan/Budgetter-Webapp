@@ -33,5 +33,11 @@ jobs:
       - name: Check formatting
         run: npx prettier --check .
 
-      - name: Syntax sanity check
-        run: node --check src/index.js
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
