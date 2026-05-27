@@ -8,6 +8,12 @@ const SHUTDOWN_TIMEOUT_MS = 10_000;
 
 async function start(): Promise<void> {
   await connectToDb();
+
+  // Serverless (Vercel) invokes the exported `app` per request — there's no
+  // long-running listener to start, and registering SIGTERM handlers fights
+  // the platform's lifecycle management.
+  if (process.env.VERCEL) return;
+
   const server = app.listen(env.PORT, () => {
     logger.info(`Server listening on PORT ${env.PORT}`);
   });
@@ -46,3 +52,6 @@ start().catch((err) => {
   logger.fatal({ err }, 'Failed to start server');
   process.exit(1);
 });
+
+// Vercel's @vercel/node uses the default export as the request handler.
+export default app;
