@@ -27,9 +27,9 @@ function readInitial(): boolean {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(readInitial);
 
-  // Reflect the current preference on <body> + localStorage on every change.
+  // Persist the preference. The body `.dark` class is applied by MainLayout
+  // (inside the Router) so it can be suppressed on the landing route.
   useEffect(() => {
-    document.body.classList.toggle('dark', isDarkMode);
     try {
       localStorage.setItem(STORAGE_KEY, String(isDarkMode));
     } catch {

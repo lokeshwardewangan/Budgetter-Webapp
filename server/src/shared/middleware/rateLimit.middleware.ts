@@ -17,7 +17,7 @@ export const globalLimiter: RateLimitRequestHandler = rateLimit({
 // Failures only — successful logins don't count against the cap.
 export const authLimiter: RateLimitRequestHandler = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 30,
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,

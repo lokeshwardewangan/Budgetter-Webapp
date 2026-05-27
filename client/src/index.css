@@ -110,3 +110,9 @@
     @apply bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent;
   }
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

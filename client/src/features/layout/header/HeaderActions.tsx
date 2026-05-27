@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Fullscreen, Minimize, Play } from 'lucide-react';
-import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
+import { Fullscreen, Minimize, MoonIcon, Play, SunIcon } from 'lucide-react';
+import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
+import { useTheme } from '@/shared/contexts/ThemeContext';
 import { useMe } from '@/features/user/hooks';
 import NotificationsPopover from './NotificationsPopover';
 
@@ -16,6 +17,7 @@ type Props = {
 export default function HeaderActions({ onStartTour }: Props) {
   const [isFull, setIsFull] = useState(false);
   const { data: user } = useMe();
+  const { isDarkMode } = useTheme();
   const avatar = user?.avatar;
 
   const toggleFullscreen = () => {
@@ -58,7 +60,20 @@ export default function HeaderActions({ onStartTour }: Props) {
         </span>
       </button>
 
-      <ThemeToggleButton variant="circle-blur" start="top-left" />
+      <AnimatedThemeToggler
+        id="theme_change_tour"
+        aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+        className="group flex h-10 w-10 cursor-pointer items-center overflow-hidden rounded-full bg-[#f2f5fa] p-2.5 text-black transition-all duration-300 hover:bg-[#047857]/20 focus:outline-none dark:bg-[#10101c] dark:text-white dark:hover:bg-slate-700 sm:hover:h-9 sm:hover:w-[156px] sm:hover:px-4"
+      >
+        {isDarkMode ? (
+          <SunIcon className="h-5 w-5 shrink-0" />
+        ) : (
+          <MoonIcon className="h-5 w-5 shrink-0" />
+        )}
+        <span className="ml-1.5 whitespace-nowrap text-sm font-medium opacity-0 transition-opacity duration-300 sm:group-hover:opacity-100">
+          {isDarkMode ? 'Switch to Light' : 'Switch to Dark'}
+        </span>
+      </AnimatedThemeToggler>
       <NotificationsPopover />
 
       <Link

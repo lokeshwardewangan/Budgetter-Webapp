@@ -9,9 +9,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={isDarkMode ? 'dark' : 'light'}
-      position="top-right"
+      position="bottom-right"
       richColors
-      closeButton
       className="toaster group"
       toastOptions={{
         classNames: {
