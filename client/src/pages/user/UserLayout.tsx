@@ -7,6 +7,7 @@ import TopHeaderLoader from './Loader/TopHeaderLoader';
 import { userSidenavbarList } from '@/data/UserSideNavbarList';
 import { useMe } from '@/features/user/hooks';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { TourProvider } from '@/features/tour';
 import { useIsMobile } from '@/shared/hooks/useMediaQuery';
 
 export default function UserLayout() {
@@ -23,13 +24,15 @@ export default function UserLayout() {
         } as CSSProperties
       }
     >
-      <SideNavbar userSidenavbarList={userSidenavbarList} />
-      <SidebarInset className="flex flex-col bg-bg_secondary_light dark:bg-bg_secondary_dark">
-        {user?._id ? <TopHeader /> : <TopHeaderLoader />}
-        <div className="flex flex-col items-center justify-start gap-5 px-6 py-5">
-          {user?._id ? <Outlet /> : <DashboardLoader />}
-        </div>
-      </SidebarInset>
+      <TourProvider>
+        <SideNavbar userSidenavbarList={userSidenavbarList} />
+        <SidebarInset className="flex flex-col bg-bg_secondary_light dark:bg-bg_secondary_dark">
+          {user?._id ? <TopHeader /> : <TopHeaderLoader />}
+          <div className="flex flex-col items-center justify-start gap-5 px-6 py-5">
+            {user?._id ? <Outlet /> : <DashboardLoader />}
+          </div>
+        </SidebarInset>
+      </TourProvider>
     </SidebarProvider>
   );
 }

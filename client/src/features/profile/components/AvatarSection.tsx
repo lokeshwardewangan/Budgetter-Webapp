@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { formatDateIST } from '@/shared/lib/dateFormat';
+import { TOUR_IDS } from '@/features/tour';
 import { useUpdateAvatar } from '../hooks';
 
 type Props = {
@@ -42,7 +43,7 @@ export default function AvatarSection({
 
   return (
     <div
-      id="your_profile_picture_section"
+      id={TOUR_IDS.profilePicture}
       className="basic_user_profile_details flex flex-col items-center space-y-4 shadow-sm"
     >
       <Avatar className="h-24 w-24 shadow-sm sm:h-32 sm:w-32">
@@ -54,7 +55,7 @@ export default function AvatarSection({
         variant="outline"
         size="sm"
         disabled={isPending}
-        id="change_your_avatar_section"
+        id={TOUR_IDS.changeAvatar}
         className="relative w-40 overflow-hidden bg-transparent"
       >
         {isPending ? (
@@ -76,7 +77,10 @@ export default function AvatarSection({
         />
       </Button>
 
-      <div className="information_details_user flex w-fit flex-col items-start justify-center space-y-1 rounded-lg">
+      <div
+        id={TOUR_IDS.membershipDetails}
+        className="information_details_user flex w-fit flex-col items-start justify-center space-y-1 rounded-lg"
+      >
         {memberSince && (
           <InfoRow
             icon={

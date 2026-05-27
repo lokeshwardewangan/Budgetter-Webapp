@@ -1,0 +1,56 @@
+/* Dark-mode overrides for @sjmc11/tourguidejs. The lib hardcodes white bg /
+   dark text on .tg-dialog; this file re-skins it when body.dark is set. */
+body.dark .tg-dialog {
+  background: #171829;
+  color: #e5e7eb;
+}
+
+body.dark .tg-dialog .tg-arrow {
+  background: #171829;
+}
+
+body.dark .tg-dialog .tg-dialog-dots {
+  border-top-color: #2a2b3d;
+  border-bottom-color: #2a2b3d;
+}
+
+body.dark .tg-dialog .tg-dialog-dots > span.tg-dot {
+  background: #3a3b54;
+}
+
+body.dark .tg-dialog .tg-dialog-dots > span.tg-dot.tg-dot-active {
+  background: #10b981;
+}
+
+body.dark .tg-dialog .tg-dialog-progress-bar {
+  background: #2a2b3d;
+}
+
+body.dark .tg-dialog .tg-dialog-progress-bar > .tg-bar {
+  background: #10b981;
+}
+
+body.dark .tg-dialog .tg-dialog-close-btn svg {
+  fill: #e5e7eb;
+}
+
+body.dark .tg-dialog .tg-dialog-footer button.tg-dialog-btn {
+  background: transparent;
+  color: #cbd5e1;
+  border-color: #3a3b54;
+}
+
+body.dark .tg-dialog .tg-dialog-footer button.tg-dialog-btn:hover {
+  color: #f1f5f9;
+  border-color: #64748b;
+}
+
+body.dark .tg-dialog .tg-dialog-footer button.tg-dialog-btn:active {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: #10b981;
+}
+
+body.dark .tg-dialog .tg-dialog-footer .tg-dialog-footer-sup .tg-step-progress {
+  color: #e5e7eb;
+}

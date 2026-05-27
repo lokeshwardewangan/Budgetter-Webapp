@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getTodayDate } from '@/utils/date/date';
+import { TOUR_IDS } from '@/features/tour';
 import { addPocketMoneySchema, type AddPocketMoneyForm } from '../schemas';
 import { useAddPocketMoney } from '../hooks';
 
@@ -39,6 +40,7 @@ export default function AddPocketMoneyForm() {
 
   return (
     <form
+      id={TOUR_IDS.inputsAddPocketMoney}
       onSubmit={onSubmit}
       noValidate
       className="add_expense_container flex w-full flex-col items-start justify-start gap-4 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark"

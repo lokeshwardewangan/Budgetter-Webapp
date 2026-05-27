@@ -1,6 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { DataTable } from '@/shared/components/table/DataTable';
 import { formatDateIST } from '@/shared/lib/dateFormat';
+import { TOUR_IDS } from '@/features/tour';
 import { usePocketMoneyHistory } from '../hooks';
 import type { PocketMoneyEntry } from '@/types/api/auth/auth';
 
@@ -24,12 +25,14 @@ export default function PocketMoneyHistoryTable() {
   const { data = [], isLoading } = usePocketMoneyHistory();
 
   return (
-    <DataTable
-      data={data}
-      columns={columns}
-      isLoading={isLoading}
-      emptyMessage="You haven't added pocket money yet."
-      className="border-border_dark dark:border"
-    />
+    <div id={TOUR_IDS.pocketMoneyDetailsTable} className="w-full">
+      <DataTable
+        data={data}
+        columns={columns}
+        isLoading={isLoading}
+        emptyMessage="You haven't added pocket money yet."
+        className="border-border_dark dark:border"
+      />
+    </div>
   );
 }

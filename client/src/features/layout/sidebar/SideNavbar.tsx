@@ -14,6 +14,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { TOUR_IDS } from '@/features/tour';
 import type { userSidenavbarListType } from '@/data/UserSideNavbarList';
 
 type Props = {
@@ -37,7 +38,7 @@ export default function SideNavbar({ userSidenavbarList }: Props) {
   const { mutateAsync: logout, isPending } = useLogout();
 
   return (
-    <Sidebar collapsible="icon" className="font-karla">
+    <Sidebar id={TOUR_IDS.sidebar} collapsible="icon" className="font-karla">
       <SidebarHeader className="py-5">
         <Link
           to="/"
@@ -85,6 +86,7 @@ export default function SideNavbar({ userSidenavbarList }: Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              id={TOUR_IDS.logout}
               tooltip={isPending ? 'Signing out…' : 'Logout'}
               className={`${itemSizing} bg-gradient-to-r from-[#065f46]/80 via-[#047857]/80 to-[#059669]/80 text-white hover:bg-gradient-to-tr hover:text-white`}
               onClick={() =>

@@ -13,6 +13,7 @@ import { formatDate } from '@/utils/date/date';
 import { expenseCategoryNames } from '@/shared/lib/expenseCategories';
 import { LabelOptions, type OptionType } from '@/utils/utility';
 import { getCustomReactSelectStyles } from '@/styles/global';
+import { TOUR_IDS } from '@/features/tour';
 import { addExpenseFormSchema, type AddExpenseFormInput } from '../schemas';
 import { useAddExpenses } from '../hooks';
 
@@ -75,7 +76,10 @@ export default function AddExpenseForm() {
   });
 
   return (
-    <div className="add_expense_container flex w-full flex-col items-start justify-start gap-4 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+    <div
+      id={TOUR_IDS.inputsAddExpense}
+      className="add_expense_container flex w-full flex-col items-start justify-start gap-4 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark"
+    >
       <h4 className="text-base font-semibold">Add Your Expenses</h4>
       <form
         onSubmit={onSubmit}

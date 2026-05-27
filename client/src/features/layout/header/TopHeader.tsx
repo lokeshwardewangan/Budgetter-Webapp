@@ -2,37 +2,25 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import { getTopHeaderName } from '@/components/hooks/HeaderName';
-import UserTourGuide from '@/components/layout/UserTourGuide';
 import { useSidebar } from '@/components/ui/sidebar';
-import { useMe } from '@/features/user/hooks';
+import { TOUR_IDS } from '@/features/tour';
 import HeaderActions from './HeaderActions';
 
 export default function TopHeader() {
   const location = useLocation();
   const { toggleSidebar } = useSidebar();
-  const { data: user } = useMe();
 
   const [currentHeaderName, setCurrentHeaderName] = useState('');
-  const [isTourTriggered, setIsTourTriggered] = useState(false);
 
   useEffect(() => {
     setCurrentHeaderName(getTopHeaderName(location.pathname));
   }, [location.pathname]);
 
-  // Auto-trigger the product tour once for first-time-logging-in users.
-  useEffect(() => {
-    const seen = localStorage.getItem('hasSeenTour');
-    if (!user?.lastLogin && !seen) {
-      localStorage.setItem('hasSeenTour', 'true');
-      setIsTourTriggered(true);
-    }
-  }, [user?.lastLogin]);
-
   return (
     <>
       <div className="topheader_container sticky top-0 z-10 flex h-16 w-full items-center bg-bg_primary_light px-1 text-text_primary_light shadow-sm dark:border-l dark:bg-bg_primary_dark dark:text-text_primary_dark">
         <button
-          id="menu_toggle_button_section"
+          id={TOUR_IDS.menuToggle}
           type="button"
           aria-label="Toggle sidebar"
           onClick={toggleSidebar}
@@ -43,13 +31,9 @@ export default function TopHeader() {
         <div className="name text-lg">
           <h2 className="font-bold">{currentHeaderName}</h2>
         </div>
-        <HeaderActions onStartTour={() => setIsTourTriggered(true)} />
+        <HeaderActions />
       </div>
       <Tooltip className="custom-react-tooltip" id="header-tooltip" />
-      <UserTourGuide
-        isTourTriggered={isTourTriggered}
-        setIsTourTriggered={setIsTourTriggered}
-      />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { DataTable } from '@/shared/components/table/DataTable';
 import { formatDateIST } from '@/shared/lib/dateFormat';
+import { TOUR_IDS } from '@/features/tour';
 import type { LentMoneyEntry } from '@/types/api/auth/auth';
 import { useLentMoneyHistory } from '../hooks';
 import MarkReceivedDialog from './MarkReceivedDialog';
@@ -49,7 +50,10 @@ export default function LentMoneyHistoryTable() {
   const { data = [], isLoading } = useLentMoneyHistory();
 
   return (
-    <div className="lent_records_details_container flex w-full flex-col items-start justify-start rounded-md border border-border_light bg-bg_primary_light shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+    <div
+      id={TOUR_IDS.lentRecordsDetailsTable}
+      className="lent_records_details_container flex w-full flex-col items-start justify-start rounded-md border border-border_light bg-bg_primary_light shadow-sm dark:border-border_dark dark:bg-bg_primary_dark"
+    >
       <h4 className="p-4 text-base font-semibold">Your Lent Money Records</h4>
       <div className="flex w-full items-center justify-center">
         <DataTable

@@ -4,20 +4,18 @@ import { Fullscreen, Minimize, MoonIcon, Play, SunIcon } from 'lucide-react';
 import { AnimatedThemeToggler } from '@/components/ui/animated-theme-toggler';
 import { useTheme } from '@/shared/contexts/ThemeContext';
 import { useMe } from '@/features/user/hooks';
+import { TOUR_IDS, useTour } from '@/features/tour';
 import NotificationsPopover from './NotificationsPopover';
-
-type Props = {
-  onStartTour: () => void;
-};
 
 // Right-hand cluster of header buttons: tour, fullscreen, theme,
 // notifications, profile link. Each individual concern that grew larger
 // (notifications) is its own component; tour + fullscreen are tiny enough
 // to live inline.
-export default function HeaderActions({ onStartTour }: Props) {
+export default function HeaderActions() {
   const [isFull, setIsFull] = useState(false);
   const { data: user } = useMe();
   const { isDarkMode } = useTheme();
+  const { start: startTour } = useTour();
   const avatar = user?.avatar;
 
   const toggleFullscreen = () => {
@@ -35,8 +33,8 @@ export default function HeaderActions({ onStartTour }: Props) {
   return (
     <div className="notification_and_profile_ absolute right-4 flex items-center justify-center gap-2.5 sm:right-6">
       <button
-        id="start_tour_guide"
-        onClick={onStartTour}
+        id={TOUR_IDS.startTourButton}
+        onClick={() => void startTour()}
         className="group flex h-10 w-10 cursor-pointer items-center overflow-hidden rounded-full bg-[#f2f5fa] p-2.5 text-black transition-all duration-300 hover:bg-[#047857]/20 focus:outline-none dark:bg-[#10101c] dark:text-white dark:hover:bg-slate-700 sm:hover:h-9 sm:hover:w-[132px] sm:hover:px-4"
       >
         <Play className="h-5 w-5 shrink-0 transition-all duration-300" />
@@ -47,7 +45,7 @@ export default function HeaderActions({ onStartTour }: Props) {
 
       <button
         onClick={toggleFullscreen}
-        id="fullscreens_tour_guide"
+        id={TOUR_IDS.fullscreen}
         className={`group hidden h-10 w-10 cursor-pointer items-center overflow-hidden rounded-full bg-[#f2f5fa] p-2.5 text-black transition-all duration-300 hover:h-9 hover:w-[118px] hover:bg-[#047857]/20 hover:px-4 focus:outline-none dark:bg-[#10101c] dark:text-white dark:hover:bg-slate-700 sm:flex ${isFull ? 'bg-[#047857]/20 dark:bg-slate-700' : ''}`}
       >
         {!isFull ? (
@@ -61,7 +59,7 @@ export default function HeaderActions({ onStartTour }: Props) {
       </button>
 
       <AnimatedThemeToggler
-        id="theme_change_tour"
+        id={TOUR_IDS.themeToggle}
         aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
         className="group flex h-10 w-10 cursor-pointer items-center overflow-hidden rounded-full bg-[#f2f5fa] p-2.5 text-black transition-all duration-300 hover:bg-[#047857]/20 focus:outline-none dark:bg-[#10101c] dark:text-white dark:hover:bg-slate-700 sm:hover:h-9 sm:hover:w-[156px] sm:hover:px-4"
       >
@@ -77,7 +75,7 @@ export default function HeaderActions({ onStartTour }: Props) {
       <NotificationsPopover />
 
       <Link
-        id="profile_section"
+        id={TOUR_IDS.profile}
         to="/user/profile"
         className="group flex h-9 w-9 items-center justify-start gap-1 overflow-hidden rounded-full border border-pink-300 transition-all duration-300 hover:border-pink-200 hover:bg-[#047857]/20 dark:border-0 dark:hover:bg-slate-700 sm:flex sm:hover:w-32 sm:hover:p-1 sm:hover:py-2"
       >

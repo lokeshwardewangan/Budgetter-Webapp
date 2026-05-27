@@ -6,6 +6,7 @@ import { DatePicker } from '@/components/ui/DatePicker';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/utils/date/date';
+import { TOUR_IDS } from '@/features/tour';
 import { addLentMoneySchema, type AddLentMoneyForm } from '../schemas';
 import { useAddLentMoney } from '../hooks';
 
@@ -37,6 +38,7 @@ export default function AddLentMoneyForm() {
 
   return (
     <form
+      id={TOUR_IDS.inputsLentMoney}
       onSubmit={onSubmit}
       noValidate
       className="add_lent_container flex w-full flex-col items-start justify-start gap-4 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark"
