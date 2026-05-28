@@ -9,5 +9,4 @@ export {
   UserLogout,
   SendResetLinkToUserEmail,
   ResetUserPassword,
-  CheckUserAccountVerified,
 } from '@/services/auth';

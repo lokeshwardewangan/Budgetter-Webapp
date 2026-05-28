@@ -1,10 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { googleLogout } from '@react-oauth/google';
 import Cookies from 'universal-cookie';
 import { qk } from '@/shared/lib/queryKeys';
 import {
-  CheckUserAccountVerified,
   LoginUser,
   registerUser,
   SignupWithGoogle,
@@ -75,14 +74,6 @@ export function useResetPassword() {
   return useMutation({
     mutationFn: ResetUserPassword,
     onSuccess: () => navigate('/login'),
-  });
-}
-
-export function useMeVerified() {
-  return useQuery({
-    queryKey: qk.meVerified,
-    queryFn: CheckUserAccountVerified,
-    select: (res) => res.data,
   });
 }
 
