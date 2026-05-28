@@ -26,9 +26,9 @@ export default function UserLayout() {
     >
       <TourProvider>
         <SideNavbar userSidenavbarList={userSidenavbarList} />
-        <SidebarInset className="flex flex-col bg-bg_secondary_light dark:bg-bg_secondary_dark">
+        <SidebarInset className="flex min-w-0 flex-col bg-bg_secondary_light dark:bg-bg_secondary_dark">
           {user?._id ? <TopHeader /> : <TopHeaderLoader />}
-          <div className="flex flex-col items-center justify-start gap-5 px-6 py-5">
+          <div className="flex w-full min-w-0 flex-col items-center justify-start gap-5 px-6 py-5">
             {user?._id ? <Outlet /> : <DashboardLoader />}
           </div>
         </SidebarInset>
