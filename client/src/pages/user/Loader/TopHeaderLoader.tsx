@@ -1,20 +1,19 @@
-import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const TopHeaderLoader: React.FC = () => {
+export default function TopHeaderLoader() {
   return (
-    <>
-      <div className="topheader_container sticky top-0 z-10 ml-0.5 flex h-16 w-full animate-pulse items-center bg-slate-300 px-5 text-black shadow-sm dark:bg-slate-800">
-        <div className="flex items-center justify-center gap-5">
-          <span className="h-8 w-8 rounded-sm bg-slate-400 dark:bg-slate-900"></span>
-          <span className="h-8 w-32 rounded-sm bg-slate-400 dark:bg-slate-900"></span>
-        </div>
-        <div className="notification_and_profile_ absolute right-4 flex items-center justify-center gap-4 sm:right-6">
-          <span className="h-8 w-8 rounded-full bg-slate-400 dark:bg-slate-900"></span>
-          <span className="h-8 w-8 rounded-sm bg-slate-400 dark:bg-slate-900"></span>
-        </div>
+    <div className="sticky top-0 z-10 flex h-16 w-full items-center justify-between bg-bg_primary_light px-4 shadow-sm dark:bg-bg_primary_dark sm:px-6">
+      <div className="flex items-center gap-3">
+        <Skeleton className="h-7 w-7" />
+        <Skeleton className="h-5 w-32 sm:w-40" />
       </div>
-    </>
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <Skeleton className="hidden h-10 w-10 rounded-full sm:block" />
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <Skeleton className="h-9 w-9 rounded-full" />
+      </div>
+    </div>
   );
-};
-
-export default TopHeaderLoader;
+}

@@ -1,28 +1,64 @@
-import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const DashboardLoader: React.FC = () => {
+export default function DashboardLoader() {
   return (
-    <>
-      <div className="dashboard_page_ flex w-full animate-pulse flex-col items-start justify-start gap-7 md:gap-10">
-        <div className="heading_dashboard_page mt-2 flex w-full items-start justify-start">
-          <h3 className="h-10 w-full rounded-sm bg-slate-300 text-left text-lg font-semibold dark:bg-slate-800 md:h-12"></h3>
-        </div>
-        <div className="summarize_box_container flex h-10 w-full flex-col items-start justify-start gap-4 rounded-md bg-slate-300 p-4 px-5 dark:bg-slate-800 md:h-12"></div>
-        <div className="summarize_box_container flex w-full flex-col items-start justify-start gap-4 rounded-md">
-          <div className="summary_boxes_outer col-span-12 grid w-full grid-cols-12 justify-center gap-x-0 gap-y-5 sm:gap-x-10 sm:gap-y-7">
-            <div className="col-span-12 h-24 w-full min-w-full max-w-full rounded-sm bg-slate-300 dark:bg-slate-800 sm:col-span-6 md:col-span-4 md:h-32 lg:col-span-3"></div>
-            <div className="col-span-12 h-24 w-full min-w-full max-w-full rounded-sm bg-slate-300 dark:bg-slate-800 sm:col-span-6 md:col-span-4 md:h-32 lg:col-span-3"></div>
-            <div className="col-span-12 h-24 w-full min-w-full max-w-full rounded-sm bg-slate-300 dark:bg-slate-800 sm:col-span-6 md:col-span-4 md:h-32 lg:col-span-3"></div>
-            <div className="col-span-12 h-24 w-full min-w-full max-w-full rounded-sm bg-slate-300 dark:bg-slate-800 sm:col-span-6 md:col-span-4 md:h-32 lg:col-span-3"></div>
-          </div>
-        </div>
-        <div className="graph flex h-72 w-full flex-row flex-wrap items-center justify-center gap-10 md:h-96 md:flex-nowrap">
-          <div className="chat_graph_container flex h-full w-full flex-col items-center justify-center gap-y-10 rounded-sm bg-slate-300 dark:bg-slate-800 md:gap-5 xl:flex-row"></div>
-          <div className="visual_graph_container flex h-full w-full flex-col items-center justify-center gap-y-10 rounded-sm bg-slate-300 dark:bg-slate-800 md:gap-5 xl:flex-row"></div>
+    <div className="flex w-full flex-col items-start justify-start gap-5">
+      <Skeleton className="h-8 w-56 sm:w-72" />
+
+      <div className="flex w-full flex-wrap items-center gap-3 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+        <Skeleton className="h-10 w-32" />
+        <Skeleton className="h-10 w-32" />
+      </div>
+
+      <div className="flex w-full flex-col gap-4 rounded-md border border-border_light bg-bg_primary_light p-4 px-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+        <Skeleton className="h-5 w-44" />
+        <div className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-[10px]" />
+          ))}
         </div>
       </div>
-    </>
-  );
-};
 
-export default DashboardLoader;
+      <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="rounded-md border border-border_light bg-bg_primary_light p-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+          <Skeleton className="mb-5 h-5 w-40" />
+          <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
+            <Skeleton className="h-40 w-40 rounded-full" />
+            <div className="flex w-full flex-col gap-3 sm:w-auto">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4 rounded-sm" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-md border border-border_light bg-bg_primary_light p-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+          <Skeleton className="mb-5 h-5 w-40" />
+          <div className="grid w-full grid-cols-7 items-end gap-3 px-1">
+            {[120, 80, 45, 95, 60, 30, 140].map((h, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <Skeleton
+                  className="w-full rounded-t-sm"
+                  style={{ height: `${h}px` }}
+                />
+                <Skeleton className="h-2.5 w-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full rounded-md border border-border_light bg-bg_primary_light p-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+        <Skeleton className="mb-5 h-5 w-56" />
+        <div className="flex w-full flex-col gap-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-10 w-full" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
