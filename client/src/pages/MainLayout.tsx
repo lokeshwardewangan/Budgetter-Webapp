@@ -1,45 +1,19 @@
 import { useEffect } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
-import Cookies from 'universal-cookie';
 import { useSentryIntegration } from '@/hooks/useSentryIntegration';
-import { useMe } from '@/features/user/hooks';
 import { useTheme } from '@/shared/contexts/ThemeContext';
-import {
-  navigateToLandingPage,
-  navigateToUserPage,
-} from '@/utils/navigate/NavigateRightPath';
 import { getPageTitle } from '@/utils/utility';
 
 export default function MainLayout() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { isDarkMode } = useTheme();
   useSentryIntegration();
-  const cookie = new Cookies();
 
-  // Trigger the /me query early so it's primed by the time pages mount.
-  // Theme + sidebar state now live in their own context providers.
-  const { data } = useMe();
-
-  // Landing route is light-only; everywhere else honors the user preference.
   useEffect(() => {
     const isLanding = location.pathname === '/';
     document.body.classList.toggle('dark', isDarkMode && !isLanding);
   }, [isDarkMode, location.pathname]);
-
-  useEffect(() => {
-    const accessToken = cookie.get('accessToken');
-    if (!accessToken) {
-      navigate(navigateToLandingPage());
-      return;
-    }
-    navigate(navigateToUserPage());
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (data) navigate(navigateToUserPage());
-  }, [data]);
 
   useEffect(() => {
     document.title = getPageTitle();
