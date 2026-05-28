@@ -22,15 +22,18 @@ import ProfilePage from '@/pages/user/Profile/ProfilePage';
 import Reports from '@/pages/user/reports/Reports';
 import AddLentMoney from '@/pages/user/addLentMoney/AddLentMoney';
 import ErrorPage from '@/components/layout/ErrorPage';
+import RequireAuth from './RequireAuth';
+import RedirectIfAuthed from './RedirectIfAuthed';
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<MainLayout />}>
-      {/* public routes */}
       <Route element={<AuthLayout />}>
-        <Route path="login" element={<LoginForm />} />
-        <Route path="signup" element={<SignupForm />} />
-        <Route path="forgot-password" element={<ForgotPasswordForm />} />
+        <Route element={<RedirectIfAuthed />}>
+          <Route path="login" element={<LoginForm />} />
+          <Route path="signup" element={<SignupForm />} />
+          <Route path="forgot-password" element={<ForgotPasswordForm />} />
+        </Route>
         <Route path="account-verified" element={<AccountVerified />} />
         <Route
           path="account-already-verified"
@@ -39,24 +42,21 @@ const routes = createBrowserRouter(
         <Route path="reset-password/*" element={<ResetPasswordForm />} />
       </Route>
 
-      {/* protected routes */}
-      <Route path="user" element={<UserLayout />}>
-        <Route index element={<Navigate to="profile" replace />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="add-expenses" element={<AddExpenses />} />
-        <Route path="show-expenses" element={<ShowExpenses />} />
-        <Route path="reports" element={<Reports />} />
-        <Route path="reports" element={<Dashboard />} />
-        <Route path="add-money" element={<AddMoney />} />
-        <Route path="add-lent-money" element={<AddLentMoney />} />
+      <Route element={<RequireAuth />}>
+        <Route path="user" element={<UserLayout />}>
+          <Route index element={<Navigate to="profile" replace />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="add-expenses" element={<AddExpenses />} />
+          <Route path="show-expenses" element={<ShowExpenses />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="add-money" element={<AddMoney />} />
+          <Route path="add-lent-money" element={<AddLentMoney />} />
+        </Route>
       </Route>
 
-      {/* home */}
       <Route path="/" element={<HomePage />} />
-      {/* logout page routes */}
       <Route path="logout" element={<Navigate to="/login" />} />
-      {/* Error page */}
       <Route path="/*" element={<ErrorPage />} />
     </Route>
   ),
