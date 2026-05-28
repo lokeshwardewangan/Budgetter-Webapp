@@ -19,7 +19,6 @@ export type ExpenseFilters = {
 
 export const qk = {
   me: ['me'] as const,
-  meVerified: ['me', 'verified'] as const,
 
   pocketMoney: {
     all: ['pocket-money'] as const,

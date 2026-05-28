@@ -108,13 +108,6 @@ export interface ResetPasswordResType {
   success: boolean;
 }
 
-export interface UserAccountVerifiedResType {
-  statusCode: number;
-  data: boolean;
-  message: string;
-  success: boolean;
-}
-
 export interface UpdateUserDetailsResType {
   statusCode: number;
   data: string | null;

@@ -5,7 +5,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { useMeVerified } from '@/features/auth/hooks';
 import { useMe } from '@/features/user/hooks';
 
 type Notification = { value: string };
@@ -16,22 +15,20 @@ export default function NotificationsPopover() {
 
   const { data: user } = useMe();
   const isVerified = user?.isVerified;
-  const { data: verifiedFromServer } = useMeVerified();
 
-  // Auto-open the popover once if the user is unverified.
   useEffect(() => {
     if (isVerified === false) setOpen(true);
-  }, []);
+  }, [isVerified]);
 
   useEffect(() => {
-    if (verifiedFromServer || isVerified) {
+    if (isVerified) {
       setNotifications([]);
     } else {
       setNotifications([
         { value: 'Your Account is not Verified, Please Check Your Email.' },
       ]);
     }
-  }, [verifiedFromServer, isVerified]);
+  }, [isVerified]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

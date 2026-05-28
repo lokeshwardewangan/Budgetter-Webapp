@@ -12,7 +12,6 @@ export const endpoints = {
     passwordResetRequest: '/auth/password-reset/request',
     passwordResetValidate: '/auth/password-reset/validate',
     passwordReset: '/auth/password-reset',
-    meVerified: '/auth/me/verified',
   },
   users: {
     me: '/users/me',

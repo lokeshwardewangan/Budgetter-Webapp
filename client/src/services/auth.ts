@@ -15,7 +15,6 @@ import {
   ResetPasswordResType,
   SendPassResetLinkResType,
   UpdateUserDetailsResType,
-  UserAccountVerifiedResType,
   UserDetailsResType,
   UserLogoutResType,
 } from '@/types/api/auth/auth';
@@ -91,14 +90,6 @@ export const ResetUserPassword = async (
   );
   return data;
 };
-
-export const CheckUserAccountVerified =
-  async (): Promise<UserAccountVerifiedResType> => {
-    const { data } = await apiURL.get<UserAccountVerifiedResType>(
-      endpoints.auth.meVerified
-    );
-    return data;
-  };
 
 // --- Current user (profile) --------------------------------------------------
 
