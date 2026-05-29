@@ -2,6 +2,7 @@ import { backendHostURL } from '@/services/api';
 import { getCurrentAccessToken } from '@/utils/cookie/CookiesInfo';
 import axios, { AxiosError, AxiosInstance } from 'axios';
 import * as Sentry from '@sentry/react';
+import Cookies from 'universal-cookie';
 import type { ApiErrorBody, ApiFieldError } from '@/shared/api/types';
 
 // 1. Axios instance
@@ -102,6 +103,16 @@ apiURL.interceptors.response.use(
       }
       return scope;
     });
+
+    const status = error.response?.status;
+    const url = error.config?.url ?? '';
+    const isAuthEndpoint = url.startsWith('/auth/');
+    if (status === 401 && !isAuthEndpoint) {
+      new Cookies().remove('accessToken', { path: '/' });
+      if (window.location.pathname !== '/login') {
+        window.location.replace('/login');
+      }
+    }
 
     return Promise.reject(error);
   }
