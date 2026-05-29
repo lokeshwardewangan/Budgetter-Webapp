@@ -1,6 +1,6 @@
 import { Loader2, Monitor, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { formatDateTimeIST } from '@/shared/lib/dateFormat';
+import { formatDateTimeIST, formatRelative } from '@/shared/lib/dateFormat';
 import { useLogout } from '@/features/auth/hooks';
 import type { SessionEntry } from '@/types/api/auth/auth';
 import { useDeleteSession } from '../hooks';
@@ -33,14 +33,12 @@ export default function SessionCard({ session, isActive }: Props) {
           <p className="font-medium text-gray-900 dark:text-gray-100">
             {browser || 'Unknown'} on {os || 'Unknown'}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Login Time: {formatTs(session.createdAt)}
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Last active{' '}
+            {session.lastUsedAt ? formatRelative(session.lastUsedAt) : 'N/A'}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Last used: {formatTs(session.lastUsedAt)}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            IP: {session.ip}
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Signed in {formatTs(session.createdAt)} · IP {session.ip}
             {isActive && (
               <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-400">
                 Current
