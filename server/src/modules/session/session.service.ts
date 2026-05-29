@@ -44,8 +44,11 @@ export async function createSession(user: UserDocument, req: Request): Promise<s
   return token;
 }
 
+const RECENT_SESSION_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+
 export async function listSessions(userId: string) {
-  return ActiveSessionModel.find({ user: userId })
+  const since = new Date(Date.now() - RECENT_SESSION_WINDOW_MS);
+  return ActiveSessionModel.find({ user: userId, lastUsedAt: { $gte: since } })
     .select('-tokenHash')
     .sort({ lastUsedAt: -1 })
     .lean();
