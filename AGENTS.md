@@ -1,30 +1,98 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-`client/` contains the Vite + React + TypeScript frontend. Main app code lives in `client/src`, with reusable UI in `client/src/components`, route pages in `client/src/pages`, API clients in `client/src/services`, Redux state in `client/src/features`, and static assets in `client/public`.
+Single source of truth for contributors (human and AI) working in this repo.
 
-`server/` contains the Express backend. Entry points are `server/src/index.js` and `server/src/app.js`; routes, controllers, models, middleware, services, and utilities are grouped under `server/src/*`. Email templates and uploaded files live in `server/public`.
+## Project structure
 
-## Build, Test, and Development Commands
-- `cd client && npm run dev` starts the frontend on the Vite dev server.
-- `cd client && npm run build` runs TypeScript project checks and creates a production build.
-- `cd client && npm run lint` runs ESLint for `.ts` and `.tsx` files.
-- `cd client && npm run typecheck` runs TypeScript without emitting files.
-- `cd client && npm run format` formats frontend files with Prettier.
-- `cd server && npm run dev` starts the backend in development mode.
-- `cd server && npm run start` runs the backend with Node.
-- `cd server && npm run format` formats backend files with Prettier.
+Two independent npm projects under one repo, wired together at the root by Husky + lint-staged.
 
-## Coding Style & Naming Conventions
-Use 2-space indentation and keep formatting consistent with Prettier. Frontend files use TypeScript, React function components, and Tailwind utility classes. Components and page files use PascalCase, hooks use `useXxx`, functions and variables use camelCase, and Redux slices end with `Slice` where applicable. Keep backend modules focused by domain, for example `user.routes.js`, `user.controllers.js`, and `user.model.js`.
+- `client/` — Vite + React 18 + TypeScript SPA
+- `server/` — Express 4 + Mongoose API (TypeScript, ESM, `"type": "module"`)
+- `docker-compose.yml` — production stack (`mongo` + `server` + nginx-served `client`)
+- Root `package.json` — workspace-style scripts and pre-commit tooling only; no runtime code
 
-## Testing Guidelines
-There is no automated test suite yet at the repository root or in `server/`. Treat `client` quality gates as the minimum: run `npm run lint`, `npm run typecheck`, and `npm run build` before opening a PR. If you add tests, place them next to the feature or in a nearby `__tests__` directory and use clear names like `ComponentName.test.tsx`.
+## Commands
 
-## Commit & Pull Request Guidelines
-Recent history follows Conventional Commit prefixes such as `feat:` and `fix:`. Continue using concise, imperative messages like `feat: add monthly report filters`. Branch names in `CONTRIBUTING.md` follow `feature/...`, `fix/...`, and `chore/...`.
+Run from the repo root:
 
-Before committing, note that `.husky/pre-commit` runs `client` build and formatting, then `server` formatting, and stages any resulting file changes. PRs should include a short description, linked issue when relevant, and screenshots for visible frontend updates.
+| Script                 | What it does                       |
+| ---------------------- | ---------------------------------- |
+| `npm run dev:client`   | Vite dev server on `:5173`         |
+| `npm run dev:server`   | tsx watch on `:5000`               |
+| `npm run build:client` | `tsc -b && vite build`             |
+| `npm run build:server` | `tsc -p tsconfig.build.json`       |
+| `npm run lint`         | ESLint over client `.ts`/`.tsx`    |
+| `npm run typecheck`    | `tsc --noEmit` for client + server |
+| `npm run test`         | Vitest (server)                    |
+| `npm run format`       | Prettier across the repo           |
 
-## Configuration Tips
-Keep secrets in `server/.env`; do not commit environment files. The backend expects MongoDB, Cloudinary, Gmail, token secrets, and local `FRONTEND_URL` / `SERVER_URL` values described in `README.md`.
+Each sub-project also exposes the same scripts directly (`cd client && npm run dev`, etc.).
+
+Docker (production): `docker compose up -d --build` from the repo root. Local dev does **not** use Docker.
+
+## Architecture — non-obvious things
+
+### REST endpoints under `/api`
+
+`server/src/routes.ts` mounts resource routers: `/api/auth`, `/api/users`, `/api/expenses`, `/api/pocket-money`, `/api/lent-money`, `/api/reports`, `/api/sessions`. Follow REST conventions for new endpoints — no verb-named actions.
+
+### Frontend state is split two ways
+
+- **TanStack Query** for all server state (cache, mutations) — wired in [client/src/main.tsx](client/src/main.tsx) with `staleTime: 5m` + `refetchOnWindowFocus: false`.
+- **React Context** for theme + sidebar state (Redux was removed; don't reintroduce it).
+- **React Hook Form + Zod** (resolvers) for forms — schemas in `client/src/features/<domain>/schemas.ts`.
+
+### Path alias `@` → `client/src/`
+
+Configured in [client/vite.config.ts](client/vite.config.ts). Always import internal modules as `@/components/...`, `@/features/...` — never relative `../../..`.
+
+### Vite manualChunks has a landmine
+
+[client/vite.config.ts](client/vite.config.ts) splits `pdf` / `framer` / `charts` / `recharts`. **Don't** split `react` / `react-dom` into their own chunk — it breaks with "Cannot read properties of undefined (reading 'forwardRef')" because some vendor modules touch React at module-eval time.
+
+### Route guards are declarative
+
+`client/src/routes/RequireAuth.tsx` and `RedirectIfAuthed.tsx` wrap route subtrees. Don't add side-effect guards in layout components — they cause UI flashes.
+
+### Backend response shape
+
+Controllers throw `new ApiError(status, msg)` ([server/src/shared/lib/ApiError.ts](server/src/shared/lib/ApiError.ts)) and return `new ApiResponse(status, data, msg)` ([server/src/shared/lib/ApiResponse.ts](server/src/shared/lib/ApiResponse.ts)). Wrap async controllers in `asyncHandler` ([server/src/shared/lib/asyncHandler.ts](server/src/shared/lib/asyncHandler.ts)) so rejections forward to Express.
+
+### CORS allowlist is hardcoded
+
+[server/src/app.ts](server/src/app.ts) hardcodes the allowed origin regex (e.g. `/\.lokeshwardewangan\.in$/`, `/\.vercel\.app$/`). Adding a new origin means editing this file — there's no env var for it.
+
+### Sentry initialises on import
+
+[client/src/App.tsx](client/src/App.tsx) calls `Sentry.init` unconditionally at module load with `tracesSampleRate: 1.0` and `sendDefaultPii: true`. If `VITE_SENTRY_DSN` is unset, Sentry no-ops — but be aware that 100% trace sampling + PII is on whenever the DSN is present.
+
+### Docker `VITE_*` are build-time only
+
+In [docker-compose.yml](docker-compose.yml), every `VITE_*` is passed as a `build.args` entry and inlined into the bundle at image build time. Changing them needs `docker compose build client` — a `restart` won't pick them up. The runtime API base for the dockerized client is `/api`, proxied by nginx to `server:5000`.
+
+### IST timezone math
+
+The server ships only to IST users. Date helpers in [server/src/shared/lib/date.ts](server/src/shared/lib/date.ts) shift to IST before slicing the day; using raw UTC would lose expenses logged between 00:00–05:30 IST.
+
+## Conventions
+
+- **TypeScript strict** everywhere. Avoid `any`.
+- **Naming**: PascalCase components, `useXxx` hooks. Server modules are grouped by domain: `domain.routes.ts` / `domain.controller.ts` / `domain.service.ts` / `domain.model.ts` / `domain.validator.ts`.
+- **Conventional Commits**: `feat:`, `fix:`, `chore:`, `perf:`, `docs:`, `refactor:`, `test:`.
+- **Branches**: `feature/...`, `fix/...`, `chore/...`.
+- **Prettier configs** are per-project: client uses `prettier-plugin-tailwindcss` + `trailingComma: "es5"`; server uses `trailingComma: "all"` + `printWidth: 100`.
+
+## Testing
+
+- **Server**: Vitest in `server/tests/` — covers auth, expenses, feed. Run with `npm run test` (root) or `npm run test:watch` (server).
+- **Client**: no test suite yet. Quality gates are `lint` + `typecheck` + `build`. New tests go next to the feature as `*.test.tsx` or under `__tests__/`.
+
+## Pre-commit hook
+
+`.husky/pre-commit` runs `npx lint-staged`. The config in root `package.json` formats only staged files with Prettier. Heavier checks (build, typecheck, vitest) belong in CI, not the hook. If a hook becomes a blocker for a WIP commit, ask the user before passing `--no-verify`.
+
+## Configuration
+
+- `client/.env.example` and `server/.env.example` are the source of truth for app-level config. Copy each to `.env` (or `.env.local` for the client) and fill in.
+- Root `.env.example` is **only** for `docker-compose` — it holds the Mongo + nginx-port wiring, not app secrets.
+- Never commit `.env`. Production uses Vercel env vars (server) and Docker secrets (compose stack).

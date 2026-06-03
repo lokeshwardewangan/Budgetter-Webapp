@@ -1,25 +1,36 @@
 {
   "name": "budgetter",
-  "version": "1.0.0",
-  "description": "**Budgetter** is designed to help students and individuals track their daily expenses, analyze their spending habits, and manage their pocket money efficiently. This project was born out of the need for a better system to keep track of personal finances, beyond just noting down expenses without proper analytics.",
-  "main": "index.js",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Personal finance tracker for students — expense logging, monthly reports, and category analytics. React + Vite SPA, Express + Mongoose API.",
+  "license": "MIT",
+  "author": "Lokeshwar Dewangan",
+  "homepage": "https://github.com/lokeshwardewangan/Budgetter-Webapp#readme",
+  "bugs": "https://github.com/lokeshwardewangan/Budgetter-Webapp/issues",
+  "repository": "github:lokeshwardewangan/Budgetter-Webapp",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "build:client": "npm --prefix client run build",
+    "build:server": "npm --prefix server run build",
+    "lint": "npm --prefix client run lint",
+    "typecheck": "npm --prefix client run typecheck && npm --prefix server run typecheck",
+    "test": "npm --prefix server run test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,html,md}\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/LokeshwarPrasad3/Budgetter-Webapp.git"
+  "lint-staged": {
+    "client/**/*.{ts,tsx,js,jsx,json,css,html,md}": "prettier --write",
+    "server/**/*.{ts,js,json,md}": "prettier --write",
+    "*.{json,md,yml,yaml}": "prettier --write"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/LokeshwarPrasad3/Budgetter-Webapp/issues"
-  },
-  "homepage": "https://github.com/LokeshwarPrasad3/Budgetter-Webapp#readme",
   "devDependencies": {
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.11"
   }
 }

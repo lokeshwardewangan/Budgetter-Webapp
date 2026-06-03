@@ -44,10 +44,4 @@ Thumbs.db
 
 # Claude Code — personal/per-machine state (team-shared settings, agents,
 # commands, and CLAUDE.md remain tracked)
-.claude/settings.local.json
-.claude/projects/
-.claude/memory/
-.claude/todos/
-.claude/shell-snapshots/
-.claude/statsig/
-.claude/ide/
+.claude/*
