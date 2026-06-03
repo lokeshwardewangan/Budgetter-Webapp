@@ -87,6 +87,7 @@ export default function ReportsTable({
         data={rows}
         columns={cols}
         isLoading={isLoading && rows.length === 0}
+        loadingLabel="Loading expenses…"
         emptyMessage="No Expenses Found"
       />
       {hasNextPage && (

@@ -30,6 +30,7 @@ export default function PocketMoneyHistoryTable() {
         data={data}
         columns={columns}
         isLoading={isLoading}
+        loadingLabel="Loading pocket money…"
         emptyMessage="You haven't added pocket money yet."
         className="border-border_dark dark:border"
       />

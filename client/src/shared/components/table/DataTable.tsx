@@ -5,6 +5,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
+import { TableLoader } from '@/shared/components/loaders/TableLoader';
 
 // `TValue` is intentionally `any` here. TanStack's `ColumnDef` is
 // invariant in its second generic, so a column that accessor-keys into a
@@ -18,6 +19,7 @@ type DataTableProps<TData> = {
   columns: ColumnDef<TData, any>[];
   emptyMessage?: string;
   isLoading?: boolean;
+  loadingLabel?: string;
   className?: string;
 };
 
@@ -30,6 +32,7 @@ export function DataTable<TData>({
   columns,
   emptyMessage = 'No records found',
   isLoading,
+  loadingLabel = 'Loading data…',
   className,
 }: DataTableProps<TData>) {
   const table = useReactTable({
@@ -39,11 +42,7 @@ export function DataTable<TData>({
   });
 
   if (isLoading) {
-    return (
-      <div className="w-full rounded-md p-5 text-sm text-gray-500">
-        Loading...
-      </div>
-    );
+    return <TableLoader label={loadingLabel} />;
   }
 
   if (!data || data.length === 0) {

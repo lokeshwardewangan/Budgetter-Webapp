@@ -1,5 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { DataTable } from '@/shared/components/table/DataTable';
+import { TableLoader } from '@/shared/components/loaders/TableLoader';
 import { getLabelColorStyle } from '@/utils/ui/utility';
 import { formatTimeIST } from '@/shared/lib/dateFormat';
 import PDFExportComponent from '@/components/user/PDFExportComponent';
@@ -81,7 +82,7 @@ export default function ExpensesTable({
       className="message_outer w-full rounded-md bg-bg_primary_light px-0 py-5 dark:bg-bg_primary_dark"
     >
       {isLoading ? (
-        <div className="flex px-5 text-sm text-gray-500">Loading...</div>
+        <TableLoader label="Loading expenses…" />
       ) : products.length === 0 ? (
         <div className="flex px-5">No Expenses Found</div>
       ) : (

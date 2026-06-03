@@ -60,6 +60,7 @@ export default function LentMoneyHistoryTable() {
           data={data}
           columns={columns}
           isLoading={isLoading}
+          loadingLabel="Loading lent records…"
           emptyMessage="No records found"
         />
       </div>
