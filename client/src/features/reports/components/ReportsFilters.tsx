@@ -62,7 +62,7 @@ export default function ReportsFilters({
             onChange={(e) => onSearchChange(e.target.value)}
             type="text"
             className="pr-9 sm:w-72"
-            placeholder="Search Expense"
+            placeholder="Search name or label"
           />
           {!search ? (
             <Search className="absolute right-2.5 top-2.5 h-4 w-4" />

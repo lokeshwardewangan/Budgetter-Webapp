@@ -85,7 +85,12 @@ export async function getExpensesFeed(
     match.$expr = { $eq: [{ $month: '$date' }, Number(month)] };
   }
   if (category) match.category = category;
-  if (search) match.name = { $regex: search, $options: 'i' };
+  if (search) {
+    match.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { label: { $regex: search, $options: 'i' } },
+    ];
+  }
 
   const [items, total] = await Promise.all([
     ExpenseModel.find(match)

@@ -53,4 +53,23 @@ describe('expense feed pagination', () => {
     expect(res.body.data.total).toBe(1);
     expect(res.body.data.items[0].name).toBe('Item 2');
   });
+
+  it('search matches label as well as name', async () => {
+    const token = await registerAndGetToken();
+    await api()
+      .post('/api/expenses')
+      .set(authHeader(token))
+      .send({
+        productsArray: [
+          { name: 'Coffee', price: 5, category: 'Food', label: 'work-trip' },
+          { name: 'Notebook', price: 10, category: 'Educational', label: null },
+        ],
+      });
+
+    const res = await api()
+      .get('/api/expenses/feed?page=0&limit=10&search=work-trip')
+      .set(authHeader(token));
+    expect(res.body.data.total).toBe(1);
+    expect(res.body.data.items[0].name).toBe('Coffee');
+  });
 });
