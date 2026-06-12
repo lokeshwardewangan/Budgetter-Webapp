@@ -20,7 +20,7 @@ export default function AddPocketMoneyForm() {
   } = useForm<AddPocketMoneyForm>({
     resolver: zodResolver(addPocketMoneySchema),
     mode: 'onTouched',
-    defaultValues: { amount: '', source: '', date: '' },
+    defaultValues: { amount: '', source: '', date: getTodayDate() },
   });
 
   const onSubmit = handleSubmit(async (values) => {
@@ -35,7 +35,7 @@ export default function AddPocketMoneyForm() {
       success: 'Pocket money added!',
       error: 'Something went wrong.',
     });
-    reset({ amount: '', source: '', date: '' });
+    reset({ amount: '', source: '', date: getTodayDate() });
   });
 
   return (
