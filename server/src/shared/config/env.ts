@@ -23,7 +23,7 @@ const EnvSchema = z.object({
 
   ADMIN_GMAIL: z.email(),
   RESEND_API_KEY: z.string().min(1),
-  EMAIL_FROM: z.string().default('Budgetter <noreply@lokeshwardewangan.in>'),
+  EMAIL_FROM: z.string().default('Budgetter <budgetter@lokeshwardewangan.in>'),
 
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   CLOUDINARY_API_KEY: z.string().optional(),

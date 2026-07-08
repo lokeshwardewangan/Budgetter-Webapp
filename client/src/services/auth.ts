@@ -147,13 +147,13 @@ export const AddUserPocketMoney = async (
   return data;
 };
 
-// --- Contact form (external service, unchanged) -----------------------------
+// --- Contact form (native backend integration) -------------------------------
 
 export const submitContactForm = async (
   credentials: contactFormCredentialsType
 ): Promise<ContactFormResType> => {
-  const { data } = await axios.post<ContactFormResType>(
-    contactFormServerHostURL,
+  const { data } = await apiURL.post<ContactFormResType>(
+    endpoints.contacts,
     credentials
   );
   return data;

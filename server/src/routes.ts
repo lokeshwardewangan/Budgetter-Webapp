@@ -7,6 +7,7 @@ import pocketMoneyRoutes from './modules/pocketMoney/pocketMoney.routes.js';
 import lentMoneyRoutes from './modules/lentMoney/lentMoney.routes.js';
 import reportRoutes from './modules/report/report.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
+import contactRoutes from './modules/contact/contact.routes.js';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/pocket-money', pocketMoneyRoutes);
 router.use('/lent-money', lentMoneyRoutes);
 router.use('/reports', reportRoutes);
 router.use('/admin', adminRoutes);
+router.use('/contacts', contactRoutes);
 
 export default router;

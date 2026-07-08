@@ -9,6 +9,7 @@ import '../../modules/pocketMoney/pocketMoney.openapi.js';
 import '../../modules/lentMoney/lentMoney.openapi.js';
 import '../../modules/report/report.openapi.js';
 import '../../modules/admin/admin.openapi.js';
+import '../../modules/contact/contact.openapi.js';
 
 export const buildOpenApiDocument = () => {
   const generator = new OpenApiGeneratorV3(registry.definitions);

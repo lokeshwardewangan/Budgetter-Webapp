@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Contact Message Submission</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Roboto', Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+      .container {
+        width: 90%;
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        font-weight: 400;
+        border-radius: 8px;
+        border: 1px solid #dadce0;
+        letter-spacing: 1px;
+      }
+      .title {
+        margin: 0px;
+        max-width: 140px;
+        margin-top: 10px;
+      }
+      .header {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .header .logo {
+        max-width: 80px;
+        height: auto;
+      }
+      .content {
+        font-size: 15px;
+        line-height: 1.5;
+        margin-bottom: 20px;
+      }
+      .message-box {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-left: 4px solid #28a745;
+        border-radius: 4px;
+        margin: 15px 0;
+      }
+      .field {
+        margin-bottom: 10px;
+      }
+      .field-label {
+        font-weight: bold;
+        color: #555;
+      }
+      .field-val {
+        color: #111;
+      }
+      .footer {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+        margin-top: 20px;
+      }
+      .social-icons {
+        margin-top: 10px;
+      }
+      .social-icons a {
+        margin: 0 5px;
+        display: inline-block;
+      }
+      .social-icons img {
+        width: 24px;
+        height: 24px;
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img
+          class="logo"
+          src="https://res.cloudinary.com/budgettercloud/image/upload/v1723972092/logo-2_hrf3qi.png"
+          alt="Budgetter Logo"
+        />
+        <div class="div">
+          <img
+            class="title"
+            src="https://res.cloudinary.com/budgettercloud/image/upload/v1723977743/pgv7qkyybvmqnurxgwqz.png"
+            alt="Budgetter"
+          />
+        </div>
+      </div>
+      <div class="content">
+        <p>Hello Admin,</p>
+        <p>You have received a new contact message from the Budgetter landing page.</p>
+
+        <div class="message-box">
+          <div class="field">
+            <span class="field-label">Name:</span>
+            <span class="field-val">{senderName}</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Email:</span>
+            <span class="field-val">{senderEmail}</span>
+          </div>
+          <div class="field">
+            <span class="field-label">Message:</span>
+            <div class="field-val" style="margin-top: 5px; white-space: pre-wrap">
+              {senderMessage}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <p>Follow us:</p>
+        <div class="social-icons">
+          <a href="https://x.com/@LokeshwarPras17" target="_blank" rel="noopener noreferrer">
+            <img src="https://img.icons8.com/ios-filled/50/000000/twitter.png" alt="Twitter" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/lokeshwar-dewangan-7b2163211/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src="https://img.icons8.com/ios-filled/50/000000/linkedin.png" alt="LinkedIn" />
+          </a>
+          <a
+            href="https://www.instagram.com/lokeshwarprasad1"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src="https://img.icons8.com/ios-filled/50/000000/instagram.png" alt="Instagram" />
+          </a>
+        </div>
+        <p>Budgetter &copy; 2025</p>
+      </div>
+    </div>
+  </body>
+</html>

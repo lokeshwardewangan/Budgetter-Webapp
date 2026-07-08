@@ -40,4 +40,5 @@ export const endpoints = {
   reports: {
     monthly: '/reports/monthly',
   },
+  contacts: '/contacts',
 } as const;
