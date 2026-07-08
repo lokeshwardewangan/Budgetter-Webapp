@@ -7,16 +7,13 @@ import PocketMoneyModel from '../pocketMoney/pocketMoney.model.js';
 import LentMoneyModel from '../lentMoney/lentMoney.model.js';
 import { monthRange } from '../../shared/lib/date.js';
 
-const CATEGORY_KEY_MAP: Record<ExpenseCategory, string> = {
-  Groceries: 'GroceriesExpenses',
-  'Housing & Utilities': 'Housing_UtilitiesExpenses',
-  Medical: 'MedicalExpenses',
-  Food: 'FoodExpenses',
-  Personal: 'PersonalExpenses',
-  Educational: 'EducationalExpenses',
-  Transportation: 'TransportationExpenses',
-  Miscellaneous: 'MiscellaneousExpenses',
-};
+export function getCategoryKey(category: string): string {
+  return category.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + 'Expenses';
+}
+
+const CATEGORY_KEY_MAP = Object.fromEntries(
+  EXPENSE_CATEGORIES.map((cat) => [cat, getCategoryKey(cat)]),
+) as Record<ExpenseCategory, string>;
 
 function emptyCategoryBreakdown(): Record<string, number> {
   return EXPENSE_CATEGORIES.reduce<Record<string, number>>((acc, cat) => {

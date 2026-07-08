@@ -7,6 +7,7 @@ import type { CategoryWiseExpensesData } from '@/types/api/reports/reports';
 import {
   expenseCategories,
   categoryGradientStops,
+  getCategoryKey,
 } from '@/shared/lib/expenseCategories';
 import DonutChartLoader from './loaders/DonutChartLoader';
 
@@ -140,18 +141,8 @@ export default function CategoryDonutChart({
 // Translate the server's CategoryWiseExpensesData (one numeric field per
 // category) into the array shape the chart expects.
 function mapToCategoryValues(data?: CategoryWiseExpensesData) {
-  const lookup: Record<string, number> = {
-    Groceries: data?.GroceriesExpenses ?? 0,
-    'Housing & Utilities': data?.Housing_UtilitiesExpenses ?? 0,
-    Medical: data?.MedicalExpenses ?? 0,
-    Food: data?.FoodExpenses ?? 0,
-    Personal: data?.PersonalExpenses ?? 0,
-    Educational: data?.EducationalExpenses ?? 0,
-    Transportation: data?.TransportationExpenses ?? 0,
-    Miscellaneous: data?.MiscellaneousExpenses ?? 0,
-  };
   return expenseCategories.map((c) => ({
     category: c.name,
-    value: lookup[c.name],
+    value: data?.[getCategoryKey(c.name)] ?? 0,
   }));
 }

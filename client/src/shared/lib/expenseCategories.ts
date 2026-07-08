@@ -46,6 +46,13 @@ export const expenseCategories = [
     textClass: 'text-indigo-600 dark:text-indigo-400',
   },
   {
+    name: 'Investment',
+    hex: 0x10b981,
+    gradient: 'linear-gradient(to right, #10B981, #059669)',
+    stops: [0x10b981, 0x059669],
+    textClass: 'text-emerald-600 dark:text-emerald-400',
+  },
+  {
     name: 'Transportation',
     hex: 0xff1493,
     gradient: 'linear-gradient(to right, #FF1493, #C71585)',
@@ -73,3 +80,9 @@ export const categoryGradientStops: Record<string, readonly number[]> =
 export const categoryColorMap: Record<string, string> = Object.fromEntries(
   expenseCategories.map((c) => [c.name, c.textClass])
 );
+
+export function getCategoryKey(category: string): string {
+  return (
+    category.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '') + 'Expenses'
+  );
+}

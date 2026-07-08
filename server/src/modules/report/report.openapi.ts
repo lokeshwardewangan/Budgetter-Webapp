@@ -2,21 +2,19 @@ import { z } from 'zod';
 import { registry, apiResponse, bearerAuth } from '../../shared/openapi/init.js';
 import { monthlyReportQuerySchema } from './report.validator.js';
 
+import { EXPENSE_CATEGORIES } from '../expense/expense.model.js';
+import { getCategoryKey } from './report.service.js';
+
+const categoryWiseSchemaShape = Object.fromEntries(
+  EXPENSE_CATEGORIES.map((cat) => [getCategoryKey(cat), z.number()]),
+);
+
 const monthlyReport = z.object({
   totalExpenses: z.number(),
   totalAddedMoney: z.number(),
   totalLentMoney: z.number(),
   lastTotalExpenses: z.number(),
-  categoryWiseExpensesData: z.object({
-    GroceriesExpenses: z.number(),
-    Housing_UtilitiesExpenses: z.number(),
-    MedicalExpenses: z.number(),
-    FoodExpenses: z.number(),
-    PersonalExpenses: z.number(),
-    EducationalExpenses: z.number(),
-    TransportationExpenses: z.number(),
-    MiscellaneousExpenses: z.number(),
-  }),
+  categoryWiseExpensesData: z.object(categoryWiseSchemaShape),
 });
 
 const tag = 'Reports';

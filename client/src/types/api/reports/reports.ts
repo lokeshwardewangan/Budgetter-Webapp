@@ -1,13 +1,4 @@
-export interface CategoryWiseExpensesData {
-  GroceriesExpenses: number;
-  Housing_UtilitiesExpenses: number;
-  MedicalExpenses: number;
-  FoodExpenses: number;
-  PersonalExpenses: number;
-  EducationalExpenses: number;
-  TransportationExpenses: number;
-  MiscellaneousExpenses: number;
-}
+export type CategoryWiseExpensesData = Record<string, number>;
 
 export interface TotalExpensesAndAddedMoneyInMonthResType {
   statusCode: number;

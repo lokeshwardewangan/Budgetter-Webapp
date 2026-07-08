@@ -15,16 +15,9 @@ if (!isLocal && process.env.CONFIRM_PROD !== 'yes') {
   process.exit(1);
 }
 
-const VALID_CATEGORIES = new Set([
-  'Groceries',
-  'Housing & Utilities',
-  'Medical',
-  'Food',
-  'Personal',
-  'Educational',
-  'Transportation',
-  'Miscellaneous',
-]);
+import { EXPENSE_CATEGORIES } from '../src/modules/expense/expense.model.js';
+
+const VALID_CATEGORIES = new Set<string>(EXPENSE_CATEGORIES);
 
 async function run(): Promise<void> {
   await mongoose.connect(env.MONGO_URL);

@@ -6,6 +6,7 @@
 
 import mongoose from 'mongoose';
 import { env } from '../src/shared/config/env.js';
+import { EXPENSE_CATEGORIES } from '../src/modules/expense/expense.model.js';
 
 async function run(): Promise<void> {
   await mongoose.connect(env.MONGO_URL);
@@ -58,16 +59,7 @@ async function run(): Promise<void> {
   if (sessionsNoHash > 0) issues.push(`${sessionsNoHash} ActiveSession docs are missing tokenHash`);
 
   // 5. Every Expense.category must be in the new enum (else editing it will 400).
-  const VALID_CATEGORIES = [
-    'Groceries',
-    'Housing & Utilities',
-    'Medical',
-    'Food',
-    'Personal',
-    'Educational',
-    'Transportation',
-    'Miscellaneous',
-  ];
+  const VALID_CATEGORIES = EXPENSE_CATEGORIES;
   const badCatExpenses = await db
     .collection('expenses')
     .countDocuments({ category: { $nin: VALID_CATEGORIES } });
