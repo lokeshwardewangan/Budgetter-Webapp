@@ -32,6 +32,7 @@ const CallToAction = lazy(() =>
 );
 
 import SEO from '@/components/seo/SEO';
+import { SOCIAL_LINKS } from '@/shared/lib/constants';
 
 const HomePage: React.FC = () => {
   const seoData = {
@@ -57,7 +58,7 @@ const HomePage: React.FC = () => {
       author: {
         '@type': 'Person',
         name: 'Lokeshwar Prasad Dewangan',
-        url: 'https://lokeshwardewangan.in/',
+        url: SOCIAL_LINKS.portfolio,
       },
     },
   };

@@ -1,10 +1,12 @@
+import { SOCIAL_LINKS } from '@/shared/lib/constants';
+
 const SocialMediaFollow = () => {
   return (
     <div className="my-8 text-center text-gray-500">
       <p className="mb-4 font-bold">Follow us on</p>
       <div className="flex justify-center space-x-4">
         <a
-          href="https://twitter.com"
+          href={SOCIAL_LINKS.twitter}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Twitter"
@@ -26,7 +28,7 @@ const SocialMediaFollow = () => {
           ></i>
         </a>
         <a
-          href="https://linkedin.com"
+          href={SOCIAL_LINKS.linkedin}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="LinkedIn"
@@ -37,7 +39,7 @@ const SocialMediaFollow = () => {
           ></i>
         </a>
         <a
-          href="https://instagram.com"
+          href={SOCIAL_LINKS.instagram}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Instagram"

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ANIMATE_WORDS_VARIENT } from '@/utils/framer/properties';
 import React from 'react';
 import { testimonials } from '@/data/testimonials';
+import { SOCIAL_LINKS } from '@/shared/lib/constants';
 
 const HeroSection: React.FC = () => {
   const MotionLink = motion.create(Link);
@@ -92,7 +93,7 @@ const HeroSection: React.FC = () => {
           <MotionLink
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            to="https://lokeshwardewangan.in/"
+            to={SOCIAL_LINKS.portfolio}
             target="_blank"
             className="group flex items-center justify-center gap-2 rounded-full border-2 border-slate-200 bg-white px-6 py-2 text-sm font-bold text-slate-700 transition-all hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-emerald-500"
           >

@@ -48,10 +48,10 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <a href="/" aria-label="Budgetter home" className="flex items-center">
             <img
-              className="h-8 2xl:h-10"
+              className="h-8 2xl:h-9"
               src="/assets/logo/logo.png"
               alt=""
-              width={48}
+              width={40}
               height={45}
               decoding="async"
             />

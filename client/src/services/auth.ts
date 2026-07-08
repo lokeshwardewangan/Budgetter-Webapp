@@ -2,7 +2,7 @@ import Cookies from 'universal-cookie';
 import axios, { AxiosRequestConfig } from 'axios';
 import { apiURL } from '@/lib/http';
 import { endpoints } from '@/shared/api/endpoints';
-import { backendHostURL, contactFormServerHostURL } from './api';
+import { backendHostURL } from './api';
 import { getCurrentAccessToken } from '@/utils/cookie/CookiesInfo';
 import {
   AllSessionsResType,

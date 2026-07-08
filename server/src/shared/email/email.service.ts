@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { Resend } from 'resend';
 import { logger } from '../lib/logger.js';
 import { env } from '../config/env.js';
+import { SOCIAL_LINKS } from '../lib/constants.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +51,11 @@ const sendMessageToUser = async (
     logger.warn({ type }, 'invalid email type');
     return false;
   }
+
+  customizedHTML = customizedHTML
+    .replaceAll('https://x.com/@LokeshwarPras17', SOCIAL_LINKS.twitter)
+    .replaceAll('https://www.linkedin.com/in/lokeshwar-dewangan-7b2163211/', SOCIAL_LINKS.linkedin)
+    .replaceAll('https://www.instagram.com/lokeshwarprasad1', SOCIAL_LINKS.instagram);
 
   try {
     const to = Array.isArray(userEmail) ? userEmail : [userEmail];

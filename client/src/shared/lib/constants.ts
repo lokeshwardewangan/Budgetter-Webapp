@@ -1,7 +1,3 @@
-// Local-only fallback URLs. Production uses env vars.
-export const clientURL = 'http://localhost:5173';
-export const serverURL = 'http://localhost:5000';
-
 export const SOCIAL_LINKS = {
   twitter: 'https://x.com/@lokeshwar_dev',
   instagram: 'https://www.instagram.com/lokeshwar.me',

@@ -1,5 +1,6 @@
 import { FOOTER_ANIMATION } from '@/utils/framer/properties';
 import React from 'react';
+import { SOCIAL_LINKS } from '@/shared/lib/constants';
 import {
   RiInstagramLine,
   RiLinkedinLine,
@@ -71,25 +72,25 @@ const Footer: React.FC = () => {
             <div className="mt-7 flex items-center gap-3">
               {[
                 {
-                  href: 'https://www.instagram.com/lokeshwarprasad1',
+                  href: SOCIAL_LINKS.instagram,
                   label: 'Instagram',
                   icon: RiInstagramLine,
                   hover: 'hover:text-pink-400 hover:border-pink-400/40',
                 },
                 {
-                  href: 'https://www.linkedin.com/in/lokeshwar-dewangan-7b2163211/',
+                  href: SOCIAL_LINKS.linkedin,
                   label: 'LinkedIn',
                   icon: RiLinkedinLine,
                   hover: 'hover:text-sky-400 hover:border-sky-400/40',
                 },
                 {
-                  href: 'https://x.com/@LokeshwarPras17',
+                  href: SOCIAL_LINKS.twitter,
                   label: 'X (Twitter)',
                   icon: RiTwitterXLine,
                   hover: 'hover:text-white hover:border-white/40',
                 },
                 {
-                  href: 'https://github.com/lokeshwarprasad',
+                  href: SOCIAL_LINKS.github,
                   label: 'GitHub',
                   icon: RiGithubLine,
                   hover: 'hover:text-emerald-300 hover:border-emerald-300/40',
@@ -198,7 +199,7 @@ const Footer: React.FC = () => {
               className="font-semibold text-slate-300 transition-colors hover:text-emerald-300"
               target="_blank"
               rel="noreferrer"
-              href="https://lokeshwardewangan.in"
+              href={SOCIAL_LINKS.portfolio}
             >
               Lokeshwar Dewangan
             </a>
