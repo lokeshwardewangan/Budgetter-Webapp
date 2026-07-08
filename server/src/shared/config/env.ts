@@ -22,7 +22,8 @@ const EnvSchema = z.object({
   FRONTEND_URL: z.url().optional(),
 
   ADMIN_GMAIL: z.email(),
-  GMAIL_PASSKEY: z.string().min(1),
+  RESEND_API_KEY: z.string().min(1),
+  EMAIL_FROM: z.string().default('Budgetter <noreply@lokeshwardewangan.in>'),
 
   CLOUDINARY_CLOUD_NAME: z.string().optional(),
   CLOUDINARY_API_KEY: z.string().optional(),

@@ -12,7 +12,7 @@ process.env.RESET_PASSWORD_TOKEN_SECRET_EXPIRY = '15m';
 process.env.GOOGLE_CLIENT_ID = 'test-google-client-id';
 process.env.SERVER_URL = 'http://localhost:5000';
 process.env.ADMIN_GMAIL = 'admin@example.com';
-process.env.GMAIL_PASSKEY = 'test-passkey';
+process.env.RESEND_API_KEY = 're_test-key';
 process.env.TRUST_PROXY_HOPS = '0';
 
 import { MongoMemoryServer } from 'mongodb-memory-server';

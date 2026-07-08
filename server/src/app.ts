@@ -27,6 +27,16 @@ app.use(
     logger,
     customProps: (req) => ({ requestId: (req as unknown as { id?: string }).id }),
     autoLogging: { ignore: (req) => req.url === '/healthz' },
+    serializers: {
+      req: (req) => ({
+        id: (req as any).id,
+        method: req.method,
+        url: req.url,
+      }),
+      res: (res) => ({
+        statusCode: res.statusCode,
+      }),
+    },
   }),
 );
 app.use(helmet());

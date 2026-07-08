@@ -1,8 +1,9 @@
-import nodemailer from 'nodemailer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { Resend } from 'resend';
 import { logger } from '../lib/logger.js';
+import { env } from '../config/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +15,8 @@ const readTemplate = (filename: string): string =>
 
 export type EmailType = 'RESET_PASSWORD' | 'VERIFY_ACCOUNT' | 'DELETE_ACCOUNT' | 'NEWSLETTER';
 
+const resend = new Resend(env.RESEND_API_KEY);
+
 const sendMessageToUser = async (
   userName: string,
   type: EmailType,
@@ -22,7 +25,12 @@ const sendMessageToUser = async (
   token: string,
   html: string | null = null,
 ): Promise<boolean> => {
-  const serverURL = process.env.SERVER_URL;
+  if (env.NODE_ENV === 'test') {
+    logger.info({ to: userEmail, type }, 'email sending mocked in test environment');
+    return true;
+  }
+
+  const serverURL = env.SERVER_URL;
 
   let customizedHTML: string;
   if (type === 'RESET_PASSWORD') {
@@ -44,27 +52,26 @@ const sendMessageToUser = async (
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'message.reponse.web@gmail.com',
-        pass: process.env.GMAIL_PASSKEY,
-      },
+    const to = Array.isArray(userEmail) ? userEmail : [userEmail];
+    const bcc = env.ADMIN_GMAIL ? [env.ADMIN_GMAIL] : undefined;
+
+    const { data, error } = await resend.emails.send({
+      from: env.EMAIL_FROM,
+      to,
+      subject: `${subject} 🚀`,
+      bcc,
+      html: customizedHTML,
     });
 
-    const mailOptions = {
-      from: 'message.reponse.web@gmail.com',
-      to: Array.isArray(userEmail) ? userEmail.join(',') : userEmail,
-      subject: `${subject} 🚀`,
-      bcc: process.env.ADMIN_GMAIL,
-      html: customizedHTML,
-    };
+    if (error) {
+      logger.error({ error, to: userEmail, type }, 'Resend SDK error sending email');
+      return false;
+    }
 
-    await transporter.sendMail(mailOptions);
-    logger.info({ to: userEmail, type }, 'email sent');
+    logger.info({ to: userEmail, type, resendId: data?.id }, 'email sent via Resend SDK');
     return true;
   } catch (err) {
-    logger.error({ err, to: userEmail, type }, 'email send failed');
+    logger.error({ err, to: userEmail, type }, 'email send failed via Resend SDK');
     return false;
   }
 };
