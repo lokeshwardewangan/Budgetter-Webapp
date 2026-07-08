@@ -35,11 +35,25 @@ export const dayRange = (d: Date): { gte: Date; lt: Date } => {
   return { gte, lt };
 };
 
-// Legacy: dd-mm-yyyy string for any client/UI still expecting it.
-export const getTodayDate = (): string => {
-  const now = new Date();
-  const date = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const year = String(now.getFullYear());
-  return `${date}-${month}-${year}`;
+export const getDaysInMonth = (month: number, year: number): number => {
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+};
+
+export const getElapsedAndRemainingDays = (
+  month: number,
+  year: number,
+): { elapsed: number; remaining: number; total: number } => {
+  const total = getDaysInMonth(month, year);
+  const istNow = new Date(Date.now() + IST_OFFSET_MS);
+  const curYear = istNow.getUTCFullYear();
+  const curMonth = istNow.getUTCMonth() + 1; // 1-based
+  const curDay = istNow.getUTCDate();
+
+  if (year < curYear || (year === curYear && month < curMonth)) {
+    return { elapsed: total, remaining: 0, total };
+  } else if (year > curYear || (year === curYear && month > curMonth)) {
+    return { elapsed: 0, remaining: total, total };
+  } else {
+    return { elapsed: curDay, remaining: total - curDay, total };
+  }
 };

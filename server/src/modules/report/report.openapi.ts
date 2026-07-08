@@ -14,7 +14,19 @@ const monthlyReport = z.object({
   totalAddedMoney: z.number(),
   totalLentMoney: z.number(),
   lastTotalExpenses: z.number(),
+  prevMonthExpenses: z.number(),
   categoryWiseExpensesData: z.object(categoryWiseSchemaShape),
+  totalDays: z.number(),
+  elapsedDays: z.number(),
+  remainingDays: z.number(),
+  weekendExpenses: z.number(),
+  weekdayExpenses: z.number(),
+  highestSpendDay: z
+    .object({
+      day: z.number(),
+      amount: z.number(),
+    })
+    .nullable(),
 });
 
 const tag = 'Reports';

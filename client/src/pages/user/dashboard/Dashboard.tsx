@@ -5,6 +5,7 @@ import { useMonthlyReport } from '@/features/dashboard/hooks';
 import { useMe } from '@/features/user/hooks';
 import DashboardFilters from '@/features/dashboard/components/DashboardFilters';
 import SummaryBoxes from '@/features/dashboard/components/SummaryBoxes';
+import PacingAdvisorCard from '@/features/dashboard/components/PacingAdvisorCard';
 import CategoryDonutChart from '@/features/dashboard/components/CategoryDonutChart';
 import ExpensesTimelineChart from '@/features/dashboard/components/ExpensesTimelineChart';
 import CategoryInsightsTable from '@/features/dashboard/components/CategoryInsightsTable';
@@ -51,8 +52,11 @@ export default function Dashboard() {
         totalExpenses={data?.totalExpenses ?? 0}
         totalAddedMoney={data?.totalAddedMoney ?? 0}
         totalLentMoney={data?.totalLentMoney ?? 0}
+        prevMonthExpenses={data?.prevMonthExpenses ?? 0}
         isLoading={isLoading}
       />
+
+      <PacingAdvisorCard data={data} isLoading={isLoading} />
 
       <div className="visual_graph_container grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
         <CategoryDonutChart

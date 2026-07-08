@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, type UseFormRegisterReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -31,6 +31,9 @@ export default function ProfileForm() {
   const { data: user } = useMe();
   const { mutateAsync: save, isPending } = useUpdateProfile();
   const passwordSection = useDialogState(false);
+  const [isPrivacyMode, setIsPrivacyMode] = useState(
+    () => localStorage.getItem('pocket_money_privacy') !== 'visible'
+  );
 
   const {
     register,
@@ -119,6 +122,35 @@ export default function ProfileForm() {
           label="Current Pocket Money"
           value={String(user?.currentPocketMoney ?? 0)}
         />
+      </div>
+
+      {/* Privacy Mode Switcher */}
+      <div className="flex items-center space-x-2 rounded-md border border-border_light bg-slate-50/50 p-3 dark:border-border_dark dark:bg-slate-900/10">
+        <input
+          id="privacyMode"
+          type="checkbox"
+          checked={isPrivacyMode}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            setIsPrivacyMode(checked);
+            localStorage.setItem(
+              'pocket_money_privacy',
+              checked ? 'hidden' : 'visible'
+            );
+            toast.success(
+              checked
+                ? 'Privacy mode enabled! Pocket money is now blurred on dashboards.'
+                : 'Privacy mode disabled! Pocket money is now visible.'
+            );
+          }}
+          className="h-4 w-4 cursor-pointer rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+        />
+        <Label
+          htmlFor="privacyMode"
+          className="cursor-pointer select-none text-sm font-medium text-text_primary_light dark:text-text_primary_dark"
+        >
+          Hide Current Balance on Dashboard (Enable Blur Mode)
+        </Label>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

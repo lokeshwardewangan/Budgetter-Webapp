@@ -13,7 +13,14 @@ export type MonthlyReportData = {
   totalAddedMoney: number;
   lastTotalExpenses: number;
   totalLentMoney: number;
+  prevMonthExpenses: number;
   categoryWiseExpensesData: CategoryWiseExpensesData;
+  totalDays: number;
+  elapsedDays: number;
+  remainingDays: number;
+  weekendExpenses: number;
+  weekdayExpenses: number;
+  highestSpendDay: { day: number; amount: number } | null;
 };
 
 export async function getMonthlyReport(
