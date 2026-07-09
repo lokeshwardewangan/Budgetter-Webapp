@@ -9,8 +9,12 @@ export const updateProfileSchema = z
   .object({
     name: z.string().trim().min(1).optional(),
     dob: optionalDob,
-    currentPassword: z.string().optional(),
-    newPassword: z.string().min(6, 'Password must be at least 6 characters').optional(),
+    currentPassword: z.string().optional().or(z.literal('')),
+    newPassword: z
+      .string()
+      .min(6, 'Password must be at least 6 characters')
+      .optional()
+      .or(z.literal('')),
     instagramLink: optionalUrl,
     facebookLink: optionalUrl,
     profession: z.string().optional(),

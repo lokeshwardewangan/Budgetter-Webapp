@@ -11,7 +11,7 @@ export const updateProfileSchema = z
       .trim()
       .min(2, 'Name must be at least 2 characters')
       .optional(),
-    dob: z.string().optional(),
+    dob: z.union([z.date(), z.string()]).optional().nullable(),
     profession: z.string().optional(),
     instagramLink: optionalUrl,
     facebookLink: optionalUrl,

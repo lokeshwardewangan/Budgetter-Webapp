@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useForm, type UseFormRegisterReturn } from 'react-hook-form';
+import {
+  useForm,
+  Controller,
+  type UseFormRegisterReturn,
+} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useMe } from '@/features/user/hooks';
+import { DatePicker } from '@/components/ui/DatePicker';
 import {
   Briefcase,
   Calendar,
@@ -39,13 +44,14 @@ export default function ProfileForm() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    control,
+    formState: { errors, isDirty },
   } = useForm<UpdateProfileForm>({
     resolver: zodResolver(updateProfileSchema),
     mode: 'onTouched',
     defaultValues: {
       name: '',
-      dob: '',
+      dob: undefined,
       profession: '',
       instagramLink: '',
       facebookLink: '',
@@ -59,7 +65,7 @@ export default function ProfileForm() {
     if (!user) return;
     reset({
       name: user.name ?? '',
-      dob: user.dob ?? '',
+      dob: user.dob ? new Date(user.dob) : undefined,
       profession: user.profession ?? '',
       instagramLink: user.instagramLink ?? '',
       facebookLink: user.facebookLink ?? '',
@@ -69,7 +75,21 @@ export default function ProfileForm() {
   }, [user, reset]);
 
   const onSubmit = handleSubmit(async (raw) => {
-    await toast.promise(save(raw), {
+    const payload = { ...raw };
+    if (!payload.currentPassword) {
+      delete payload.currentPassword;
+    }
+    if (!payload.newPassword) {
+      delete payload.newPassword;
+    }
+
+    if (payload.dob instanceof Date) {
+      payload.dob = payload.dob.toISOString();
+    } else if (!payload.dob) {
+      payload.dob = '';
+    }
+
+    await toast.promise(save(payload), {
       loading: 'Saving...',
       success: 'Profile updated!',
       error: 'Something went wrong.',
@@ -109,14 +129,27 @@ export default function ProfileForm() {
           field={register('profession')}
           error={errors.profession?.message}
         />
-        <EditableField
-          id="dateOfBirth"
-          label="Date of Birth"
-          type="date"
-          icon={<Calendar className="h-4 w-4 text-gray-400" />}
-          field={register('dob')}
-          error={errors.dob?.message}
-        />
+        <div className="w-full space-y-2">
+          <Label htmlFor="dateOfBirth">Date of Birth</Label>
+          <Controller
+            name="dob"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                inputDate={field.value ? new Date(field.value) : undefined}
+                setInputDate={(d) => field.onChange(d)}
+              />
+            )}
+          />
+          {errors.dob?.message && (
+            <span
+              role="alert"
+              className="mt-1 block text-xs font-medium text-red-500"
+            >
+              {errors.dob.message}
+            </span>
+          )}
+        </div>
         <ReadOnlyRow
           icon={<IndianRupee className="h-4 w-4 text-gray-400" />}
           label="Current Pocket Money"
@@ -209,7 +242,7 @@ export default function ProfileForm() {
       <div className="button-container flex w-full items-end justify-end">
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || !isDirty}
           className="mt-2 w-36 bg-green-600"
         >
           {isPending ? (
