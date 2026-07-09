@@ -10,7 +10,6 @@ import { useMe } from '@/features/user/hooks';
 import { DatePicker } from '@/components/ui/DatePicker';
 import {
   Briefcase,
-  Calendar,
   Facebook,
   IndianRupee,
   Instagram,
@@ -31,6 +30,7 @@ import {
 import { useDialogState } from '@/shared/hooks/useDialogState';
 import { updateProfileSchema, type UpdateProfileForm } from '../schemas';
 import { useUpdateProfile } from '../hooks';
+import type { UpdateProfileInput } from '../api';
 
 export default function ProfileForm() {
   const { data: user } = useMe();
@@ -75,21 +75,28 @@ export default function ProfileForm() {
   }, [user, reset]);
 
   const onSubmit = handleSubmit(async (raw) => {
-    const payload = { ...raw };
-    if (!payload.currentPassword) {
-      delete payload.currentPassword;
+    const cleanPayload: UpdateProfileInput = {
+      name: raw.name,
+      profession: raw.profession,
+      instagramLink: raw.instagramLink,
+      facebookLink: raw.facebookLink,
+    };
+
+    if (raw.currentPassword) {
+      cleanPayload.currentPassword = raw.currentPassword;
     }
-    if (!payload.newPassword) {
-      delete payload.newPassword;
+    if (raw.newPassword) {
+      cleanPayload.newPassword = raw.newPassword;
     }
 
-    if (payload.dob instanceof Date) {
-      payload.dob = payload.dob.toISOString();
-    } else if (!payload.dob) {
-      payload.dob = '';
+    if (raw.dob) {
+      cleanPayload.dob =
+        raw.dob instanceof Date ? raw.dob.toISOString() : raw.dob;
+    } else {
+      cleanPayload.dob = '';
     }
 
-    await toast.promise(save(payload), {
+    await toast.promise(save(cleanPayload), {
       loading: 'Saving...',
       success: 'Profile updated!',
       error: 'Something went wrong.',

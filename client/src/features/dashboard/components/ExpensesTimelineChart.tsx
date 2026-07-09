@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import { useTheme } from '@/shared/contexts/ThemeContext';
 import ChartFilterOptions from '@/shared/components/charts/ChartFilterOptions';
-import { getDayName, getLast7Dates } from '@/utils/date/date';
+import { getMonthInNumber } from '@/utils/date/date';
 import { useAllExpenses } from '@/features/expenses/hooks';
 import type { Expense } from '@/types/api/expenses/expenses';
 import LineChartLoader from './loaders/LineChartLoader';
@@ -12,16 +12,15 @@ import LineChartLoader from './loaders/LineChartLoader';
 type ChartFilter = 'daily' | 'weekly' | 'monthly' | 'yearly';
 type Point = { day: string; value: number };
 
-// ISO date string → dd-mm-yyyy for grouping/comparison against legacy helpers.
-function toDdMmYyyy(iso: string): string {
-  const d = new Date(iso);
-  const dd = String(d.getUTCDate()).padStart(2, '0');
-  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const yyyy = d.getUTCFullYear();
-  return `${dd}-${mm}-${yyyy}`;
-}
+type Props = {
+  monthLabel: string;
+  yearLabel: string;
+};
 
-export default function ExpensesTimelineChart() {
+export default function ExpensesTimelineChart({
+  monthLabel,
+  yearLabel,
+}: Props) {
   const chartRef = useRef<HTMLDivElement>(null);
   const { isDarkMode } = useTheme();
   const [filter, setFilter] = useState<ChartFilter>('daily');
@@ -29,8 +28,8 @@ export default function ExpensesTimelineChart() {
   const { data: allExpenses = [], isLoading } = useAllExpenses();
 
   const chartData = useMemo(
-    () => computeSeries(allExpenses, filter),
-    [allExpenses, filter]
+    () => computeSeries(allExpenses, filter, monthLabel, yearLabel),
+    [allExpenses, filter, monthLabel, yearLabel]
   );
 
   useLayoutEffect(() => {
@@ -129,26 +128,37 @@ export default function ExpensesTimelineChart() {
     };
   }, [isDarkMode, chartData]);
 
-  useEffect(() => {}, [filter]);
+  const chartTitle = useMemo(() => {
+    switch (filter) {
+      case 'daily':
+        return `Daily Spend - ${monthLabel} ${yearLabel}`;
+      case 'weekly':
+        return `Weekly Spend - ${monthLabel} ${yearLabel}`;
+      case 'monthly':
+        return `6-Month Trend (up to ${monthLabel} ${yearLabel})`;
+      case 'yearly':
+        return `3-Year Trend (up to ${yearLabel})`;
+    }
+  }, [filter, monthLabel, yearLabel]);
 
   return (
     <div
       id="interval_time_expense_insight_section"
       className="flex w-full max-w-full flex-col items-center rounded-lg border border-border_light bg-bg_primary_light p-0 py-5 shadow-sm dark:border-border_dark dark:bg-bg_primary_dark md:p-4"
     >
-      <div className="heading_part_chart relative flex w-full items-center justify-center">
-        <h2 className="mb-4 text-left text-lg font-semibold">
-          Expenses Details
+      <div className="heading_part_chart relative flex w-full items-center justify-between px-4 sm:px-2">
+        <h2 className="text-left text-base font-semibold text-text_primary_light dark:text-text_primary_dark">
+          {chartTitle}
         </h2>
         <ChartFilterOptions setChartFilter={setFilter} />
       </div>
-      <div className="chart_element_container flex h-full w-full flex-col items-center justify-center">
+      <div className="chart_element_container flex h-full w-full flex-col items-center justify-center px-2">
         {isLoading ? (
           <LineChartLoader />
         ) : (
           <div
             ref={chartRef}
-            className="h-[250px] w-full lg:h-full"
+            className="h-[230px] w-full"
             style={{ maxWidth: '100%' }}
           />
         )}
@@ -157,50 +167,107 @@ export default function ExpensesTimelineChart() {
   );
 }
 
-function computeSeries(allExpenses: Expense[], filter: ChartFilter): Point[] {
+function computeSeries(
+  allExpenses: Expense[],
+  filter: ChartFilter,
+  monthLabel: string,
+  yearLabel: string
+): Point[] {
+  const monthNum = getMonthInNumber(monthLabel);
+
   if (filter === 'daily') {
-    return getLast7Dates.map((day) => ({
-      day: getDayName(day),
-      value: allExpenses
-        .filter((e) => toDdMmYyyy(e.date) === day)
-        .reduce((sum, e) => sum + (e.price ?? 0), 0),
-    }));
+    const daysInMonth = new Date(
+      Number(yearLabel),
+      Number(monthNum),
+      0
+    ).getDate();
+    return Array.from({ length: daysInMonth }, (_, i) => {
+      const day = i + 1;
+      const dayStr = String(day).padStart(2, '0');
+      const val = allExpenses
+        .filter((e) => {
+          const d = new Date(e.date);
+          const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const y = String(d.getUTCFullYear());
+          const dayVal = String(d.getUTCDate()).padStart(2, '0');
+          return m === monthNum && y === yearLabel && dayVal === dayStr;
+        })
+        .reduce((sum, e) => sum + (e.price ?? 0), 0);
+      return { day: dayStr, value: val };
+    });
   }
 
   if (filter === 'weekly') {
-    const now = new Date();
-    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-    const currentYear = String(now.getFullYear());
     const weeks = [
-      { day: 'Week-1', value: 0 },
-      { day: 'Week-2', value: 0 },
-      { day: 'Week-3', value: 0 },
-      { day: 'Week-4', value: 0 },
+      { day: 'Week 1', value: 0 },
+      { day: 'Week 2', value: 0 },
+      { day: 'Week 3', value: 0 },
+      { day: 'Week 4', value: 0 },
+      { day: 'Week 5', value: 0 },
     ];
     for (const e of allExpenses) {
-      const [d, m, y] = toDdMmYyyy(e.date).split('-');
-      if (m !== currentMonth || y !== currentYear) continue;
-      const idx = Math.min(Math.floor((parseInt(d) - 1) / 7), 3);
+      const d = new Date(e.date);
+      const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const y = String(d.getUTCFullYear());
+      if (m !== monthNum || y !== yearLabel) continue;
+      const day = d.getUTCDate();
+      const idx = Math.min(Math.floor((day - 1) / 7), 4);
       weeks[idx].value += e.price ?? 0;
+    }
+    if (weeks[4].value === 0) {
+      weeks.pop();
     }
     return weeks;
   }
 
   if (filter === 'monthly') {
-    const byMonth = new Map<string, number>();
-    for (const e of allExpenses) {
-      const [, m, y] = toDdMmYyyy(e.date).split('-');
-      const key = `${m}-${y}`;
-      byMonth.set(key, (byMonth.get(key) ?? 0) + (e.price ?? 0));
+    const trendMonths: { mNum: string; yStr: string; label: string }[] = [];
+    let curM = Number(monthNum);
+    let curY = Number(yearLabel);
+    for (let i = 5; i >= 0; i--) {
+      let targetM = curM - i;
+      let targetY = curY;
+      while (targetM <= 0) {
+        targetM += 12;
+        targetY -= 1;
+      }
+      const monthNameShort = new Date(targetY, targetM - 1).toLocaleString(
+        'default',
+        {
+          month: 'short',
+        }
+      );
+      trendMonths.push({
+        mNum: String(targetM).padStart(2, '0'),
+        yStr: String(targetY),
+        label: `${monthNameShort} ${targetY}`,
+      });
     }
-    return Array.from(byMonth, ([day, value]) => ({ day, value }));
+    return trendMonths.map(({ mNum, yStr, label }) => {
+      const val = allExpenses
+        .filter((e) => {
+          const d = new Date(e.date);
+          const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const y = String(d.getUTCFullYear());
+          return m === mNum && y === yStr;
+        })
+        .reduce((sum, e) => sum + (e.price ?? 0), 0);
+      return { day: label, value: val };
+    });
   }
 
   // yearly
-  const byYear = new Map<string, number>();
-  for (const e of allExpenses) {
-    const [, , y] = toDdMmYyyy(e.date).split('-');
-    byYear.set(y, (byYear.get(y) ?? 0) + (e.price ?? 0));
-  }
-  return Array.from(byYear, ([day, value]) => ({ day, value }));
+  const currentYearNum = Number(yearLabel);
+  const years = [currentYearNum - 2, currentYearNum - 1, currentYearNum];
+  return years.map((y) => {
+    const yStr = String(y);
+    const val = allExpenses
+      .filter((e) => {
+        const d = new Date(e.date);
+        const yVal = String(d.getUTCFullYear());
+        return yVal === yStr;
+      })
+      .reduce((sum, e) => sum + (e.price ?? 0), 0);
+    return { day: yStr, value: val };
+  });
 }

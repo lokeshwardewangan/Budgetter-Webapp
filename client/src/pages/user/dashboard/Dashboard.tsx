@@ -64,7 +64,7 @@ export default function Dashboard() {
           data={data?.categoryWiseExpensesData}
           isLoading={isLoading}
         />
-        <ExpensesTimelineChart />
+        <ExpensesTimelineChart monthLabel={monthLabel} yearLabel={yearLabel} />
       </div>
 
       <div className="category_insights_container mb-10 w-full">
