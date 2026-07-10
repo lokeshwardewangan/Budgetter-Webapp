@@ -8,6 +8,8 @@ import lentMoneyRoutes from './modules/lentMoney/lentMoney.routes.js';
 import reportRoutes from './modules/report/report.routes.js';
 import adminRoutes from './modules/admin/admin.routes.js';
 import contactRoutes from './modules/contact/contact.routes.js';
+import budgetRoutes from './modules/budget/budget.routes.js';
+import aiRoutes from './modules/ai/ai.routes.js';
 
 const router = Router();
 
@@ -20,5 +22,7 @@ router.use('/lent-money', lentMoneyRoutes);
 router.use('/reports', reportRoutes);
 router.use('/admin', adminRoutes);
 router.use('/contacts', contactRoutes);
+router.use('/budgets', budgetRoutes);
+router.use('/ai', aiRoutes);
 
 export default router;

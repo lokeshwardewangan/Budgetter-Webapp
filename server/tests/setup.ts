@@ -15,13 +15,29 @@ process.env.ADMIN_GMAIL = 'admin@example.com';
 process.env.RESEND_API_KEY = 're_test-key';
 process.env.TRUST_PROXY_HOPS = '0';
 
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { execSync } from 'child_process';
+import fs from 'fs';
+
+// Try to locate system-wide mongod to avoid download issues & SIGSEGV on Ubuntu 24.04
+if (!process.env.MONGOMS_SYSTEM_BINARY) {
+  try {
+    const systemMongod = execSync('which mongod', { encoding: 'utf8' }).trim();
+    if (systemMongod && fs.existsSync(systemMongod)) {
+      process.env.MONGOMS_SYSTEM_BINARY = systemMongod;
+    }
+  } catch (err) {
+    // If 'which mongod' fails or mongod is not installed, fallback to default mongodb-memory-server download
+  }
+}
+
 import mongoose from 'mongoose';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 
-let mongod: MongoMemoryServer | undefined;
+// Declare mongod type as any to avoid static import type reference issues
+let mongod: any;
 
 beforeAll(async () => {
+  const { MongoMemoryServer } = await import('mongodb-memory-server');
   mongod = await MongoMemoryServer.create();
   process.env.MONGO_URL = mongod.getUri();
   await mongoose.connect(process.env.MONGO_URL);

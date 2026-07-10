@@ -22,6 +22,9 @@
   "license": "ISC",
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.5.0",
+    "@langchain/core": "^1.2.3",
+    "@langchain/langgraph": "^1.4.8",
+    "@langchain/openai": "^1.5.5",
     "@types/js-cookie": "^3.0.6",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.4.0",
