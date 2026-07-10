@@ -9,6 +9,8 @@ const EnvSchema = z.object({
 
   MONGO_URL: z.string().min(1, 'MONGO_URL is required'),
 
+  OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required'),
+
   ACCESS_TOKEN_SECRET_KEY: z.string().min(1),
   ACCESS_TOKEN_SECRET_EXPIRY: z.string().min(1),
   ACCOUNT_VERIFICATION_TOKEN_SECRET: z.string().min(1),
