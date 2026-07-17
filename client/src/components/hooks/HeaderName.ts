@@ -3,6 +3,8 @@ export const getTopHeaderName = (pathName: string): string => {
     // for user routes
     case '/user/dashboard':
       return 'Dashboard';
+    case '/user/budgets':
+      return 'My Budgets';
     case '/user/add-expenses':
       return 'Add Expenses';
     case '/user/show-expenses':
@@ -13,6 +15,8 @@ export const getTopHeaderName = (pathName: string): string => {
       return 'Pocket Money';
     case '/user/add-lent-money':
       return 'Lent Money';
+    case '/user/assistant':
+      return 'AI Assistant';
     case '/user/profile':
       return 'Profile';
     default:
