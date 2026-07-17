@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  Sparkles,
   Send,
   Trash2,
   Loader2,
@@ -8,13 +7,14 @@ import {
   Wrench,
   Bot,
   User,
-  Zap,
   Info,
+  Cpu,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChatMessage, streamChatMessage } from '@/features/ai/api';
+import { useMe } from '@/features/user/hooks';
 
 // Map raw backend tool names to readable descriptions
 const toolNameMap: Record<string, string> = {
@@ -127,6 +127,7 @@ function FormattedMessage({ content }: { content: string }) {
 }
 
 export default function AssistantPage() {
+  const { data: currentUser } = useMe();
   const [threadId, setThreadId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
@@ -277,25 +278,26 @@ export default function AssistantPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-8.5rem)] max-h-[820px] w-full flex-col overflow-hidden rounded-md border border-border_light bg-bg_primary_light shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
+    <div className="flex h-[calc(100vh-6.5rem)] w-full flex-col overflow-hidden rounded-md border border-border_light bg-bg_primary_light shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
       {/* Premium Header */}
       <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-bg_secondary_dark/40">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-emerald-500/10 p-2 dark:bg-emerald-500/20">
-            <Sparkles className="h-5 w-5 text-[#059669] dark:text-emerald-400" />
+            <Cpu className="h-5 w-5 text-[#059669] dark:text-emerald-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-text_primary_light dark:text-text_primary_dark">
-                AI Financial Assistant
+              <h2 className="text-base font-bold leading-snug tracking-tight text-text_primary_light dark:text-text_primary_dark">
+                Cognitive Financial Engine
               </h2>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-[#059669] dark:text-emerald-400">
-                <Zap className="h-2.5 w-2.5" /> Agent Active
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />{' '}
+                ENGINE STATE: ACTIVE
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Query records, track budgets, log spend, or generate reports
-              dynamically.
+            <p className="mt-0.5 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+              Semantic ledger query orchestration, dynamic budget pacing
+              analysis, and programmatic report compilation.
             </p>
           </div>
         </div>
@@ -355,14 +357,22 @@ export default function AssistantPage() {
                 >
                   {/* Avatar Bubble */}
                   <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xs shadow-sm ${
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border text-xs shadow-sm ${
                       isUser
                         ? 'border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400'
                         : 'border-emerald-500/20 bg-emerald-500/10 text-[#059669] dark:text-emerald-400'
                     }`}
                   >
                     {isUser ? (
-                      <User className="h-4.5 w-4.5" />
+                      currentUser?.avatar ? (
+                        <img
+                          src={currentUser.avatar}
+                          alt="User Avatar"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-4.5 w-4.5" />
+                      )
                     ) : (
                       <Bot className="h-4.5 w-4.5" />
                     )}
