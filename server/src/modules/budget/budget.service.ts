@@ -76,8 +76,8 @@ export interface BudgetStatusItem {
   limit: number;
   spent: number;
   remaining: number;
-  pacingPercentage: number;
-  status: 'Under Control' | 'Running Hot' | 'Budget Exhausted';
+  percentageSpent: number;
+  status: 'UNDER_LIMIT' | 'RUNNING_HOT' | 'EXHAUSTED';
 }
 
 export async function getBudgetStatus(userId: string, month: number, year: number) {
@@ -108,13 +108,13 @@ export async function getBudgetStatus(userId: string, month: number, year: numbe
 
     const spent = expenseMap.get(budget.category) || 0;
     const remaining = Math.max(0, budget.limit - spent);
-    const pacingPercentage = budget.limit > 0 ? (spent / budget.limit) * 100 : 0;
+    const percentageSpent = budget.limit > 0 ? (spent / budget.limit) * 100 : 0;
 
-    let status: BudgetStatusItem['status'] = 'Under Control';
-    if (pacingPercentage > 90) {
-      status = 'Budget Exhausted';
-    } else if (pacingPercentage > 70) {
-      status = 'Running Hot';
+    let status: BudgetStatusItem['status'] = 'UNDER_LIMIT';
+    if (percentageSpent >= 100) {
+      status = 'EXHAUSTED';
+    } else if (percentageSpent > 75) {
+      status = 'RUNNING_HOT';
     }
 
     items.push({
@@ -122,7 +122,7 @@ export async function getBudgetStatus(userId: string, month: number, year: numbe
       limit: budget.limit,
       spent,
       remaining,
-      pacingPercentage,
+      percentageSpent,
       status,
     });
   }
@@ -133,12 +133,12 @@ export async function getBudgetStatus(userId: string, month: number, year: numbe
     : budgets.reduce((sum, b) => sum + (b.category !== 'Overall' ? b.limit : 0), 0);
 
   const overallRemaining = Math.max(0, overallLimit - totalSpent);
-  const overallPacingPercentage = overallLimit > 0 ? (totalSpent / overallLimit) * 100 : 0;
-  let overallStatus: BudgetStatusItem['status'] = 'Under Control';
-  if (overallPacingPercentage > 90) {
-    overallStatus = 'Budget Exhausted';
-  } else if (overallPacingPercentage > 70) {
-    overallStatus = 'Running Hot';
+  const overallPercentageSpent = overallLimit > 0 ? (totalSpent / overallLimit) * 100 : 0;
+  let overallStatus: BudgetStatusItem['status'] = 'UNDER_LIMIT';
+  if (overallPercentageSpent >= 100) {
+    overallStatus = 'EXHAUSTED';
+  } else if (overallPercentageSpent > 75) {
+    overallStatus = 'RUNNING_HOT';
   }
 
   const overallStatusItem: BudgetStatusItem = {
@@ -146,7 +146,7 @@ export async function getBudgetStatus(userId: string, month: number, year: numbe
     limit: overallLimit,
     spent: totalSpent,
     remaining: overallRemaining,
-    pacingPercentage: overallPacingPercentage,
+    percentageSpent: overallPercentageSpent,
     status: overallStatus,
   };
 

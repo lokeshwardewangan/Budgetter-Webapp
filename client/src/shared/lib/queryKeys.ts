@@ -20,6 +20,14 @@ export type ExpenseFilters = {
 export const qk = {
   me: ['me'] as const,
 
+  budgets: {
+    all: ['budgets'] as const,
+    list: (month: number, year: number) =>
+      ['budgets', 'list', { month, year }] as const,
+    status: (month: number, year: number) =>
+      ['budgets', 'status', { month, year }] as const,
+  },
+
   pocketMoney: {
     all: ['pocket-money'] as const,
   },

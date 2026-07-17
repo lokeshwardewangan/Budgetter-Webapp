@@ -40,7 +40,7 @@ beforeAll(async () => {
   const { MongoMemoryServer } = await import('mongodb-memory-server');
   mongod = await MongoMemoryServer.create();
   process.env.MONGO_URL = mongod.getUri();
-  await mongoose.connect(process.env.MONGO_URL);
+  await mongoose.connect(process.env.MONGO_URL!);
 });
 
 afterEach(async () => {
