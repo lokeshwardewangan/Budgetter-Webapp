@@ -5,6 +5,8 @@ import {
   ChartPie,
   LayoutDashboard,
   PiggyBank,
+  Target,
+  Sparkles,
 } from 'lucide-react';
 
 export type userSidenavbarListType = {
@@ -18,6 +20,11 @@ export const userSidenavbarList: userSidenavbarListType[] = [
     route: 'user/dashboard',
     name: 'Dashboard',
     icon: LayoutDashboard,
+  },
+  {
+    route: 'user/budgets',
+    name: 'Budgets',
+    icon: Target,
   },
   {
     route: 'user/add-expenses',
@@ -43,5 +50,10 @@ export const userSidenavbarList: userSidenavbarListType[] = [
     route: 'user/add-lent-money',
     name: 'Lent Money',
     icon: HandCoins,
+  },
+  {
+    route: 'user/assistant',
+    name: 'AI Assistant',
+    icon: Sparkles,
   },
 ];

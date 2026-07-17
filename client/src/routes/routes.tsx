@@ -21,6 +21,8 @@ import AddExpenses from '@/pages/user/addExpenses/AddExpenses';
 import ProfilePage from '@/pages/user/Profile/ProfilePage';
 import Reports from '@/pages/user/reports/Reports';
 import AddLentMoney from '@/pages/user/addLentMoney/AddLentMoney';
+import BudgetsPage from '@/pages/user/budgets/BudgetsPage';
+import AssistantPage from '@/pages/user/assistant/AssistantPage';
 import ErrorPage from '@/components/layout/ErrorPage';
 import RequireAuth from './RequireAuth';
 import RedirectIfAuthed from './RedirectIfAuthed';
@@ -47,11 +49,13 @@ const routes = createBrowserRouter(
           <Route index element={<Navigate to="profile" replace />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="budgets" element={<BudgetsPage />} />
           <Route path="add-expenses" element={<AddExpenses />} />
           <Route path="show-expenses" element={<ShowExpenses />} />
           <Route path="reports" element={<Reports />} />
           <Route path="add-money" element={<AddMoney />} />
           <Route path="add-lent-money" element={<AddLentMoney />} />
+          <Route path="assistant" element={<AssistantPage />} />
         </Route>
       </Route>
 
@@ -61,6 +65,7 @@ const routes = createBrowserRouter(
     </Route>
   ),
   {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     future: {
       v7_startTransition: true,
       v7_relativeSplatPath: true,
