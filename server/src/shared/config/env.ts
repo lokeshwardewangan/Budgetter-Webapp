@@ -9,7 +9,10 @@ const EnvSchema = z.object({
 
   MONGO_URL: z.string().min(1, 'MONGO_URL is required'),
 
-  OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required'),
+  AI_PROVIDER: z.enum(['openai', 'gemini']).default('openai'),
+  OPENAI_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
+  GEMINI_MODEL: z.string().optional().default('gemini-1.5-flash'),
 
   ACCESS_TOKEN_SECRET_KEY: z.string().min(1),
   ACCESS_TOKEN_SECRET_EXPIRY: z.string().min(1),

@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   PiggyBank,
   Target,
-  Sparkles,
+  BrainCircuit,
 } from 'lucide-react';
 
 export type userSidenavbarListType = {
@@ -54,6 +54,6 @@ export const userSidenavbarList: userSidenavbarListType[] = [
   {
     route: 'user/assistant',
     name: 'AI Assistant',
-    icon: Sparkles,
+    icon: BrainCircuit,
   },
 ];

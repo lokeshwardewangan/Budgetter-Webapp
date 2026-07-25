@@ -76,6 +76,10 @@ export function getTransactionTools(userId: string) {
   const createTransaction = tool(
     async ({ type, name, amount, category, date, label }) => {
       try {
+        if (amount <= 0) {
+          return 'Error: Transaction amount must be a positive number greater than 0.';
+        }
+
         const txDate = date ? new Date(date) : new Date();
 
         if (type === 'expense') {
@@ -132,7 +136,7 @@ export function getTransactionTools(userId: string) {
         name: z
           .string()
           .describe('The name of the expense product, source of pocket money, or person lent to.'),
-        amount: z.number().positive().describe('The monetary amount in INR.'),
+        amount: z.number().describe('The monetary amount in INR.'),
         category: z
           .enum(EXPENSE_CATEGORIES)
           .optional()
@@ -149,6 +153,9 @@ export function getTransactionTools(userId: string) {
   const updateTransaction = tool(
     async ({ type, id, updates }) => {
       try {
+        if (updates.amount !== undefined && updates.amount <= 0) {
+          return 'Error: Updated amount must be a positive number greater than 0.';
+        }
         if (type === 'expense') {
           const existing = await expenseService.updateExpense(userId, id, {
             expenseName: updates.name as string,
@@ -219,7 +226,7 @@ export function getTransactionTools(userId: string) {
         id: z.string().describe('The Mongo database ID of the transaction.'),
         updates: z.object({
           name: z.string().optional().describe('Updated name, source, or personName.'),
-          amount: z.number().positive().optional().describe('Updated amount in INR.'),
+          amount: z.number().optional().describe('Updated amount in INR.'),
           category: z
             .enum(EXPENSE_CATEGORIES)
             .optional()

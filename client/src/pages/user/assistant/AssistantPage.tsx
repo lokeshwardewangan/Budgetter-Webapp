@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
   Send,
   Trash2,
@@ -134,6 +134,9 @@ export default function AssistantPage() {
   const [isStreaming, setIsStreaming] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isInitialLoad = useRef(true);
 
   // Initialize Thread ID and load history from LocalStorage
   useEffect(() => {
@@ -159,7 +162,17 @@ export default function AssistantPage() {
         console.error('Failed to load chat history', err);
       }
     }
+
+    // Auto-focus input on page mount
+    inputRef.current?.focus();
   }, []);
+
+  // Re-focus input whenever streaming completes
+  useEffect(() => {
+    if (!isStreaming) {
+      inputRef.current?.focus();
+    }
+  }, [isStreaming]);
 
   // Save history to LocalStorage whenever messages change
   useEffect(() => {
@@ -168,13 +181,31 @@ export default function AssistantPage() {
     }
   }, [messages]);
 
-  // Auto-scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Scroll to bottom logic
+  const scrollToBottom = (instant = false) => {
+    if (chatContainerRef.current) {
+      if (instant) {
+        chatContainerRef.current.scrollTop =
+          chatContainerRef.current.scrollHeight;
+      } else {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   };
 
+  // Instant scroll to bottom on initial load / page open
+  useLayoutEffect(() => {
+    if (messages.length > 0 && isInitialLoad.current) {
+      scrollToBottom(true);
+      isInitialLoad.current = false;
+    }
+  }, [messages]);
+
+  // Smooth scroll during active streaming / new messages
   useEffect(() => {
-    scrollToBottom();
+    if (!isInitialLoad.current) {
+      scrollToBottom(false);
+    }
   }, [messages, isStreaming]);
 
   // Wipes local state and generates a fresh thread context
@@ -261,7 +292,13 @@ export default function AssistantPage() {
           );
         },
         onError: (err) => {
-          toast.error(err || 'Stream error occurred.');
+          const cleanErr = err
+            ? err.split('\n')[0].slice(0, 100)
+            : 'Stream error occurred.';
+          toast.error(cleanErr);
+          setMessages((prev) =>
+            prev.filter((m) => m.id !== assistantMsgId || m.content.length > 0)
+          );
           setIsStreaming(false);
         },
         onDone: () => {
@@ -271,8 +308,13 @@ export default function AssistantPage() {
       });
     } catch (err) {
       const errMsg =
-        err instanceof Error ? err.message : 'Failed to submit message.';
+        err instanceof Error
+          ? err.message.split('\n')[0].slice(0, 100)
+          : 'Failed to submit message.';
       toast.error(errMsg);
+      setMessages((prev) =>
+        prev.filter((m) => m.id !== assistantMsgId || m.content.length > 0)
+      );
       setIsStreaming(false);
     }
   };
@@ -280,22 +322,22 @@ export default function AssistantPage() {
   return (
     <div className="flex h-[calc(100vh-6.5rem)] w-full flex-col overflow-hidden rounded-md border border-border_light bg-bg_primary_light shadow-sm dark:border-border_dark dark:bg-bg_primary_dark">
       {/* Premium Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-bg_secondary_dark/40">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-emerald-500/10 p-2 dark:bg-emerald-500/20">
-            <Cpu className="h-5 w-5 text-[#059669] dark:text-emerald-400" />
+      <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800 dark:bg-bg_secondary_dark/40 sm:p-4">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <div className="shrink-0 rounded-lg bg-emerald-500/10 p-2 dark:bg-emerald-500/20">
+            <Cpu className="h-4 w-4 text-[#059669] dark:text-emerald-400 sm:h-5 sm:w-5" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold leading-snug tracking-tight text-text_primary_light dark:text-text_primary_dark">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <h2 className="text-sm font-bold leading-snug tracking-tight text-text_primary_light dark:text-text_primary_dark sm:text-base">
                 Cognitive Financial Engine
               </h2>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[8.5px] font-bold uppercase tracking-wider text-[#059669] dark:text-emerald-400 sm:px-2.5 sm:text-[9px]">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />{' '}
-                ENGINE STATE: ACTIVE
+                ACTIVE
               </span>
             </div>
-            <p className="mt-0.5 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+            <p className="mt-0.5 line-clamp-1 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400 sm:line-clamp-none sm:text-xs">
               Semantic ledger query orchestration, dynamic budget pacing
               analysis, and programmatic report compilation.
             </p>
@@ -305,16 +347,22 @@ export default function AssistantPage() {
         {messages.length > 0 && (
           <Button
             variant="ghost"
+            size="sm"
             onClick={handleClearHistory}
-            className="flex items-center gap-1.5 text-xs text-rose-500 hover:bg-rose-50/50 hover:text-rose-700 dark:hover:bg-rose-950/20"
+            className="flex h-8 shrink-0 items-center gap-1.5 px-2 text-xs text-rose-500 hover:bg-rose-50/50 hover:text-rose-700 dark:hover:bg-rose-950/20 sm:px-3"
           >
-            <Trash2 className="h-3.5 w-3.5" /> Clear History
+            <Trash2 className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Clear History</span>
+            <span className="sm:hidden">Clear</span>
           </Button>
         )}
       </div>
 
       {/* Message Feed */}
-      <div className="scrollbar-thin flex-1 space-y-6 overflow-y-auto p-5">
+      <div
+        ref={chatContainerRef}
+        className="scrollbar-thin flex-1 space-y-6 overflow-y-auto p-5"
+      >
         {messages.length === 0 ? (
           <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center space-y-6 p-8 text-center">
             <div className="animate-bounce-slow rounded-full bg-emerald-500/10 p-4">
@@ -444,6 +492,7 @@ export default function AssistantPage() {
           className="relative flex items-center"
         >
           <Input
+            ref={inputRef}
             type="text"
             placeholder={
               isStreaming
