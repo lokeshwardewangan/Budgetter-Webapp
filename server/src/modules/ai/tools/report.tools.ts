@@ -21,8 +21,8 @@ export function getReportTools(userId: string) {
       description:
         'Get deep spending analytics for a specific month and year, including categories breakdown, weekday/weekend split, and peak spending days.',
       schema: z.object({
-        month: z.number().int().min(1).max(12).describe('Month (1-12).'),
-        year: z.number().int().min(2000).describe('Year (4-digit, e.g., 2026).'),
+        month: z.number().describe('Month (1-12).'),
+        year: z.number().describe('Year (4-digit, e.g., 2026).'),
       }),
     },
   );
@@ -120,12 +120,9 @@ export function getReportTools(userId: string) {
         type: z.enum(['weekly', 'monthly', 'yearly']).describe('Period type of the report.'),
         month: z
           .number()
-          .int()
-          .min(1)
-          .max(12)
           .optional()
           .describe('Month (required for monthly report, optional otherwise).'),
-        year: z.number().int().min(2000).describe('Year.'),
+        year: z.number().describe('Year.'),
       }),
     },
   );

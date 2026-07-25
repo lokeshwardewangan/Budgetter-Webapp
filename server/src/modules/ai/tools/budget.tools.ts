@@ -30,8 +30,8 @@ export function getBudgetTools(userId: string) {
       description:
         'Get status of budgets for a specific month and year, including spending, remaining amounts, pacing status, and overrun alerts.',
       schema: z.object({
-        month: z.number().int().min(1).max(12).describe('Month (1-12).'),
-        year: z.number().int().min(2000).describe('Year (4-digit, e.g., 2026).'),
+        month: z.number().describe('Month (1-12).'),
+        year: z.number().describe('Year (4-digit, e.g., 2026).'),
         category: z
           .enum(['Overall', ...EXPENSE_CATEGORIES])
           .optional()
@@ -43,6 +43,9 @@ export function getBudgetTools(userId: string) {
   const createBudget = tool(
     async ({ category, limit, month, year }) => {
       try {
+        if (limit < 0) return 'Error: Budget limit cannot be negative.';
+        if (month < 1 || month > 12) return 'Error: Month must be between 1 and 12.';
+
         const result = await budgetService.upsertBudget(userId, {
           category,
           limit,
@@ -62,9 +65,9 @@ export function getBudgetTools(userId: string) {
         category: z
           .enum(['Overall', ...EXPENSE_CATEGORIES])
           .describe('Category name or "Overall".'),
-        limit: z.number().nonnegative().describe('Budget limit in INR.'),
-        month: z.number().int().min(1).max(12).describe('Month (1-12).'),
-        year: z.number().int().min(2000).describe('Year (4-digit, e.g., 2026).'),
+        limit: z.number().describe('Budget limit in INR.'),
+        month: z.number().describe('Month (1-12).'),
+        year: z.number().describe('Year (4-digit, e.g., 2026).'),
       }),
     },
   );
@@ -72,6 +75,9 @@ export function getBudgetTools(userId: string) {
   const updateBudget = tool(
     async ({ category, limit, month, year }) => {
       try {
+        if (limit < 0) return 'Error: Budget limit cannot be negative.';
+        if (month < 1 || month > 12) return 'Error: Month must be between 1 and 12.';
+
         const result = await budgetService.upsertBudget(userId, {
           category,
           limit,
@@ -91,9 +97,9 @@ export function getBudgetTools(userId: string) {
         category: z
           .enum(['Overall', ...EXPENSE_CATEGORIES])
           .describe('Category name or "Overall".'),
-        limit: z.number().nonnegative().describe('New budget limit in INR.'),
-        month: z.number().int().min(1).max(12).describe('Month (1-12).'),
-        year: z.number().int().min(2000).describe('Year (4-digit, e.g., 2026).'),
+        limit: z.number().describe('New budget limit in INR.'),
+        month: z.number().describe('Month (1-12).'),
+        year: z.number().describe('Year (4-digit, e.g., 2026).'),
       }),
     },
   );
