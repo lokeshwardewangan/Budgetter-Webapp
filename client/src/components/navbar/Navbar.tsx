@@ -82,21 +82,43 @@ const Navbar: React.FC = () => {
 
           {/* Navigation - Large Screens */}
           <div className="hidden items-center space-x-5 lg:flex">
-            {navListArray.map(({ route, name }, index) => (
-              <a
-                key={index}
-                href={`/${route}`}
-                className="top_nav_list relative rounded-lg p-0.5 py-0.5 text-sm font-medium capitalize text-[#1a1a1a] transition-all duration-300 ease-in before:absolute before:bottom-0 before:left-0 before:h-[1.5px] before:w-0 before:bg-[#317c63] before:transition-all before:duration-300 hover:before:w-full 2xl:text-base"
-                style={{ textUnderlineOffset: '8px' }}
-              >
-                <span>{name}</span>
-              </a>
-            ))}
+            {navListArray.map(({ route, name, isAi }, index) => {
+              const href = route.startsWith('#') ? route : `/${route}`;
+              if (isAi) {
+                return (
+                  <a
+                    key={index}
+                    href={href}
+                    className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 transition-all duration-300 hover:scale-105 hover:bg-emerald-500/20 hover:shadow-md hover:shadow-emerald-500/10 dark:text-emerald-300"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                    </span>
+                    <span>{name}</span>
+                    <span className="py-0.2 rounded-full bg-emerald-600 px-1.5 text-[8px] font-black uppercase text-white">
+                      NEW
+                    </span>
+                  </a>
+                );
+              }
+
+              return (
+                <a
+                  key={index}
+                  href={href}
+                  className="top_nav_list relative rounded-lg p-0.5 py-0.5 text-sm font-medium capitalize text-[#1a1a1a] transition-all duration-300 ease-in before:absolute before:bottom-0 before:left-0 before:h-[1.5px] before:w-0 before:bg-[#317c63] before:transition-all before:duration-300 hover:before:w-full 2xl:text-base"
+                  style={{ textUnderlineOffset: '8px' }}
+                >
+                  <span>{name}</span>
+                </a>
+              );
+            })}
             <Link
               to="/login"
               className="rounded-full bg-gradient-to-r from-[#065f46]/80 via-[#047857]/80 to-[#059669]/80 px-4 py-1.5 text-xs text-white shadow-xl transition-transform duration-300 hover:scale-105 hover:bg-gradient-to-br 2xl:px-6 2xl:text-sm 2xl:font-semibold"
             >
-              Login Today ?
+              Login Today
             </Link>
           </div>
         </motion.div>
@@ -128,21 +150,31 @@ const Navbar: React.FC = () => {
               className={`menu_phone_container fixed right-2 top-16 z-50 mt-2 w-full max-w-[16rem] rounded-lg bg-white py-4 text-center font-karla text-black shadow-md lg:hidden`}
             >
               <motion.div className="flex flex-col justify-center">
-                {navListArray.map(({ route, name }, index) => (
-                  <motion.a
-                    variants={MENU_ITEM_EFFECT_VARIENT}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    key={index}
-                    href={`/${route}`}
-                    onClick={() => setIsOpen(false)}
-                    className="block py-3 pl-6 text-left text-base font-bold capitalize transition-all duration-300 ease-in hover:underline focus:underline focus:outline-none"
-                    style={{ textUnderlineOffset: '8px' }}
-                  >
-                    {name}
-                  </motion.a>
-                ))}
+                {navListArray.map(({ route, name, isAi }, index) => {
+                  const href = route.startsWith('#') ? route : `/${route}`;
+                  return (
+                    <motion.a
+                      variants={MENU_ITEM_EFFECT_VARIENT}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      key={index}
+                      href={href}
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center justify-between px-6 py-3 text-left text-base font-bold capitalize transition-all duration-300 ease-in hover:underline focus:underline focus:outline-none ${
+                        isAi ? 'text-emerald-600' : ''
+                      }`}
+                      style={{ textUnderlineOffset: '8px' }}
+                    >
+                      <span>{name}</span>
+                      {isAi && (
+                        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
+                          AI ✨
+                        </span>
+                      )}
+                    </motion.a>
+                  );
+                })}
                 <hr />
                 {/* <motion.div className="switch_theme flex justify-between px-6 py-3 pb-0 text-base font-medium">
                   <motion.div

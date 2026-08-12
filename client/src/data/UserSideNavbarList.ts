@@ -33,7 +33,7 @@ export const userSidenavbarList: userSidenavbarListType[] = [
   },
   {
     route: 'user/show-expenses',
-    name: 'All Expenses',
+    name: 'Expense History',
     icon: Receipt,
   },
   {

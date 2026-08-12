@@ -1,31 +1,29 @@
 type navListType = {
   route: string;
   name: string;
+  isAi?: boolean;
 };
 
 export const navListArray: navListType[] = [
-  {
-    route: '#main_layout',
-    name: 'Home',
-  },
   {
     route: '#features_section',
     name: 'Features',
   },
   {
-    route: '#getintouch_section',
-    name: 'Get in Touch',
-  },
-  {
-    route: '#testimonials_section',
-    name: 'Testimonials',
+    route: '#ai_showcase_section',
+    name: 'AI Agent',
+    isAi: true,
   },
   {
     route: '#insightspreview_section',
     name: 'Insights',
   },
   {
-    route: '#usefullforstudent_section',
-    name: 'For Students',
+    route: '#testimonials_section',
+    name: 'Reviews',
+  },
+  {
+    route: '#getintouch_section',
+    name: 'Contact',
   },
 ];

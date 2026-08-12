@@ -28,8 +28,8 @@ const HeroSection: React.FC = () => {
     >
       <div className="hero_section_content z-10 flex w-full max-w-xl flex-col justify-center gap-5 xl:w-1/2 xl:max-w-none">
         <motion.div variants={ANIMATE_WORDS_VARIENT}>
-          <span className="mb-3 inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-            ✨ Comprehensive Financial Insights
+          <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <span>🤖 Powered by AI Financial Copilot & Smart Pacing</span>
           </span>
           <h1 className="hero_section_title font-bree text-4xl font-semibold leading-tight text-slate-900 dark:text-white sm:text-5xl lg:text-5xl">
             Track Every Rupee. <br className="hidden sm:block" />
@@ -55,12 +55,11 @@ const HeroSection: React.FC = () => {
 
         <motion.p
           variants={ANIMATE_WORDS_VARIENT}
-          className="hero_section_description text-base font-medium text-slate-600 dark:text-slate-300 sm:text-lg lg:max-w-lg"
+          className="hero_section_description text-base font-normal leading-relaxed text-slate-700 dark:text-slate-200 sm:text-lg lg:max-w-xl"
         >
-          Budgetter helps you record daily expenses, analyze spending habits,
-          and manage your money with clear dashboaTrack daily expenses, manage
-          income, and clearly see where your money goes—so you stay in control
-          every day.
+          Take control of your finances with an intuitive AI copilot, real-time
+          budget pacing, and smart expense tracking — built to help you save
+          effortlessly every day.
         </motion.p>
 
         <motion.div
@@ -71,9 +70,9 @@ const HeroSection: React.FC = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             to="/login"
-            className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-2 text-sm font-bold text-white shadow-lg transition-all hover:shadow-emerald-500/30"
+            className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:shadow-emerald-500/30"
           >
-            <span className="relative z-10">Get Started Now</span>
+            <span className="relative z-10">Try AI Assistant</span>
             <svg
               className="relative z-10 h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1"
               fill="none"
@@ -164,7 +163,23 @@ const HeroSection: React.FC = () => {
               height={600}
               decoding="async"
             />
-            {/* Floating UI Card Decoration */}
+            {/* Top-Right AI Floating Card */}
+            <motion.div
+              initial={{ y: -15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="absolute -right-3 -top-3 hidden items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-slate-900/90 px-3 py-2 text-white shadow-xl backdrop-blur-md sm:flex"
+            >
+              <div className="relative flex h-3 w-3 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </div>
+              <span className="text-xs font-bold text-emerald-300">
+                AI Assistant Active
+              </span>
+            </motion.div>
+
+            {/* Bottom-Left Floating UI Card Decoration */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
