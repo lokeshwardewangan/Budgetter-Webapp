@@ -4,7 +4,22 @@ type cardDataType = {
   icon: string;
   bg: string;
 };
+
 export const cardData: cardDataType[] = [
+  {
+    title: 'AI Financial Copilot',
+    description:
+      'Talk naturally to log transactions, query your ledger, analyze budget pacing, or compile instant spending reports.',
+    icon: 'ri-robot-2-line',
+    bg: '#A7F3D0',
+  },
+  {
+    title: 'Smart Budget Pacing',
+    description:
+      'Set monthly overall and category budgets with live pacing warnings to prevent end-of-month overspending.',
+    icon: 'ri-target-line',
+    bg: '#BFDBFE',
+  },
   {
     title: 'Track Your Expenses',
     description:
@@ -41,30 +56,16 @@ export const cardData: cardDataType[] = [
     bg: '#FFC300',
   },
   {
-    title: 'Expense Filtering',
+    title: 'Expense Filtering & Export',
     description:
-      'Filter expenses by date, category, or amount to easily find specific transactions.',
-    icon: 'ri-filter-line',
-    bg: '#C1FFD7',
-  },
-  {
-    title: 'Generate Reports',
-    description:
-      'Create reports by date or category for easy review and research purposes.',
+      'Filter expenses by date, category, or amount, and export beautiful PDF reports with one click.',
     icon: 'ri-file-chart-line',
     bg: '#D3C0F9',
   },
   {
-    title: 'Easy to Use',
+    title: 'Dark Mode & Privacy',
     description:
-      'Simple design focused on making budgeting easy for students new to managing money.',
-    icon: 'ri-user-smile-line',
-    bg: '#FFDAC1',
-  },
-  {
-    title: 'Dark Mode',
-    description:
-      'Switch to dark mode for a comfortable viewing experience, day or night.',
+      'Switch to dark mode and enable dashboard balance blur mode for maximum privacy and comfort.',
     icon: 'ri-moon-line',
     bg: '#F3E8FF',
   },

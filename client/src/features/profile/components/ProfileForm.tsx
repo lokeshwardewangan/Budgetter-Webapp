@@ -10,6 +10,8 @@ import { useMe } from '@/features/user/hooks';
 import { DatePicker } from '@/components/ui/DatePicker';
 import {
   Briefcase,
+  Eye,
+  EyeOff,
   Facebook,
   IndianRupee,
   Instagram,
@@ -36,6 +38,8 @@ export default function ProfileForm() {
   const { data: user } = useMe();
   const { mutateAsync: save, isPending } = useUpdateProfile();
   const passwordSection = useDialogState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [isPrivacyMode, setIsPrivacyMode] = useState(
     () => localStorage.getItem('pocket_money_privacy') !== 'visible'
   );
@@ -222,18 +226,54 @@ export default function ProfileForm() {
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-2 space-y-2">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input
-              {...register('currentPassword')}
-              type="password"
-              placeholder="Current Password"
-              autoComplete="current-password"
-            />
-            <Input
-              {...register('newPassword')}
-              type="password"
-              placeholder="New Password"
-              autoComplete="new-password"
-            />
+            <div className="relative w-full">
+              <Input
+                {...register('currentPassword')}
+                type={showCurrentPassword ? 'text' : 'password'}
+                placeholder="Current Password"
+                autoComplete="current-password"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                aria-label={
+                  showCurrentPassword
+                    ? 'Hide current password'
+                    : 'Show current password'
+                }
+              >
+                {showCurrentPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            <div className="relative w-full">
+              <Input
+                {...register('newPassword')}
+                type={showNewPassword ? 'text' : 'password'}
+                placeholder="New Password"
+                autoComplete="new-password"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                aria-label={
+                  showNewPassword ? 'Hide new password' : 'Show new password'
+                }
+              >
+                {showNewPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
           </div>
           {errors.newPassword?.message && (
             <span

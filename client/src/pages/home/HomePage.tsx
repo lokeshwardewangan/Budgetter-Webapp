@@ -9,6 +9,11 @@ import { Tooltip } from 'react-tooltip';
 
 // Lazy Imports for Performance
 const Features = lazy(() => import('@/components/home/Features'));
+const AiAssistantShowcase = lazy(() =>
+  import('@/components/home/AiAssistantShowcase').then((module) => ({
+    default: module.AiAssistantShowcase,
+  }))
+);
 const ContactSection = lazy(
   () => import('@/components/home/GetInTouchSection')
 );
@@ -36,9 +41,9 @@ import { SOCIAL_LINKS } from '@/shared/lib/constants';
 
 const HomePage: React.FC = () => {
   const seoData = {
-    title: 'Budgetter - Smart Finance Tracker for Students',
+    title: 'Budgetter - Smart Finance Tracker & AI Copilot for Students',
     description:
-      'Take control of your student finances with Budgetter. Track expenses, analytics habits, and save money with our easy-to-use budget planner.',
+      'Take control of your student finances with Budgetter. AI Assistant, real-time budget pacing, expense tracking, and instant report compilation.',
     image:
       'https://budgetter.lokeshwardewangan.in/assets/dashboard/hero-min.svg',
     structuredData: {
@@ -52,7 +57,7 @@ const HomePage: React.FC = () => {
         price: '0',
         priceCurrency: 'INR',
       },
-      description: 'Take control of your student finances with Budgetter.',
+      description: 'Take control of your student finances with Budgetter AI.',
       image:
         'https://budgetter.lokeshwardewangan.in/assets/dashboard/hero-min.svg',
       author: {
@@ -88,6 +93,7 @@ const HomePage: React.FC = () => {
           }
         >
           <Features />
+          <AiAssistantShowcase />
           <WhyItIsUseful />
           <InsightsPreview />
           <Testimonials />
